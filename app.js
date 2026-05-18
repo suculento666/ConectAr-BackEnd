@@ -1,8 +1,8 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import 'dotenv/config';
 
-import db from './src/configs/db.js';
+import supabase from './src/configs/supabase.js';
 import userRoutes from './src/routes/userRoutes.js';
 import eventRoutes from './src/routes/eventRoutes.js';
 
@@ -17,8 +17,18 @@ app.use('/api/users', userRoutes);
 app.use('/api/events', eventRoutes);
 
 // Ruta de prueba
-app.get('/', (req, res) => {
+app.get('/', (_req, res) => {
   res.json({ message: 'ConectAr API funcionando' });
+});
+
+// Verificar conexión con Supabase
+supabase.from('_test_').select('*').limit(1).then(({ error }) => {
+  // PGRST116 = tabla vacía, 42P01 = tabla no existe → ambos significan que la conexión funciona
+  if (!error || error.code === 'PGRST116' || error.code === '42P01' || error.message.includes('schema cache')) {
+    console.log('✅ Conectado a Supabase');
+  } else {
+    console.error('❌ Error conectando a Supabase:', error.message);
+  }
 });
 
 // Puerto
