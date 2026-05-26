@@ -1,49 +1,106 @@
 // eventController.js - maneja eventos, participación y feedback
+import {
+  newEvent, getEvents, getEvent, editEvent, removeEvent,
+  participateInEvent, cancelParticipation, getEventParticipants,
+  submitFeedback,
+} from '../services/event.service.js';
 
-const createEvent = (req, res) => {
-  res.json({ message: 'createEvent - próximamente' });
+// GET /api/events - trae todos los eventos
+const getAllEvents = async (_req, res) => {
+  try {
+    const events = await getEvents();
+    res.status(200).json(events);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
 
-const getAllEvents = (req, res) => {
-  res.json({ message: 'getAllEvents - próximamente' });
+// GET /api/events/:id - trae un evento por id
+const getEventById = async (req, res) => {
+  try {
+    const event = await getEvent(req.params.id);
+    res.status(200).json(event);
+  } catch (err) {
+    res.status(404).json({ error: err.message });
+  }
 };
 
-const getEventById = (req, res) => {
-  res.json({ message: 'getEventById - próximamente' });
+// POST /api/events - crea un evento
+const createEvent = async (req, res) => {
+  try {
+    const { creator_id, title, description, location, event_date, event_type, accessibility, max_participants, image_url } = req.body;
+    const event = await newEvent({ creator_id, title, description, location, event_date, event_type, accessibility, max_participants, image_url });
+    res.status(201).json(event);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 };
 
-const updateEvent = (req, res) => {
-  res.json({ message: 'updateEvent - próximamente' });
+// PUT /api/events/:id - edita un evento
+const updateEvent = async (req, res) => {
+  try {
+    const event = await editEvent(req.params.id, req.body);
+    res.status(200).json(event);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 };
 
-const deleteEvent = (req, res) => {
-  res.json({ message: 'deleteEvent - próximamente' });
+// DELETE /api/events/:id - elimina un evento
+const deleteEvent = async (req, res) => {
+  try {
+    const result = await removeEvent(req.params.id);
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 };
 
-const joinEvent = (req, res) => {
-  res.json({ message: 'joinEvent - próximamente' });
+// POST /api/events/:id/join - un usuario se une a un evento
+const joinEvent = async (req, res) => {
+  try {
+    const { user_id } = req.body;
+    const participation = await participateInEvent({ user_id, event_id: req.params.id });
+    res.status(201).json(participation);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 };
 
-const leaveEvent = (req, res) => {
-  res.json({ message: 'leaveEvent - próximamente' });
+// DELETE /api/events/:id/join - un usuario abandona un evento
+const leaveEvent = async (req, res) => {
+  try {
+    const { user_id } = req.body;
+    const result = await cancelParticipation({ user_id, event_id: req.params.id });
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 };
 
-const getParticipants = (req, res) => {
-  res.json({ message: 'getParticipants - próximamente' });
+// GET /api/events/:id/participants - trae los participantes de un evento
+const getParticipants = async (req, res) => {
+  try {
+    const participants = await getEventParticipants(req.params.id);
+    res.status(200).json(participants);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
 
-const createFeedback = (req, res) => {
-  res.json({ message: 'createFeedback - próximamente' });
+// POST /api/events/:id/feedback - envía feedback de un evento
+const createFeedback = async (req, res) => {
+  try {
+    const { usuario_id, puntuacion, comentario } = req.body;
+    const feedback = await submitFeedback({ usuario_id, evento_id: req.params.id, puntuacion, comentario });
+    res.status(201).json(feedback);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 };
 
 export {
-  createEvent,
-  getAllEvents,
-  getEventById,
-  updateEvent,
-  deleteEvent,
-  joinEvent,
-  leaveEvent,
-  getParticipants,
+  getAllEvents, getEventById, createEvent, updateEvent, deleteEvent,
+  joinEvent, leaveEvent, getParticipants,
   createFeedback,
 };

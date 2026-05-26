@@ -1,12 +1,12 @@
 import express from 'express';
+import { registerUser, loginUser, getAllUsers, getUserById, updateUser } from '../controllers/userController.js';
+
 const router = express.Router();
 
-router.get('/', (req, res) => {
-  res.json({ message: 'GET /api/users - próximamente' });
-});
-
-router.post('/', (req, res) => {
-  res.json({ message: 'POST /api/users - próximamente' });
-});
+router.post('/register', registerUser);
+router.post('/login', loginUser);
+router.get('/', getAllUsers);
+router.get('/:id', getUserById);
+router.put('/:id', updateUser);
 
 export default router;
