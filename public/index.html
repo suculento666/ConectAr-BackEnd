@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ConectAr API</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #0f0f13; color: #e2e2e2; min-height: 100vh; }
+    header { background: linear-gradient(135deg,#1a1a2e,#16213e); padding: 1.5rem 2rem; border-bottom: 1px solid #2a2a4a; display: flex; align-items: center; gap: 1rem; }
+    header h1 { font-size: 1.6rem; color: #7c6af7; }
+    header p  { color: #888; font-size: 0.85rem; margin-top: 0.2rem; }
+    .badge { margin-left: auto; background: #1e3a2f; color: #4ade80; font-size: 0.72rem; padding: 0.25rem 0.7rem; border-radius: 999px; border: 1px solid #4ade8044; font-weight: 600; }
+    .tabs { display: flex; border-bottom: 1px solid #2a2a3e; background: #13131a; padding: 0 2rem; }
+    .tab { padding: 0.75rem 1.2rem; font-size: 0.85rem; cursor: pointer; color: #666; border-bottom: 2px solid transparent; transition: all 0.15s; user-select: none; }
+    .tab:hover { color: #aaa; }
+    .tab.active { color: #a89cf7; border-bottom-color: #7c6af7; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .page { max-width: 1100px; margin: 1.5rem auto; padding: 0 1.5rem; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+    @media (max-width: 750px) { .grid-2 { grid-template-columns: 1fr; } }
+    .card { background: #16161e; border: 1px solid #2a2a3e; border-radius: 10px; overflow: hidden; }
+    .card h2 { padding: 0.85rem 1.1rem; font-size: 0.82rem; font-weight: 700; background: #1e1e2e; border-bottom: 1px solid #2a2a3e; color: #a89cf7; letter-spacing: 0.06em; text-transform: uppercase; }
+    .route { display: flex; align-items: center; gap: 0.7rem; padding: 0.6rem 1.1rem; cursor: pointer; transition: background 0.12s; border-bottom: 1px solid #1e1e2e; }
+    .route:last-child { border-bottom: none; }
+    .route:hover { background: #1e1e2e; }
+    .method { font-size: 0.68rem; font-weight: 700; padding: 0.18rem 0.45rem; border-radius: 4px; min-width: 48px; text-align: center; letter-spacing: 0.04em; }
+    .GET    { background: #0d3321; color: #4ade80; border: 1px solid #4ade8033; }
+    .POST   { background: #1a2d4a; color: #60a5fa; border: 1px solid #60a5fa33; }
+    .PUT    { background: #2d2010; color: #fb923c; border: 1px solid #fb923c33; }
+    .DELETE { background: #2d1010; color: #f87171; border: 1px solid #f8717133; }
+    .route-path { font-size: 0.82rem; color: #ccc; font-family: monospace; }
+    .route-desc { font-size: 0.72rem; color: #555; margin-left: auto; }
+    .insert-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(220px,1fr)); gap: 0.8rem; padding: 1rem; }
+    .insert-btn { background: #1e1e2e; border: 1px solid #2a2a3e; border-radius: 8px; padding: 0.9rem 1rem; cursor: pointer; text-align: left; transition: border-color 0.15s,background 0.15s; }
+    .insert-btn:hover { background: #252535; border-color: #7c6af7; }
+    .insert-btn .ib-label { font-size: 0.78rem; font-weight: 600; color: #a89cf7; margin-bottom: 0.3rem; }
+    .insert-btn .ib-desc  { font-size: 0.72rem; color: #666; line-height: 1.4; }
+    .insert-btn .ib-method { display: inline-block; margin-bottom: 0.4rem; }
+    .tester-body { padding: 1.1rem; display: grid; grid-template-columns: 80px 1fr auto; gap: 0.7rem; align-items: start; }
+    select,input,textarea { background: #0f0f13; border: 1px solid #2a2a3e; color: #e2e2e2; border-radius: 6px; padding: 0.45rem 0.75rem; font-size: 0.83rem; font-family: monospace; width: 100%; }
+    select:focus,input:focus,textarea:focus { outline: none; border-color: #7c6af7; }
+    textarea { grid-column: 1/-1; resize: vertical; min-height: 100px; }
+    button.send-btn { background: #7c6af7; color: white; border: none; border-radius: 6px; padding: 0.45rem 1.1rem; cursor: pointer; font-size: 0.83rem; font-weight: 600; transition: background 0.15s; white-space: nowrap; }
+    button.send-btn:hover { background: #6a58e0; }
+    .response-box { grid-column: 1/-1; background: #0a0a10; border: 1px solid #2a2a3e; border-radius: 6px; padding: 0.9rem; font-family: monospace; font-size: 0.78rem; min-height: 80px; white-space: pre-wrap; word-break: break-all; color: #a0f0a0; max-height: 320px; overflow-y: auto; }
+    .status-ok  { color: #4ade80; }
+    .status-err { color: #f87171; }
+    .status-line { grid-column: 1/-1; font-size: 0.75rem; color: #555; }
+    .mt { margin-top: 1.2rem; }
+
+    
+    /* feed */
+    .feed-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.2rem; }
+    .feed-header h3 { font-size: 0.9rem; color: #888; font-weight: 400; }
+    .feed-header button { background: #1e1e2e; border: 1px solid #2a2a3e; color: #a89cf7; border-radius: 6px; padding: 0.4rem 1rem; cursor: pointer; font-size: 0.8rem; transition: border-color 0.15s; }
+    .feed-header button:hover { border-color: #7c6af7; }
+    .feed-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap: 1.2rem; }
+    .event-card { background: #16161e; border: 1px solid #2a2a3e; border-radius: 12px; overflow: hidden; transition: border-color 0.15s,transform 0.15s; }
+    .event-card:hover { border-color: #7c6af7; transform: translateY(-2px); }
+    .event-card-img { width: 100%; height: 140px; object-fit: cover; display: block; background: #1e1e2e; }
+    .event-card-placeholder { width: 100%; height: 140px; display: flex; align-items: center; justify-content: center; font-size: 3rem; background: #1e1e2e; }
+    .event-card-body { padding: 1rem; }
+    .event-card-type { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 0.18rem 0.5rem; border-radius: 4px; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .type-deporte   { background: #0d3321; color: #4ade80; border: 1px solid #4ade8033; }
+    .type-concierto { background: #2d1040; color: #c084fc; border: 1px solid #c084fc33; }
+    .type-cultura   { background: #1a2d4a; color: #60a5fa; border: 1px solid #60a5fa33; }
+    .type-fiesta    { background: #2d2010; color: #fb923c; border: 1px solid #fb923c33; }
+    .type-otro      { background: #1e1e2e; color: #94a3b8; border: 1px solid #94a3b833; }
+    .event-card-title { font-size: 0.95rem; font-weight: 600; color: #e2e2e2; margin-bottom: 0.4rem; line-height: 1.3; }
+    .event-card-desc { font-size: 0.78rem; color: #666; line-height: 1.5; margin-bottom: 0.8rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .event-card-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; font-size: 0.72rem; color: #555; }
+    .event-meta-item { display: flex; align-items: center; gap: 0.25rem; background: #1e1e2e; padding: 0.2rem 0.5rem; border-radius: 4px; }
+    .access-publico { color: #4ade80; }
+    .access-privado { color: #f87171; }
+    .feed-empty { grid-column: 1/-1; text-align: center; padding: 4rem 2rem; color: #444; }
+    .feed-empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .feed-empty p { font-size: 0.85rem; }
+    .feed-loading { grid-column: 1/-1; text-align: center; padding: 3rem; color: #555; font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>ConectAr API</h1>
+    <p>Panel de desarrollo provisional</p>
+  </div>
+  <span class="badge" id="statusBadge">Verificando...</span>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('routes')">Rutas</div>
+  <div class="tab" onclick="switchTab('inserts')">Inserts rápidos</div>
+  <div class="tab" onclick="switchTab('feed')">Feed</div>
+  <div class="tab" onclick="switchTab('tester')">Tester</div>
+</div>
+
+<!-- TAB: RUTAS -->
+<div class="tab-content active" id="tab-routes">
+  <div class="page">
+    <div class="grid-2">
+      <div class="card">
+        <h2>👤 Usuarios</h2>
+        <div class="route" onclick="goTester('POST','/api/users/register',JSON.stringify({email:'maria.garcia@gmail.com',password:'Pass1234!',username:'mariag',full_name:'Maria Garcia',bio:'Amante del deporte y la musica'},null,2))">
+          <span class="method POST">POST</span><span class="route-path">/api/users/register</span><span class="route-desc">Registrar usuario</span>
+        </div>
+        <div class="route" onclick="goTester('POST','/api/users/login',JSON.stringify({email:'maria.garcia@gmail.com',password:'Pass1234!'},null,2))">
+          <span class="method POST">POST</span><span class="route-path">/api/users/login</span><span class="route-desc">Login</span>
+        </div>
+        <div class="route" onclick="goTester('GET','/api/users','')">
+          <span class="method GET">GET</span><span class="route-path">/api/users</span><span class="route-desc">Todos los usuarios</span>
+        </div>
+        <div class="route" onclick="goTester('GET','/api/users/:id','')">
+          <span class="method GET">GET</span><span class="route-path">/api/users/:id</span><span class="route-desc">Usuario por ID</span>
+        </div>
+        <div class="route" onclick="goTester('PUT','/api/users/:id',JSON.stringify({bio:'Nueva bio',avatar_url:'https://i.pravatar.cc/150'},null,2))">
+          <span class="method PUT">PUT</span><span class="route-path">/api/users/:id</span><span class="route-desc">Editar perfil</span>
+        </div>
+      </div>
+      <div class="card">
+        <h2>📅 Eventos</h2>
+        <div class="route" onclick="goTester('GET','/api/events','')">
+          <span class="method GET">GET</span><span class="route-path">/api/events</span><span class="route-desc">Todos los eventos</span>
+        </div>
+        <div class="route" onclick="goTester('GET','/api/events/:id','')">
+          <span class="method GET">GET</span><span class="route-path">/api/events/:id</span><span class="route-desc">Evento por ID</span>
+        </div>
+        <div class="route" onclick="goTester('POST','/api/events',JSON.stringify({creator_id:'UUID',title:'Futbol 5',description:'Partido amistoso',location:'Palermo, CABA',event_date:'2026-06-15T18:00:00Z',event_type:'deporte',accessibility:'publico',max_participants:10,image_url:''},null,2))">
+          <span class="method POST">POST</span><span class="route-path">/api/events</span><span class="route-desc">Crear evento</span>
+        </div>
+        <div class="route" onclick="goTester('PUT','/api/events/:id',JSON.stringify({title:'Titulo actualizado',max_participants:20},null,2))">
+          <span class="method PUT">PUT</span><span class="route-path">/api/events/:id</span><span class="route-desc">Editar evento</span>
+        </div>
+        <div class="route" onclick="goTester('DELETE','/api/events/:id','')">
+          <span class="method DELETE">DEL</span><span class="route-path">/api/events/:id</span><span class="route-desc">Eliminar evento</span>
+        </div>
+      </div>
+      <div class="card">
+        <h2>🤝 Participaciones</h2>
+        <div class="route" onclick="goTester('GET','/api/events/:id/participants','')">
+          <span class="method GET">GET</span><span class="route-path">/api/events/:id/participants</span><span class="route-desc">Ver participantes</span>
+        </div>
+        <div class="route" onclick="goTester('POST','/api/events/:id/join',JSON.stringify({user_id:'UUID'},null,2))">
+          <span class="method POST">POST</span><span class="route-path">/api/events/:id/join</span><span class="route-desc">Unirse al evento</span>
+        </div>
+        <div class="route" onclick="goTester('DELETE','/api/events/:id/join',JSON.stringify({user_id:'UUID'},null,2))">
+          <span class="method DELETE">DEL</span><span class="route-path">/api/events/:id/join</span><span class="route-desc">Abandonar evento</span>
+        </div>
+      </div>
+      <div class="card">
+        <h2>⭐ Feedback</h2>
+        <div class="route" onclick="goTester('POST','/api/events/:id/feedback',JSON.stringify({usuario_id:'UUID',puntuacion:5,comentario:'Excelente evento'},null,2))">
+          <span class="method POST">POST</span><span class="route-path">/api/events/:id/feedback</span><span class="route-desc">Enviar feedback</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB: INSERTS -->
+<div class="tab-content" id="tab-inserts">
+  <div class="page">
+    <div class="card">
+      <h2>👤 Usuarios de prueba</h2>
+      <div class="insert-grid">
+        <div class="insert-btn" onclick="goTester('POST','/api/users/register',JSON.stringify({email:'carlos.perez@gmail.com',password:'Pass1234!',username:'carlosp',full_name:'Carlos Perez',bio:'Me gusta el futbol y los asados'},null,2))">
+          <div class="ib-method"><span class="method POST">POST</span></div>
+          <div class="ib-label">Carlos Perez</div>
+          <div class="ib-desc">carlos.perez@gmail.com</div>
+        </div>
+        <div class="insert-btn" onclick="goTester('POST','/api/users/register',JSON.stringify({email:'laura.vidal@gmail.com',password:'Pass1234!',username:'laurav',full_name:'Laura Vidal',bio:'Yoga, meditacion y running'},null,2))">
+          <div class="ib-method"><span class="method POST">POST</span></div>
+          <div class="ib-label">Laura Vidal</div>
+          <div class="ib-desc">laura.vidal@gmail.com</div>
+        </div>
+        <div class="insert-btn" onclick="goTester('POST','/api/users/register',JSON.stringify({email:'martin.rodriguez@hotmail.com',password:'Pass1234!',username:'martinr',full_name:'Martin Rodriguez',bio:'Musico y amante de los eventos culturales'},null,2))">
+          <div class="ib-method"><span class="method POST">POST</span></div>
+          <div class="ib-label">Martin Rodriguez</div>
+          <div class="ib-desc">martin.rodriguez@hotmail.com</div>
+        </div>
+        <div class="insert-btn" onclick="goTester('POST','/api/users/register',JSON.stringify({email:'sofia.martinez@outlook.com',password:'Pass1234!',username:'sofiam',full_name:'Sofia Martinez',bio:'Fotografa y viajera'},null,2))">
+          <div class="ib-method"><span class="method POST">POST</span></div>
+          <div class="ib-label">Sofia Martinez</div>
+          <div class="ib-desc">sofia.martinez@outlook.com</div>
+        </div>
+      </div>
+    </div>
+    <div class="card mt">
+      <h2>📅 Eventos de prueba</h2>
+      <div class="insert-grid">
+        <div class="insert-btn" onclick="goTester('POST','/api/events',JSON.stringify({creator_id:'REEMPLAZAR-UUID',title:'Futbol 5 en Palermo',description:'Partido amistoso, todos los niveles bienvenidos. Traer botines y agua.',location:'Palermo, CABA',event_date:'2026-06-15T18:00:00Z',event_type:'deporte',accessibility:'publico',max_participants:10},null,2))">
+          <div class="ib-method"><span class="method POST">POST</span></div>
+          <div class="ib-label">Futbol 5 en Palermo</div>
+          <div class="ib-desc">deporte · publico · 10 participantes</div>
+        </div>
+        <div class="insert-btn" onclick="goTester('POST','/api/events',JSON.stringify({creator_id:'REEMPLAZAR-UUID',title:'Clase de yoga en el parque',description:'Sesion de yoga para principiantes al aire libre. Traer mat.',location:'Parque Centenario, CABA',event_date:'2026-06-20T09:00:00Z',event_type:'deporte',accessibility:'publico',max_participants:20},null,2))">
+          <div class="ib-method"><span class="method POST">POST</span></div>
+          <div class="ib-label">Yoga en el parque</div>
+          <div class="ib-desc">deporte · publico · 20 participantes</div>
+        </div>
+        <div class="insert-btn" onclick="goTester('POST','/api/events',JSON.stringify({creator_id:'REEMPLAZAR-UUID',title:'Jam session de jazz',description:'Noche de improvisacion jazz. Musicos de todos los niveles.',location:'San Telmo, CABA',event_date:'2026-06-22T21:00:00Z',event_type:'concierto',accessibility:'privado',max_participants:30},null,2))">
+          <div class="ib-method"><span class="method POST">POST</span></div>
+          <div class="ib-label">Jam session de jazz</div>
+          <div class="ib-desc">concierto · privado · 30 participantes</div>
+        </div>
+        <div class="insert-btn" onclick="goTester('POST','/api/events',JSON.stringify({creator_id:'REEMPLAZAR-UUID',title:'Workshop de fotografia urbana',description:'Recorrido fotografico por el microcentro con feedback grupal.',location:'Microcentro, CABA',event_date:'2026-06-28T10:00:00Z',event_type:'cultura',accessibility:'publico',max_participants:15},null,2))">
+          <div class="ib-method"><span class="method POST">POST</span></div>
+          <div class="ib-label">Workshop de fotografia</div>
+          <div class="ib-desc">cultura · publico · 15 participantes</div>
+        </div>
+        <div class="insert-btn" onclick="goTester('POST','/api/events',JSON.stringify({creator_id:'REEMPLAZAR-UUID',title:'Meetup de desarrollo web',description:'Charlas sobre React, Node y buenas practicas.',location:'Online',event_date:'2026-07-05T19:00:00Z',event_type:'otro',accessibility:'publico',max_participants:100},null,2))">
+          <div class="ib-method"><span class="method POST">POST</span></div>
+          <div class="ib-label">Meetup dev web</div>
+          <div class="ib-desc">otro · publico · 100 participantes</div>
+        </div>
+        <div class="insert-btn" onclick="goTester('POST','/api/events',JSON.stringify({creator_id:'REEMPLAZAR-UUID',title:'Caminata por la Reserva Ecologica',description:'Caminata guiada de 2hs por la reserva. Apto para toda la familia.',location:'Reserva Ecologica, CABA',event_date:'2026-07-12T08:00:00Z',event_type:'deporte',accessibility:'publico',max_participants:25},null,2))">
+          <div class="ib-method"><span class="method POST">POST</span></div>
+          <div class="ib-label">Caminata ecologica</div>
+          <div class="ib-desc">deporte · publico · 25 participantes</div>
+        </div>
+      </div>
+    </div>
+    <div class="card mt">
+      <h2>🤝 Participaciones de prueba</h2>
+      <div class="insert-grid">
+        <div class="insert-btn" onclick="goTester('POST','/api/events/REEMPLAZAR-EVENT-UUID/join',JSON.stringify({user_id:'REEMPLAZAR-USER-UUID'},null,2))">
+          <div class="ib-method"><span class="method POST">POST</span></div>
+          <div class="ib-label">Unirse a evento</div>
+          <div class="ib-desc">Reemplaza los UUIDs con IDs reales</div>
+        </div>
+        <div class="insert-btn" onclick="goTester('DELETE','/api/events/REEMPLAZAR-EVENT-UUID/join',JSON.stringify({user_id:'REEMPLAZAR-USER-UUID'},null,2))">
+          <div class="ib-method"><span class="method DELETE">DEL</span></div>
+          <div class="ib-label">Abandonar evento</div>
+          <div class="ib-desc">Reemplaza los UUIDs con IDs reales</div>
+        </div>
+      </div>
+    </div>
+    <div class="card mt">
+      <h2>⭐ Feedback de prueba</h2>
+      <div class="insert-grid">
+        <div class="insert-btn" onclick="goTester('POST','/api/events/REEMPLAZAR-EVENT-UUID/feedback',JSON.stringify({usuario_id:'REEMPLAZAR-USER-UUID',puntuacion:5,comentario:'Excelente evento, muy bien organizado.'},null,2))">
+          <div class="ib-method"><span class="method POST">POST</span></div>
+          <div class="ib-label">Feedback 5 estrellas</div>
+          <div class="ib-desc">Puntuacion maxima</div>
+        </div>
+        <div class="insert-btn" onclick="goTester('POST','/api/events/REEMPLAZAR-EVENT-UUID/feedback',JSON.stringify({usuario_id:'REEMPLAZAR-USER-UUID',puntuacion:3,comentario:'Estuvo bien pero podria mejorar.'},null,2))">
+          <div class="ib-method"><span class="method POST">POST</span></div>
+          <div class="ib-label">Feedback 3 estrellas</div>
+          <div class="ib-desc">Puntuacion media</div>
+        </div>
+        <div class="insert-btn" onclick="goTester('POST','/api/events/REEMPLAZAR-EVENT-UUID/feedback',JSON.stringify({usuario_id:'REEMPLAZAR-USER-UUID',puntuacion:1,comentario:'No cumplio las expectativas.'},null,2))">
+          <div class="ib-method"><span class="method POST">POST</span></div>
+          <div class="ib-label">Feedback 1 estrella</div>
+          <div class="ib-desc">Puntuacion minima</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB: FEED -->
+<div class="tab-content" id="tab-feed">
+  <div class="page">
+    <div class="feed-header">
+      <h3 id="feedCount">Cargando eventos...</h3>
+      <button onclick="loadFeed()">&#8635; Actualizar</button>
+    </div>
+    <div class="feed-grid" id="feedGrid">
+      <div class="feed-loading">Cargando...</div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB: TESTER -->
+<div class="tab-content" id="tab-tester">
+  <div class="page">
+    <div class="card">
+      <h2>🧪 Tester de endpoints</h2>
+      <div class="tester-body">
+        <select id="method">
+          <option>GET</option>
+          <option>POST</option>
+          <option>PUT</option>
+          <option>DELETE</option>
+        </select>
+        <input id="url" type="text" placeholder="/api/events" value="/api/events" />
+        <button class="send-btn" onclick="sendRequest()">Enviar</button>
+        <textarea id="body" placeholder="Body JSON (opcional)"></textarea>
+        <div class="status-line" id="statusLine"></div>
+        <pre class="response-box" id="response">// La respuesta aparecera aqui</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var BASE = window.location.origin;
+
+  fetch(BASE + '/').then(function(r){ return r.json(); }).then(function(){
+    var b = document.getElementById('statusBadge');
+    b.textContent = '● Online'; b.style.background = '#1e3a2f'; b.style.color = '#4ade80';
+  }).catch(function(){
+    var b = document.getElementById('statusBadge');
+    b.textContent = '● Offline'; b.style.background = '#3a1e1e'; b.style.color = '#f87171';
+  });
+
+  function switchTab(name) {
+    var names = ['routes','inserts','feed','tester'];
+    var tabs = document.querySelectorAll('.tab');
+    var contents = document.querySelectorAll('.tab-content');
+    for (var i = 0; i < tabs.length; i++) {
+      tabs[i].classList.toggle('active', names[i] === name);
+    }
+    for (var j = 0; j < contents.length; j++) {
+      contents[j].classList.toggle('active', contents[j].id === 'tab-' + name);
+    }
+    if (name === 'feed') loadFeed();
+  }
+
+  function goTester(method, path, body) {
+    switchTab('tester');
+    document.getElementById('method').value = method;
+    document.getElementById('url').value = path;
+    document.getElementById('body').value = body;
+    document.getElementById('response').textContent = '// La respuesta aparecera aqui';
+    document.getElementById('statusLine').textContent = '';
+  }
+
+  var TYPE_EMOJI  = { deporte:'⚽', concierto:'🎵', cultura:'🎨', fiesta:'🎉', otro:'📌' };
+  var TYPE_COLOR  = { deporte:'type-deporte', concierto:'type-concierto', cultura:'type-cultura', fiesta:'type-fiesta', otro:'type-otro' };
+  var TYPE_IMG    = {
+    deporte:   'https://images.unsplash.com/photo-1517649763962-0c623066013b?w=400&h=140&fit=crop',
+    concierto: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=400&h=140&fit=crop',
+    cultura:   'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=400&h=140&fit=crop',
+    fiesta:    'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=400&h=140&fit=crop',
+    otro:      'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=400&h=140&fit=crop'
+  };
+
+  function formatDate(iso) {
+    if (!iso) return '';
+    var d = new Date(iso);
+    return d.toLocaleDateString('es-AR', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+  }
+
+  function renderCard(ev) {
+    var type   = ev.event_type || 'otro';
+    var emoji  = TYPE_EMOJI[type]  || '📌';
+    var color  = TYPE_COLOR[type]  || 'type-otro';
+    var img    = ev.image_url      || TYPE_IMG[type] || TYPE_IMG.otro;
+    var access = ev.accessibility === 'publico'
+      ? '<span class="access-publico">🌐 Publico</span>'
+      : '<span class="access-privado">🔒 Privado</span>';
+    return '<div class="event-card">'
+      + '<img class="event-card-img" src="' + img + '" alt="' + ev.title + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
+      + '<div class="event-card-placeholder" style="display:none">' + emoji + '</div>'
+      + '<div class="event-card-body">'
+      + '<span class="event-card-type ' + color + '">' + emoji + ' ' + type + '</span>'
+      + '<div class="event-card-title">' + ev.title + '</div>'
+      + '<div class="event-card-desc">' + (ev.description || 'Sin descripcion') + '</div>'
+      + '<div class="event-card-meta">'
+      + '<span class="event-meta-item">📍 ' + (ev.location || 'Sin ubicacion') + '</span>'
+      + '<span class="event-meta-item">📅 ' + formatDate(ev.event_date) + '</span>'
+      + '<span class="event-meta-item">👥 ' + (ev.max_participants || '—') + ' cupos</span>'
+      + '<span class="event-meta-item">' + access + '</span>'
+      + '</div></div></div>';
+  }
+
+  function loadFeed() {
+    var grid  = document.getElementById('feedGrid');
+    var count = document.getElementById('feedCount');
+    grid.innerHTML  = '<div class="feed-loading">Cargando eventos...</div>';
+    count.textContent = 'Cargando...';
+    fetch(BASE + '/api/events').then(function(r){ return r.json().then(function(d){ return {ok:r.ok, data:d}; }); })
+    .then(function(res) {
+      if (!res.ok) {
+        grid.innerHTML = '<div class="feed-empty"><div class="feed-empty-icon">⚠️</div><p>' + (res.data.error || 'Error') + '</p></div>';
+        count.textContent = 'Error'; return;
+      }
+      if (!res.data.length) {
+        grid.innerHTML = '<div class="feed-empty"><div class="feed-empty-icon">📭</div><p>No hay eventos todavia.<br>Crea uno desde <strong>Inserts rapidos</strong>.</p></div>';
+        count.textContent = '0 eventos'; return;
+      }
+      var sorted = res.data.slice().sort(function(a,b){ return new Date(a.event_date) - new Date(b.event_date); });
+      grid.innerHTML = sorted.map(renderCard).join('');
+      count.textContent = sorted.length + ' evento' + (sorted.length !== 1 ? 's' : '');
+    }).catch(function(err) {
+      grid.innerHTML = '<div class="feed-empty"><div class="feed-empty-icon">❌</div><p>Error de red: ' + err.message + '</p></div>';
+      count.textContent = 'Error';
+    });
+  }
+
+  function sendRequest() {
+    var method = document.getElementById('method').value;
+    var path   = document.getElementById('url').value;
+    var raw    = document.getElementById('body').value.trim();
+    var resBox = document.getElementById('response');
+    var stLine = document.getElementById('statusLine');
+    var opts   = { method: method, headers: { 'Content-Type': 'application/json' } };
+    if (raw && method !== 'GET') {
+      try { opts.body = JSON.stringify(JSON.parse(raw)); }
+      catch(e) { resBox.textContent = 'Body JSON invalido'; return; }
+    }
+    resBox.textContent = 'Cargando...'; stLine.textContent = '';
+    var start = Date.now();
+    fetch(BASE + path, opts).then(function(r) {
+      var ms = Date.now() - start;
+      return r.text().then(function(t) { return { ok: r.ok, status: r.status, text: t, ms: ms }; });
+    }).then(function(res) {
+      var pretty;
+      try { pretty = JSON.stringify(JSON.parse(res.text), null, 2); } catch(e) { pretty = res.text; }
+      resBox.textContent = pretty;
+      resBox.className = 'response-box ' + (res.ok ? 'status-ok' : 'status-err');
+      stLine.textContent = 'HTTP ' + res.status + ' · ' + res.ms + 'ms';
+      stLine.style.color = res.ok ? '#4ade80' : '#f87171';
+    }).catch(function(err) {
+      resBox.textContent = 'Error de red: ' + err.message;
+      resBox.className = 'response-box status-err';
+    });
+  }
+</script>
+</body>
+</html>

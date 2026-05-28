@@ -9,6 +9,12 @@ const newEvent = async ({ creator_id, title, description, location, event_date, 
   if (!creator_id || !title || !event_date || !event_type || !accessibility) {
     throw new Error('creator_id, title, event_date, event_type y accessibility son obligatorios');
   }
+  if (!['publico', 'privado'].includes(accessibility)) {
+    throw new Error('accessibility debe ser "publico" o "privado"');
+  }
+  if (!['deporte', 'concierto', 'cultura', 'fiesta', 'otro'].includes(event_type)) {
+    throw new Error('event_type debe ser: deporte, concierto, cultura, fiesta u otro');
+  }
   return await createEvent({ creator_id, title, description, location, event_date, event_type, accessibility, max_participants, image_url });
 };
 
