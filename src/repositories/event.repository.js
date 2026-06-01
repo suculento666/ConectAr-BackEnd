@@ -16,7 +16,7 @@ const createEvent = async ({ creator_id, title, description, location, event_dat
 const getAllEvents = async () => {
   const { data, error } = await supabase
     .from('events')
-    .select('*');
+    .select('*, users(id, username, full_name, avatar_url)');
   if (error) throw new Error(error.message);
   return data;
 };
