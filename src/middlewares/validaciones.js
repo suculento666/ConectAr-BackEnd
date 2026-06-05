@@ -1,4 +1,5 @@
 const validarRegistro = (req, res, next) => {
+  console.log('📥 Body en validarRegistro:', JSON.stringify(req.body));
   const { email, password, username, full_name } = req.body;
 
   if (!email || !password || !username || !full_name) {
@@ -64,7 +65,7 @@ const validarEvento = (req, res, next) => {
     });
   }
 
-  const tiposValidos = ['deporte', 'concierto', 'cultura', 'fiesta', 'otro'];
+  const tiposValidos = ['deporte', 'deportes', 'concierto', 'cultura', 'fiesta', 'otro'];
   if (!tiposValidos.includes(event_type)) {
     return res.status(400).json({ error: 'event_type debe ser: deporte, concierto, cultura, fiesta u otro' });
   }

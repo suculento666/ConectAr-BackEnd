@@ -4,6 +4,7 @@ import { registerUser as registerUserService, loginUser as loginUserService, get
 // POST /api/users/register - crea un usuario nuevo via Supabase Auth
 const registerUser = async (req, res) => {
   try {
+    console.log('📥 Body recibido en /register:', JSON.stringify(req.body));
     const { email, password, username, full_name, bio, avatar_url } = req.body;
     const result = await registerUserService({ email, password, username, full_name, bio, avatar_url });
     res.status(201).json(result);

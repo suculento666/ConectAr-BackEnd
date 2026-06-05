@@ -1,6 +1,20 @@
 // Repositorio Event - acceso a la base de datos (tablas: events, event_participants, feedback)
 import supabase from '../configs/supabase.js';
 
+// Imágenes por defecto según event_type
+const DEFAULT_IMAGES = {
+  concierto: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800',
+  deporte:   'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800',
+  cultura:   'https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=800',
+  fiesta:    'https://images.unsplash.com/photo-1496337589254-7e19d01cec44?w=800',
+  otro:      'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800',
+};
+
+const applyDefaultImage = (event) => ({
+  ...event,
+  image_url: event.image_url || DEFAULT_IMAGES[event.event_type] || DEFAULT_IMAGES.otro,
+});
+
 // --- Events ---
 
 const createEvent = async ({ creator_id, title, description, location, event_date, event_type, accessibility, max_participants, image_url }) => {
@@ -18,7 +32,7 @@ const getAllEvents = async () => {
     .from('events')
     .select('*, users(id, username, full_name, avatar_url)');
   if (error) throw new Error(error.message);
-  return data;
+  return data.map(applyDefaultImage);
 };
 
 const getEventById = async (id) => {
@@ -28,7 +42,7 @@ const getEventById = async (id) => {
     .eq('id', id)
     .single();
   if (error) throw new Error(error.message);
-  return data;
+  return applyDefaultImage(data);
 };
 
 const updateEvent = async (id, fields) => {
@@ -73,12 +87,25 @@ const leaveEvent = async ({ user_id, event_id }) => {
   return { message: 'Participación cancelada' };
 };
 
+const FAKE_PARTICIPANTS = [
+  { user_id: 'fake-1', event_id: null, joined_at: new Date().toISOString(), users: { id: 'fake-1', username: 'martina_g',     full_name: 'Martina González', avatar_url: 'https://i.pravatar.cc/150?img=1' } },
+  { user_id: 'fake-2', event_id: null, joined_at: new Date().toISOString(), users: { id: 'fake-2', username: 'lucas_rr',      full_name: 'Lucas Ramírez',    avatar_url: 'https://i.pravatar.cc/150?img=2' } },
+  { user_id: 'fake-3', event_id: null, joined_at: new Date().toISOString(), users: { id: 'fake-3', username: 'sofi.lopez',    full_name: 'Sofía López',      avatar_url: 'https://i.pravatar.cc/150?img=3' } },
+  { user_id: 'fake-4', event_id: null, joined_at: new Date().toISOString(), users: { id: 'fake-4', username: 'tomifernandez', full_name: 'Tomás Fernández', avatar_url: 'https://i.pravatar.cc/150?img=4' } },
+  { user_id: 'fake-5', event_id: null, joined_at: new Date().toISOString(), users: { id: 'fake-5', username: 'caro.diaz',     full_name: 'Carolina Díaz',    avatar_url: 'https://i.pravatar.cc/150?img=5' } },
+];
+
 const getParticipants = async (event_id) => {
   const { data, error } = await supabase
     .from('event_participants')
     .select('*, users(id, username, full_name, avatar_url)')
     .eq('event_id', event_id);
   if (error) throw new Error(error.message);
+
+  // Si no hay participantes reales, devolver los hardcodeados
+  if (!data || data.length === 0) {
+    return FAKE_PARTICIPANTS.map(p => ({ ...p, event_id }));
+  }
   return data;
 };
 

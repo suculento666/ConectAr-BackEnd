@@ -26,6 +26,9 @@ const loginUser = async ({ email, password }) => {
     throw new Error('email y password son obligatorios');
   }
   const data = await signIn({ email, password });
+  if (!data.session) {
+    throw new Error('Confirmá tu email antes de iniciar sesión');
+  }
   return {
     user: {
       id: data.user.id,
