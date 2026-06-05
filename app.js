@@ -10,7 +10,17 @@ const app = express();
 
 // Middlewares
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
+  origin: function (origin, callback) {
+    const allowed = (process.env.FRONTEND_URL || 'http://localhost:5173')
+      .split(',')
+      .map(u => u.trim());
+    // Permitir también requests sin origin (ej: Postman, curl)
+    if (!origin || allowed.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS: origen no permitido → ' + origin));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
@@ -38,6 +48,6 @@ supabase.from('_test_').select('*').limit(1).then(({ error }) => {
 
 // Puerto
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en puerto ${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Servidor corriendo en http://0.0.0.0:${PORT} (accesible en la red local)`);
 });
