@@ -53,4 +53,14 @@ const updateUser = async (id, fields) => {
   return data;
 };
 
-export { signUp, signIn, getAllUsers, getUserById, updateUser };
+// Perfil: busca usuarios por username (búsqueda parcial)
+const searchUsersByUsername = async (username) => {
+  const { data, error } = await supabase
+    .from('users')
+    .select('id, username, full_name, bio, avatar_url, xp, level, created_at')
+    .ilike('username', `%${username}%`);
+  if (error) throw new Error(error.message);
+  return data;
+};
+
+export { signUp, signIn, getAllUsers, getUserById, updateUser, searchUsersByUsername };

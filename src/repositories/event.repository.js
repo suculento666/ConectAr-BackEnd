@@ -27,10 +27,16 @@ const createEvent = async ({ creator_id, title, description, location, event_dat
   return data;
 };
 
-const getAllEvents = async () => {
-  const { data, error } = await supabase
+const getAllEvents = async (filters = {}) => {
+  let query = supabase
     .from('events')
     .select('*, users(id, username, full_name, avatar_url)');
+
+  if (filters.event_type) {
+    query = query.eq('event_type', filters.event_type);
+  }
+
+  const { data, error } = await query;
   if (error) throw new Error(error.message);
   return data.map(applyDefaultImage);
 };

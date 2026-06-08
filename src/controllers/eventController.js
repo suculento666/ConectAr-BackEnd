@@ -1,14 +1,16 @@
-// eventController.js - maneja eventos, participación y feedback
+f// eventController.js - maneja eventos, participación y feedback
 import {
   newEvent, getEvents, getEvent, editEvent, removeEvent,
   participateInEvent, cancelParticipation, getEventParticipants,
   submitFeedback,
 } from '../services/event.service.js';
 
-// GET /api/events - trae todos los eventos
-const getAllEvents = async (_req, res) => {
+// GET /api/events?type=deporte - trae todos los eventos, con filtro opcional por event_type
+const getAllEvents = async (req, res) => {
   try {
-    const events = await getEvents();
+    const { type } = req.query;
+    const filters = type ? { event_type: type.toLowerCase() } : {};
+    const events = await getEvents(filters);
     res.status(200).json(events);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -28,6 +30,7 @@ const getEventById = async (req, res) => {
 // POST /api/events - crea un evento
 const createEvent = async (req, res) => {
   try {
+    console.log('📥 Body crear evento:', JSON.stringify(req.body));
     const { creator_id, title, description, location, event_date, event_type, accessibility, max_participants, image_url } = req.body;
     const event = await newEvent({ creator_id, title, description, location, event_date, event_type, accessibility, max_participants, image_url });
     res.status(201).json(event);

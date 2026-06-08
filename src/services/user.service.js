@@ -1,5 +1,5 @@
 // Servicio User - lógica de negocio para usuarios
-import { signUp, signIn, getAllUsers, getUserById, updateUser } from '../repositories/user.repository.js';
+import { signUp, signIn, getAllUsers, getUserById, updateUser, searchUsersByUsername } from '../repositories/user.repository.js';
 
 const registerUser = async ({ email, password, username, full_name, bio, avatar_url }) => {
   if (!email || !password || !username || !full_name) {
@@ -53,4 +53,11 @@ const editUser = async (id, fields) => {
   return await updateUser(id, safeFields);
 };
 
-export { registerUser, loginUser, getUsers, getUser, editUser };
+const searchUsers = async (username) => {
+  if (!username || username.trim().length < 2) {
+    throw new Error('El término de búsqueda debe tener al menos 2 caracteres');
+  }
+  return await searchUsersByUsername(username.trim());
+};
+
+export { registerUser, loginUser, getUsers, getUser, editUser, searchUsers };

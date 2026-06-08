@@ -24,8 +24,8 @@ const newEvent = async ({ creator_id, title, description, location, event_date, 
   return await createEvent({ creator_id, title, description, location, event_date, event_type: tipoFinal, accessibility, max_participants, image_url });
 };
 
-const getEvents = async () => {
-  return await getAllEvents();
+const getEvents = async (filters = {}) => {
+  return await getAllEvents(filters);
 };
 
 const getEvent = async (id) => {

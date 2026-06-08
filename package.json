@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node app.js",
-    "dev": "nodemon app.js"
+    "start": "node --env-file=.env app.js",
+    "dev": "nodemon --exec \"node --env-file=.env\" app.js"
   },
   "repository": {
     "type": "git",

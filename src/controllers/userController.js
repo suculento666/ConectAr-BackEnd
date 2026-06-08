@@ -1,5 +1,5 @@
 // userController.js - maneja todo lo relacionado al usuario
-import { registerUser as registerUserService, loginUser as loginUserService, getUsers, getUser, editUser } from '../services/user.service.js';
+import { registerUser as registerUserService, loginUser as loginUserService, getUsers, getUser, editUser, searchUsers } from '../services/user.service.js';
 
 // POST /api/users/register - crea un usuario nuevo via Supabase Auth
 const registerUser = async (req, res) => {
@@ -54,4 +54,15 @@ const updateUser = async (req, res) => {
   }
 };
 
-export { registerUser, loginUser, getAllUsers, getUserById, updateUser };
+// GET /api/users/search?username=xxx - busca usuarios por username
+const searchUsersByUsername = async (req, res) => {
+  try {
+    const { username } = req.query;
+    const users = await searchUsers(username);
+    res.status(200).json(users);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+export { registerUser, loginUser, getAllUsers, getUserById, updateUser, searchUsersByUsername };
