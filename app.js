@@ -1,6 +1,5 @@
 import express from 'express';
 import cors from 'cors';
-
 import supabase from './src/configs/supabase.js';
 import userRoutes from './src/routes/userRoutes.js';
 import eventRoutes from './src/routes/eventRoutes.js';

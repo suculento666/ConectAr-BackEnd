@@ -1,4 +1,4 @@
-f// eventController.js - maneja eventos, participación y feedback
+// eventController.js - maneja eventos, participación y feedback
 import {
   newEvent, getEvents, getEvent, editEvent, removeEvent,
   participateInEvent, cancelParticipation, getEventParticipants,
