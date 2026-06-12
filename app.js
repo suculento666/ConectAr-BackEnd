@@ -9,9 +9,11 @@ const app = express();
 // Middlewares
 app.use(cors({
   origin: function (origin, callback) {
-    const allowed = (process.env.FRONTEND_URL || 'http://localhost:5173')
-      .split(',')
-      .map(u => u.trim());
+    const baseOrigins = ['http://localhost:5173', 'http://localhost:3000'];
+    const envOrigins = process.env.FRONTEND_URL
+      ? process.env.FRONTEND_URL.split(',').map(u => u.trim())
+      : [];
+    const allowed = [...new Set([...baseOrigins, ...envOrigins])];
     // Permitir también requests sin origin (ej: Postman, curl)
     if (!origin || allowed.includes(origin)) {
       callback(null, true);

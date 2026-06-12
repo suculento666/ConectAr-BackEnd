@@ -74,6 +74,18 @@ const deleteEvent = async (id) => {
 // --- Event Participants ---
 
 const joinEvent = async ({ user_id, event_id }) => {
+  // Verificar si ya existe la participación
+  const { data: existing } = await supabase
+    .from('event_participants')
+    .select('user_id')
+    .eq('user_id', user_id)
+    .eq('event_id', event_id)
+    .single();
+
+  if (existing) {
+    throw new Error('Ya estás anotado en este evento');
+  }
+
   const { data, error } = await supabase
     .from('event_participants')
     .insert([{ user_id, event_id }])

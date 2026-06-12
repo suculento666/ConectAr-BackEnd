@@ -53,14 +53,30 @@ const updateUser = async (id, fields) => {
   return data;
 };
 
-// Perfil: busca usuarios por username (búsqueda parcial)
-const searchUsersByUsername = async (username) => {
+// Auth: cierra sesión del usuario actual
+const signOut = async () => {
+  const { error } = await supabase.auth.signOut();
+  if (error) throw new Error(error.message);
+};
+
+// Perfil: busca usuarios por username o full_name (búsqueda parcial)
+const searchUsersByUsername = async (query) => {
   const { data, error } = await supabase
     .from('users')
     .select('id, username, full_name, bio, avatar_url, xp, level, created_at')
-    .ilike('username', `%${username}%`);
+    .or(`username.ilike.%${query}%,full_name.ilike.%${query}%`);
   if (error) throw new Error(error.message);
   return data;
 };
 
-export { signUp, signIn, getAllUsers, getUserById, updateUser, searchUsersByUsername };
+// Participaciones: trae los eventos en los que participa un usuario
+const getUserEvents = async (user_id) => {
+  const { data, error } = await supabase
+    .from('event_participants')
+    .select('event_id')
+    .eq('user_id', user_id);
+  if (error) throw new Error(error.message);
+  return data;
+};
+
+export { signUp, signIn, signOut, getAllUsers, getUserById, updateUser, searchUsersByUsername, getUserEvents };

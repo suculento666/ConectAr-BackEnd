@@ -51,11 +51,21 @@
     .mt { margin-top: 1.2rem; }
 
     
-    /* feed */
-    .feed-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.2rem; }
-    .feed-header h3 { font-size: 0.9rem; color: #888; font-weight: 400; }
-    .feed-header button { background: #1e1e2e; border: 1px solid #2a2a3e; color: #a89cf7; border-radius: 6px; padding: 0.4rem 1rem; cursor: pointer; font-size: 0.8rem; transition: border-color 0.15s; }
-    .feed-header button:hover { border-color: #7c6af7; }
+    /* home / feed */
+    .home-toolbar { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.4rem; flex-wrap: wrap; }
+    .home-toolbar h3 { font-size: 0.88rem; color: #666; font-weight: 400; margin-right: auto; }
+    .filter-chips { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .chip { display: flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.9rem; border-radius: 999px; border: 1px solid #2a2a3e; background: #16161e; color: #666; font-size: 0.78rem; cursor: pointer; transition: all 0.15s; user-select: none; font-weight: 500; }
+    .chip:hover { border-color: #7c6af7; color: #a89cf7; }
+    .chip.active { background: #2a1f6e; border-color: #7c6af7; color: #c4baff; }
+    .chip-all.active  { background: #2a1f6e; border-color: #7c6af7; color: #c4baff; }
+    .chip-dep.active  { background: #0d3321; border-color: #4ade80; color: #4ade80; }
+    .chip-con.active  { background: #2d1040; border-color: #c084fc; color: #c084fc; }
+    .chip-cul.active  { background: #1a2d4a; border-color: #60a5fa; color: #60a5fa; }
+    .chip-fie.active  { background: #2d2010; border-color: #fb923c; color: #fb923c; }
+    .chip-otr.active  { background: #1e1e2e; border-color: #94a3b8; color: #94a3b8; }
+    .refresh-btn { background: #1e1e2e; border: 1px solid #2a2a3e; color: #a89cf7; border-radius: 6px; padding: 0.38rem 0.9rem; cursor: pointer; font-size: 0.8rem; transition: border-color 0.15s; white-space: nowrap; }
+    .refresh-btn:hover { border-color: #7c6af7; }
     .feed-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap: 1.2rem; }
     .event-card { background: #16161e; border: 1px solid #2a2a3e; border-radius: 12px; overflow: hidden; transition: border-color 0.15s,transform 0.15s; }
     .event-card:hover { border-color: #7c6af7; transform: translateY(-2px); }
@@ -78,6 +88,92 @@
     .feed-empty-icon { font-size: 3rem; margin-bottom: 1rem; }
     .feed-empty p { font-size: 0.85rem; }
     .feed-loading { grid-column: 1/-1; text-align: center; padding: 3rem; color: #555; font-size: 0.85rem; }
+    .event-card-footer { padding: 0.75rem 1rem; border-top: 1px solid #1e1e2e; }
+    .btn-join    { width:100%; padding:0.45rem; border-radius:6px; border:none; cursor:pointer; font-size:0.8rem; font-weight:600; background:#1a2d4a; color:#60a5fa; border:1px solid #60a5fa44; transition:background 0.15s; }
+    .btn-join:hover    { background:#243d60; }
+    .btn-request { width:100%; padding:0.45rem; border-radius:6px; border:none; cursor:pointer; font-size:0.8rem; font-weight:600; background:#2d1010; color:#f87171; border:1px solid #f8717144; transition:background 0.15s; }
+    .btn-request:hover { background:#3d1818; }
+    .btn-joined  { width:100%; padding:0.45rem; border-radius:6px; border:none; cursor:pointer; font-size:0.8rem; font-weight:600; background:#0d3321; color:#4ade80; border:1px solid #4ade8044; cursor:default; }
+    .btn-noauth  { width:100%; padding:0.45rem; border-radius:6px; border:1px solid #2a2a3e; font-size:0.78rem; color:#555; background:transparent; cursor:pointer; transition:color 0.15s; }
+    .btn-noauth:hover  { color:#888; }
+
+    /* auth */
+    .auth-wrap { max-width: 400px; margin: 2rem auto; }
+    .auth-field { margin-bottom: 0.8rem; }
+    .auth-field label { display: block; font-size: 0.75rem; color: #888; margin-bottom: 0.3rem; }
+    .auth-actions { display: flex; gap: 0.7rem; margin-top: 1rem; }
+    .auth-actions button { flex: 1; padding: 0.55rem; border-radius: 6px; border: none; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: background 0.15s; }
+    .btn-login  { background: #7c6af7; color: #fff; }
+    .btn-login:hover  { background: #6a58e0; }
+    .btn-logout { background: #3a1e1e; color: #f87171; border: 1px solid #f8717133 !important; }
+    .btn-logout:hover { background: #4a2a2a; }
+    .auth-status { margin-top: 1rem; padding: 0.7rem 1rem; border-radius: 6px; font-size: 0.8rem; display: none; }
+    .auth-status.ok  { background: #0d3321; color: #4ade80; border: 1px solid #4ade8033; display: block; }
+    .auth-status.err { background: #2d1010; color: #f87171; border: 1px solid #f8717133; display: block; }
+    .session-box { background: #1e1e2e; border: 1px solid #2a2a3e; border-radius: 8px; padding: 1rem; margin-top: 1.2rem; font-size: 0.78rem; color: #888; }
+    .session-box strong { color: #a89cf7; display: block; margin-bottom: 0.5rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; }
+    .session-token { font-family: monospace; word-break: break-all; color: #555; font-size: 0.7rem; }
+
+    /* buscador personas */
+    .search-bar { display: flex; gap: 0.7rem; margin-bottom: 1.5rem; }
+    .search-bar input { flex: 1; font-size: 0.9rem; padding: 0.6rem 1rem; }
+    .search-bar button { background: #7c6af7; color: #fff; border: none; border-radius: 6px; padding: 0.6rem 1.2rem; cursor: pointer; font-size: 0.85rem; font-weight: 600; white-space: nowrap; }
+    .search-bar button:hover { background: #6a58e0; }
+    .users-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
+    .user-card { background: #16161e; border: 1px solid #2a2a3e; border-radius: 12px; padding: 1.2rem; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.5rem; transition: border-color 0.15s, transform 0.15s; }
+    .user-card:hover { border-color: #7c6af7; transform: translateY(-2px); }
+    .user-avatar { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; background: #2a2a3e; border: 2px solid #2a2a3e; }
+    .user-avatar-placeholder { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #7c6af7, #4a3abf); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: 700; color: #fff; }
+    .user-card-name { font-size: 0.95rem; font-weight: 600; color: #e2e2e2; }
+    .user-card-username { font-size: 0.78rem; color: #7c6af7; }
+    .user-card-bio { font-size: 0.75rem; color: #666; line-height: 1.4; max-height: 2.8rem; overflow: hidden; }
+    .user-card-meta { display: flex; gap: 0.5rem; margin-top: 0.3rem; }
+    .user-meta-pill { font-size: 0.68rem; background: #1e1e2e; border: 1px solid #2a2a3e; border-radius: 999px; padding: 0.15rem 0.6rem; color: #888; }
+    .search-empty { text-align: center; padding: 4rem 2rem; color: #444; }
+    .search-empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .search-hint { font-size: 0.78rem; color: #555; margin-top: 0.5rem; }
+
+    /* crear evento */
+    .create-wrap { max-width: 620px; margin: 2rem auto; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; padding: 1.2rem; }
+    .form-grid .full { grid-column: 1 / -1; }
+    .form-field { display: flex; flex-direction: column; gap: 0.3rem; }
+    .form-field label { font-size: 0.75rem; color: #888; font-weight: 500; }
+    .form-field label span.req { color: #f87171; margin-left: 2px; }
+    .form-field input,
+    .form-field select,
+    .form-field textarea { background: #0f0f13; border: 1px solid #2a2a3e; color: #e2e2e2; border-radius: 6px; padding: 0.5rem 0.75rem; font-size: 0.85rem; font-family: inherit; width: 100%; transition: border-color 0.15s; }
+    .form-field input:focus,
+    .form-field select:focus,
+    .form-field textarea:focus { outline: none; border-color: #7c6af7; }
+    .form-field textarea { resize: vertical; min-height: 80px; }
+    .type-selector { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem; }
+    .type-opt { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; padding: 0.6rem 0.3rem; border-radius: 8px; border: 1px solid #2a2a3e; background: #16161e; cursor: pointer; transition: all 0.15s; user-select: none; }
+    .type-opt:hover { border-color: #7c6af7; background: #1e1e2e; }
+    .type-opt.selected { border-color: #7c6af7; background: #2a1f6e; }
+    .type-opt.sel-dep { border-color: #4ade80; background: #0d3321; }
+    .type-opt.sel-con { border-color: #c084fc; background: #2d1040; }
+    .type-opt.sel-cul { border-color: #60a5fa; background: #1a2d4a; }
+    .type-opt.sel-fie { border-color: #fb923c; background: #2d2010; }
+    .type-opt.sel-otr { border-color: #94a3b8; background: #1e1e2e; }
+    .type-opt-icon { font-size: 1.4rem; }
+    .type-opt-label { font-size: 0.65rem; color: #888; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; }
+    .access-toggle { display: flex; gap: 0.6rem; }
+    .access-opt { flex: 1; padding: 0.5rem; border-radius: 6px; border: 1px solid #2a2a3e; background: #16161e; cursor: pointer; text-align: center; font-size: 0.8rem; color: #666; transition: all 0.15s; user-select: none; }
+    .access-opt:hover { border-color: #7c6af7; color: #aaa; }
+    .access-opt.sel-pub { border-color: #4ade80; background: #0d3321; color: #4ade80; font-weight: 600; }
+    .access-opt.sel-priv { border-color: #f87171; background: #2d1010; color: #f87171; font-weight: 600; }
+    .form-actions { padding: 0 1.2rem 1.2rem; display: flex; gap: 0.7rem; }
+    .form-actions button { flex: 1; padding: 0.65rem; border-radius: 6px; border: none; cursor: pointer; font-size: 0.88rem; font-weight: 600; transition: background 0.15s; }
+    .btn-create { background: #7c6af7; color: #fff; }
+    .btn-create:hover { background: #6a58e0; }
+    .btn-reset  { background: #1e1e2e; color: #888; border: 1px solid #2a2a3e !important; }
+    .btn-reset:hover  { color: #ccc; border-color: #555 !important; }
+    .create-status { margin: 0 1.2rem 1.2rem; padding: 0.7rem 1rem; border-radius: 6px; font-size: 0.82rem; display: none; }
+    .create-status.ok  { background: #0d3321; color: #4ade80; border: 1px solid #4ade8033; display: block; }
+    .create-status.err { background: #2d1010; color: #f87171; border: 1px solid #f8717133; display: block; }
+    .creator-hint { font-size: 0.72rem; color: #555; margin-top: 0.25rem; }
+    @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } .type-selector { grid-template-columns: repeat(3,1fr); } }
   </style>
 </head>
 <body>
@@ -93,8 +189,11 @@
 <div class="tabs">
   <div class="tab active" onclick="switchTab('routes')">Rutas</div>
   <div class="tab" onclick="switchTab('inserts')">Inserts rápidos</div>
-  <div class="tab" onclick="switchTab('feed')">Feed</div>
+  <div class="tab" onclick="switchTab('feed')">🏠 Home</div>
   <div class="tab" onclick="switchTab('tester')">Tester</div>
+  <div class="tab" onclick="switchTab('auth')">Auth</div>
+  <div class="tab" onclick="switchTab('search')">Buscador</div>
+  <div class="tab" onclick="switchTab('create')">➕ Crear Evento</div>
 </div>
 
 <!-- TAB: RUTAS -->
@@ -260,12 +359,20 @@
   </div>
 </div>
 
-<!-- TAB: FEED -->
+<!-- TAB: HOME -->
 <div class="tab-content" id="tab-feed">
   <div class="page">
-    <div class="feed-header">
-      <h3 id="feedCount">Cargando eventos...</h3>
-      <button onclick="loadFeed()">&#8635; Actualizar</button>
+    <div class="home-toolbar">
+      <div class="filter-chips">
+        <span class="chip chip-all active" onclick="setFilter(null, this)">🗂 Todos</span>
+        <span class="chip chip-dep" onclick="setFilter('deporte', this)">⚽ Deporte</span>
+        <span class="chip chip-con" onclick="setFilter('concierto', this)">🎵 Concierto</span>
+        <span class="chip chip-cul" onclick="setFilter('cultura', this)">🎨 Cultura</span>
+        <span class="chip chip-fie" onclick="setFilter('fiesta', this)">🎉 Fiesta</span>
+        <span class="chip chip-otr" onclick="setFilter('otro', this)">📌 Otro</span>
+      </div>
+      <h3 id="feedCount"></h3>
+      <button class="refresh-btn" onclick="loadFeed()">↻ Actualizar</button>
     </div>
     <div class="feed-grid" id="feedGrid">
       <div class="feed-loading">Cargando...</div>
@@ -295,6 +402,189 @@
   </div>
 </div>
 
+<!-- TAB: CREAR EVENTO -->
+<div class="tab-content" id="tab-create">
+  <div class="page">
+    <div class="card create-wrap">
+      <h2>➕ Nuevo Evento</h2>
+      <div class="form-grid">
+
+        <!-- Nombre -->
+        <div class="form-field full">
+          <label for="ev-title">Nombre del evento <span class="req">*</span></label>
+          <input id="ev-title" type="text" placeholder="ej: Fútbol 5 en Palermo" maxlength="100" />
+        </div>
+
+        <!-- Tipo de evento -->
+        <div class="form-field full">
+          <label>Tipo de evento <span class="req">*</span></label>
+          <div class="type-selector">
+            <div class="type-opt" id="type-deporte"   onclick="selectType('deporte')">
+              <span class="type-opt-icon">⚽</span><span class="type-opt-label">Deporte</span>
+            </div>
+            <div class="type-opt" id="type-concierto" onclick="selectType('concierto')">
+              <span class="type-opt-icon">🎵</span><span class="type-opt-label">Concierto</span>
+            </div>
+            <div class="type-opt" id="type-cultura"   onclick="selectType('cultura')">
+              <span class="type-opt-icon">🎨</span><span class="type-opt-label">Cultura</span>
+            </div>
+            <div class="type-opt" id="type-fiesta"    onclick="selectType('fiesta')">
+              <span class="type-opt-icon">🎉</span><span class="type-opt-label">Fiesta</span>
+            </div>
+            <div class="type-opt" id="type-otro"      onclick="selectType('otro')">
+              <span class="type-opt-icon">📌</span><span class="type-opt-label">Otro</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Descripción -->
+        <div class="form-field full">
+          <label for="ev-desc">Descripción</label>
+          <textarea id="ev-desc" placeholder="Contá de qué se trata el evento..."></textarea>
+        </div>
+
+        <!-- Ubicación -->
+        <div class="form-field full">
+          <label for="ev-location">Ubicación</label>
+          <input id="ev-location" type="text" placeholder="ej: Palermo, CABA / Online" />
+        </div>
+
+        <!-- Fecha y hora -->
+        <div class="form-field">
+          <label>Fecha <span class="req">*</span></label>
+          <div style="display:flex; gap:0.5rem;">
+            <select id="ev-day" style="flex:1">
+              <option value="">Día</option>
+            </select>
+            <select id="ev-month" style="flex:2">
+              <option value="">Mes</option>
+              <option value="1">Enero</option><option value="2">Febrero</option>
+              <option value="3">Marzo</option><option value="4">Abril</option>
+              <option value="5">Mayo</option><option value="6">Junio</option>
+              <option value="7">Julio</option><option value="8">Agosto</option>
+              <option value="9">Septiembre</option><option value="10">Octubre</option>
+              <option value="11">Noviembre</option><option value="12">Diciembre</option>
+            </select>
+            <select id="ev-year" style="flex:1.2">
+              <option value="">Año</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Hora -->
+        <div class="form-field">
+          <label>Hora <span class="req">*</span></label>
+          <div style="display:flex; gap:0.5rem; align-items:center;">
+            <select id="ev-hour" style="flex:1">
+              <option value="">Hs</option>
+            </select>
+            <span style="color:#555; font-size:1.1rem; line-height:1;">:</span>
+            <select id="ev-min" style="flex:1">
+              <option value="00">00</option><option value="15">15</option>
+              <option value="30">30</option><option value="45">45</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Máximo de participantes -->
+        <div class="form-field">
+          <label for="ev-max">Máx. participantes</label>
+          <input id="ev-max" type="number" placeholder="ej: 20" min="1" max="9999" />
+        </div>
+
+        <!-- Accesibilidad -->
+        <div class="form-field">
+          <label>Accesibilidad <span class="req">*</span></label>
+          <div class="access-toggle">
+            <div class="access-opt" id="acc-publico"  onclick="selectAccess('publico')">🌐 Público</div>
+            <div class="access-opt" id="acc-privado"  onclick="selectAccess('privado')">🔒 Privado</div>
+          </div>
+        </div>
+
+        <!-- Imagen URL -->
+        <div class="form-field">
+          <label for="ev-img">Imagen (URL)</label>
+          <input id="ev-img" type="url" placeholder="https://..." />
+        </div>
+
+        <!-- Creator ID -->
+        <div class="form-field full">
+          <label for="ev-creator">Creator ID <span class="req">*</span></label>
+          <input id="ev-creator" type="text" placeholder="UUID del usuario creador" />
+          <span class="creator-hint" id="creatorHint">
+            Iniciá sesión en la pestaña Auth para autocompletar este campo.
+          </span>
+        </div>
+
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-reset"  onclick="resetEventForm()">Limpiar</button>
+        <button class="btn-create" onclick="submitEvent()">Crear evento</button>
+      </div>
+      <div class="create-status" id="createStatus"></div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB: BUSCADOR -->
+<div class="tab-content" id="tab-search">
+  <div class="page">
+    <div class="search-bar">
+      <input id="searchInput" type="text" placeholder="Buscar por nombre o usuario..." oninput="onSearchInput()" onkeydown="if(event.key==='Enter') doSearch()" />
+      <button onclick="doSearch()">🔍 Buscar</button>
+    </div>
+    <div id="searchResults" class="users-grid">
+      <div class="search-empty">
+        <div class="search-empty-icon">👥</div>
+        <p>Escribí un nombre o usuario para buscar</p>
+        <p class="search-hint">Mínimo 2 caracteres</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB: AUTH -->
+<div class="tab-content" id="tab-auth">
+  <div class="page">
+    <div class="card auth-wrap">
+      <h2>🔐 Sesión</h2>
+      <div style="padding:1.1rem">
+        <div id="authLoggedOut">
+          <div class="auth-field">
+            <label>Email</label>
+            <input id="authEmail" type="email" placeholder="carlos.perez@gmail.com" value="carlos.perez@gmail.com" />
+          </div>
+          <div class="auth-field">
+            <label>Password</label>
+            <input id="authPassword" type="password" placeholder="••••••••" value="Pass1234!" />
+          </div>
+          <div class="auth-actions">
+            <button class="btn-login" onclick="doLogin()">Iniciar sesión</button>
+          </div>
+        </div>
+
+        <div id="authLoggedIn" style="display:none">
+          <div class="session-box">
+            <strong>✅ Sesión activa</strong>
+            <div>Usuario: <span id="sessionEmail" style="color:#e2e2e2"></span></div>
+            <div>ID: <span id="sessionId" style="color:#e2e2e2"></span></div>
+          </div>
+          <div class="session-box" style="margin-top:0.7rem">
+            <strong>🔑 Access Token</strong>
+            <div class="session-token" id="sessionToken"></div>
+          </div>
+          <div class="auth-actions">
+            <button class="btn-logout" onclick="doLogout()">Cerrar sesión</button>
+          </div>
+        </div>
+
+        <div class="auth-status" id="authStatus"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
   var BASE = window.location.origin;
 
@@ -307,7 +597,7 @@
   });
 
   function switchTab(name) {
-    var names = ['routes','inserts','feed','tester'];
+    var names = ['routes','inserts','feed','tester','auth','search','create'];
     var tabs = document.querySelectorAll('.tab');
     var contents = document.querySelectorAll('.tab-content');
     for (var i = 0; i < tabs.length; i++) {
@@ -316,7 +606,9 @@
     for (var j = 0; j < contents.length; j++) {
       contents[j].classList.toggle('active', contents[j].id === 'tab-' + name);
     }
-    if (name === 'feed') loadFeed();
+    if (name === 'feed')   loadFeed();
+    if (name === 'auth')   refreshAuthUI();
+    if (name === 'create') initEventForm();
   }
 
   function goTester(method, path, body) {
@@ -338,53 +630,139 @@
     otro:      'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=400&h=140&fit=crop'
   };
 
+  var activeFilter = null;
+
+  function setFilter(type, chipEl) {
+    activeFilter = type;
+    document.querySelectorAll('.filter-chips .chip').forEach(function(c) { c.classList.remove('active'); });
+    chipEl.classList.add('active');
+    loadFeed();
+  }
+
   function formatDate(iso) {
     if (!iso) return '';
     var d = new Date(iso);
     return d.toLocaleDateString('es-AR', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
   }
 
-  function renderCard(ev) {
+  function renderCard(ev, joinedSet) {
     var type   = ev.event_type || 'otro';
     var emoji  = TYPE_EMOJI[type]  || '📌';
     var color  = TYPE_COLOR[type]  || 'type-otro';
     var img    = ev.image_url      || TYPE_IMG[type] || TYPE_IMG.otro;
-    var access = ev.accessibility === 'publico'
-      ? '<span class="access-publico">🌐 Publico</span>'
-      : '<span class="access-privado">🔒 Privado</span>';
+    var isPrivado  = ev.accessibility === 'privado';
+    var alreadyIn  = joinedSet && joinedSet[ev.id];
+    var access = isPrivado
+      ? '<span class="access-privado">🔒 Privado</span>'
+      : '<span class="access-publico">🌐 Público</span>';
+
+    var userRaw = sessionStorage.getItem('session_user');
+    var userId  = userRaw ? JSON.parse(userRaw).id : null;
+    var footer;
+    if (!userId) {
+      footer = '<button class="btn-noauth" onclick="switchTab(\'auth\')">Iniciá sesión para unirte</button>';
+    } else if (alreadyIn) {
+      footer = '<button class="btn-joined" disabled>✅ Ya estás anotado</button>';
+    } else if (isPrivado) {
+      footer = '<button class="btn-request" onclick="joinEvent(\'' + ev.id + '\',\'' + ev.title.replace(/'/g,"\\'") + '\',true,this)">📩 Solicitar unirse</button>';
+    } else {
+      footer = '<button class="btn-join" onclick="joinEvent(\'' + ev.id + '\',\'' + ev.title.replace(/'/g,"\\'") + '\',false,this)">✅ Unirse al evento</button>';
+    }
+
     return '<div class="event-card">'
       + '<img class="event-card-img" src="' + img + '" alt="' + ev.title + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
       + '<div class="event-card-placeholder" style="display:none">' + emoji + '</div>'
       + '<div class="event-card-body">'
       + '<span class="event-card-type ' + color + '">' + emoji + ' ' + type + '</span>'
       + '<div class="event-card-title">' + ev.title + '</div>'
-      + '<div class="event-card-desc">' + (ev.description || 'Sin descripcion') + '</div>'
+      + '<div class="event-card-desc">' + (ev.description || 'Sin descripción') + '</div>'
       + '<div class="event-card-meta">'
-      + '<span class="event-meta-item">📍 ' + (ev.location || 'Sin ubicacion') + '</span>'
+      + '<span class="event-meta-item">📍 ' + (ev.location || 'Sin ubicación') + '</span>'
       + '<span class="event-meta-item">📅 ' + formatDate(ev.event_date) + '</span>'
       + '<span class="event-meta-item">👥 ' + (ev.max_participants || '—') + ' cupos</span>'
       + '<span class="event-meta-item">' + access + '</span>'
-      + '</div></div></div>';
+      + '</div></div>'
+      + '<div class="event-card-footer">' + footer + '</div>'
+      + '</div>';
+  }
+
+  function joinEvent(eventId, eventTitle, isPrivado, btn) {
+    var userRaw = sessionStorage.getItem('session_user');
+    var token   = sessionStorage.getItem('access_token');
+    if (!userRaw || !token) { switchTab('auth'); return; }
+    var userId = JSON.parse(userRaw).id;
+    btn.disabled = true;
+    btn.textContent = isPrivado ? 'Solicitando...' : 'Uniéndose...';
+    fetch(BASE + '/api/events/' + eventId + '/join', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ user_id: userId })
+    }).then(function(r) {
+      return r.json().then(function(d) { return { ok: r.ok, data: d }; });
+    }).then(function(res) {
+      if (res.ok) {
+        btn.className = 'btn-joined';
+        btn.textContent = isPrivado ? '📩 Solicitud enviada' : '✅ ¡Te uniste!';
+      } else {
+        var msg = res.data.error || '';
+        // Si ya estaba anotado, mostrar estado final en vez de error
+        if (msg.includes('Ya estás anotado')) {
+          btn.className = 'btn-joined';
+          btn.textContent = '✅ Ya estás anotado';
+        } else {
+          btn.disabled = false;
+          btn.textContent = isPrivado ? '📩 Solicitar unirse' : '✅ Unirse al evento';
+          alert('Error: ' + msg);
+        }
+      }
+    }).catch(function(err) {
+      btn.disabled = false;
+      btn.textContent = isPrivado ? '📩 Solicitar unirse' : '✅ Unirse al evento';
+      alert('Error de red: ' + err.message);
+    });
   }
 
   function loadFeed() {
     var grid  = document.getElementById('feedGrid');
     var count = document.getElementById('feedCount');
-    grid.innerHTML  = '<div class="feed-loading">Cargando eventos...</div>';
-    count.textContent = 'Cargando...';
-    fetch(BASE + '/api/events').then(function(r){ return r.json().then(function(d){ return {ok:r.ok, data:d}; }); })
-    .then(function(res) {
-      if (!res.ok) {
-        grid.innerHTML = '<div class="feed-empty"><div class="feed-empty-icon">⚠️</div><p>' + (res.data.error || 'Error') + '</p></div>';
+    grid.innerHTML = '<div class="feed-loading">Cargando eventos...</div>';
+    count.textContent = '';
+
+    var userRaw = sessionStorage.getItem('session_user');
+    var userId  = userRaw ? JSON.parse(userRaw).id : null;
+    var eventsUrl = BASE + '/api/events' + (activeFilter ? '?type=' + activeFilter : '');
+
+    // Carga eventos y participaciones del usuario en paralelo
+    var fetchEvents = fetch(eventsUrl).then(function(r){ return r.json().then(function(d){ return {ok:r.ok, data:d}; }); });
+    var fetchJoined = userId
+      ? fetch(BASE + '/api/users/' + userId + '/events').then(function(r){ return r.ok ? r.json() : []; }).catch(function(){ return []; })
+      : Promise.resolve([]);
+
+    Promise.all([fetchEvents, fetchJoined]).then(function(results) {
+      var evRes   = results[0];
+      var joined  = results[1];
+
+      // Construir set de event_ids en los que el usuario ya participa
+      var joinedSet = {};
+      if (Array.isArray(joined)) {
+        joined.forEach(function(p) {
+          var id = p.event_id || (p.events && p.events.id) || p.id;
+          if (id) joinedSet[id] = true;
+        });
+      }
+
+      if (!evRes.ok) {
+        grid.innerHTML = '<div class="feed-empty"><div class="feed-empty-icon">⚠️</div><p>' + (evRes.data.error || 'Error') + '</p></div>';
         count.textContent = 'Error'; return;
       }
-      if (!res.data.length) {
-        grid.innerHTML = '<div class="feed-empty"><div class="feed-empty-icon">📭</div><p>No hay eventos todavia.<br>Crea uno desde <strong>Inserts rapidos</strong>.</p></div>';
+      if (!evRes.data.length) {
+        var label = activeFilter ? ' de tipo <strong>' + activeFilter + '</strong>' : '';
+        grid.innerHTML = '<div class="feed-empty"><div class="feed-empty-icon">📭</div><p>No hay eventos' + label + '.<br>Creá uno desde <strong>Inserts rápidos</strong>.</p></div>';
         count.textContent = '0 eventos'; return;
       }
-      var sorted = res.data.slice().sort(function(a,b){ return new Date(a.event_date) - new Date(b.event_date); });
-      grid.innerHTML = sorted.map(renderCard).join('');
-      count.textContent = sorted.length + ' evento' + (sorted.length !== 1 ? 's' : '');
+      var sorted = evRes.data.slice().sort(function(a,b){ return new Date(a.event_date) - new Date(b.event_date); });
+      grid.innerHTML = sorted.map(function(ev){ return renderCard(ev, joinedSet); }).join('');
+      count.textContent = sorted.length + ' evento' + (sorted.length !== 1 ? 's' : '') + (activeFilter ? ' · ' + activeFilter : '');
     }).catch(function(err) {
       grid.innerHTML = '<div class="feed-empty"><div class="feed-empty-icon">❌</div><p>Error de red: ' + err.message + '</p></div>';
       count.textContent = 'Error';
@@ -418,6 +796,294 @@
       resBox.textContent = 'Error de red: ' + err.message;
       resBox.className = 'response-box status-err';
     });
+  }
+  function doLogin() {
+    var email    = document.getElementById('authEmail').value.trim();
+    var password = document.getElementById('authPassword').value;
+    var status   = document.getElementById('authStatus');
+    status.className = 'auth-status';
+    status.textContent = 'Iniciando sesión...';
+    status.style.display = 'block';
+    fetch(BASE + '/api/users/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, password: password })
+    }).then(function(r) {
+      return r.json().then(function(d) { return { ok: r.ok, data: d }; });
+    }).then(function(res) {
+      if (!res.ok) {
+        status.className = 'auth-status err';
+        status.textContent = '❌ ' + (res.data.error || 'Error al iniciar sesión');
+        return;
+      }
+      sessionStorage.setItem('access_token', res.data.access_token);
+      sessionStorage.setItem('session_user', JSON.stringify(res.data.user));
+      status.className = 'auth-status ok';
+      status.textContent = '✅ Sesión iniciada correctamente';
+      refreshAuthUI();
+    }).catch(function(err) {
+      status.className = 'auth-status err';
+      status.textContent = '❌ Error de red: ' + err.message;
+    });
+  }
+
+  function doLogout() {
+    var token  = sessionStorage.getItem('access_token');
+    var status = document.getElementById('authStatus');
+    status.className = 'auth-status';
+    status.textContent = 'Cerrando sesión...';
+    status.style.display = 'block';
+    fetch(BASE + '/api/users/logout', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token }
+    }).then(function(r) {
+      return r.json().then(function(d) { return { ok: r.ok, data: d }; });
+    }).then(function(res) {
+      sessionStorage.removeItem('access_token');
+      sessionStorage.removeItem('session_user');
+      if (res.ok) {
+        status.className = 'auth-status ok';
+        status.textContent = '✅ Sesión cerrada correctamente';
+      } else {
+        status.className = 'auth-status err';
+        status.textContent = '⚠️ ' + (res.data.error || 'Error al cerrar sesión');
+      }
+      refreshAuthUI();
+    }).catch(function(err) {
+      sessionStorage.removeItem('access_token');
+      sessionStorage.removeItem('session_user');
+      status.className = 'auth-status err';
+      status.textContent = '❌ Error de red: ' + err.message;
+      refreshAuthUI();
+    });
+  }
+
+  function refreshAuthUI() {
+    var token = sessionStorage.getItem('access_token');
+    var userRaw = sessionStorage.getItem('session_user');
+    var loggedOut = document.getElementById('authLoggedOut');
+    var loggedIn  = document.getElementById('authLoggedIn');
+    if (token && userRaw) {
+      var user = JSON.parse(userRaw);
+      document.getElementById('sessionEmail').textContent = user.email || '—';
+      document.getElementById('sessionId').textContent    = user.id    || '—';
+      document.getElementById('sessionToken').textContent = token;
+      loggedOut.style.display = 'none';
+      loggedIn.style.display  = 'block';
+    } else {
+      loggedOut.style.display = 'block';
+      loggedIn.style.display  = 'none';
+    }
+  }
+
+  // Al cargar la página, restaurar estado de sesión si existe
+  refreshAuthUI();
+
+  // --- BUSCADOR DE PERSONAS ---
+  var searchTimer = null;
+
+  function onSearchInput() {
+    clearTimeout(searchTimer);
+    var val = document.getElementById('searchInput').value.trim();
+    if (val.length < 2) {
+      document.getElementById('searchResults').innerHTML =
+        '<div class="search-empty"><div class="search-empty-icon">👥</div><p>Escribí un nombre o usuario para buscar</p><p class="search-hint">Mínimo 2 caracteres</p></div>';
+      return;
+    }
+    searchTimer = setTimeout(doSearch, 400);
+  }
+
+  function doSearch() {
+    var q = document.getElementById('searchInput').value.trim();
+    if (q.length < 2) return;
+    var results = document.getElementById('searchResults');
+    results.innerHTML = '<div class="search-empty"><div class="search-empty-icon">⏳</div><p>Buscando...</p></div>';
+    fetch(BASE + '/api/users/search?q=' + encodeURIComponent(q))
+      .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
+      .then(function(res) {
+        if (!res.ok) {
+          results.innerHTML = '<div class="search-empty"><div class="search-empty-icon">⚠️</div><p>' + (res.data.error || 'Error') + '</p></div>';
+          return;
+        }
+        if (!res.data.length) {
+          results.innerHTML = '<div class="search-empty"><div class="search-empty-icon">🔍</div><p>No se encontraron usuarios para <strong>"' + q + '"</strong></p></div>';
+          return;
+        }
+        results.innerHTML = res.data.map(renderUserCard).join('');
+      })
+      .catch(function(err) {
+        results.innerHTML = '<div class="search-empty"><div class="search-empty-icon">❌</div><p>Error de red: ' + err.message + '</p></div>';
+      });
+  }
+
+  function renderUserCard(user) {
+    var initials = (user.full_name || user.username || '?').split(' ').map(function(w){ return w[0]; }).slice(0,2).join('').toUpperCase();
+    var avatar = user.avatar_url
+      ? '<img class="user-avatar" src="' + user.avatar_url + '" alt="' + user.username + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
+        + '<div class="user-avatar-placeholder" style="display:none">' + initials + '</div>'
+      : '<div class="user-avatar-placeholder">' + initials + '</div>';
+    return '<div class="user-card">'
+      + avatar
+      + '<div class="user-card-name">' + (user.full_name || user.username) + '</div>'
+      + '<div class="user-card-username">@' + user.username + '</div>'
+      + (user.bio ? '<div class="user-card-bio">' + user.bio + '</div>' : '')
+      + '<div class="user-card-meta">'
+      + '<span class="user-meta-pill">⭐ Nv ' + (user.level || 1) + '</span>'
+      + '<span class="user-meta-pill">🔥 ' + (user.xp || 0) + ' XP</span>'
+      + '</div></div>';
+  }
+  // --- CREAR EVENTO ---
+  var selectedType   = null;
+  var selectedAccess = null;
+
+  var TYPE_SEL_CLASS = { deporte:'sel-dep', concierto:'sel-con', cultura:'sel-cul', fiesta:'sel-fie', otro:'sel-otr' };
+
+  function selectType(type) {
+    selectedType = type;
+    ['deporte','concierto','cultura','fiesta','otro'].forEach(function(t) {
+      var el = document.getElementById('type-' + t);
+      el.className = 'type-opt' + (t === type ? ' selected ' + TYPE_SEL_CLASS[t] : '');
+    });
+  }
+
+  function selectAccess(acc) {
+    selectedAccess = acc;
+    document.getElementById('acc-publico').className = 'access-opt' + (acc === 'publico' ? ' sel-pub' : '');
+    document.getElementById('acc-privado').className = 'access-opt' + (acc === 'privado' ? ' sel-priv' : '');
+  }
+
+  function initEventForm() {
+    // Poblar días (1-31)
+    var dayEl = document.getElementById('ev-day');
+    if (dayEl.options.length === 1) {
+      for (var d = 1; d <= 31; d++) {
+        var o = document.createElement('option');
+        o.value = d; o.textContent = d;
+        dayEl.appendChild(o);
+      }
+    }
+    // Poblar años (año actual + 3)
+    var yearEl = document.getElementById('ev-year');
+    if (yearEl.options.length === 1) {
+      var cy = new Date().getFullYear();
+      for (var y = cy; y <= cy + 3; y++) {
+        var oy = document.createElement('option');
+        oy.value = y; oy.textContent = y;
+        yearEl.appendChild(oy);
+      }
+    }
+    // Poblar horas (0-23)
+    var hourEl = document.getElementById('ev-hour');
+    if (hourEl.options.length === 1) {
+      for (var h = 0; h <= 23; h++) {
+        var oh = document.createElement('option');
+        oh.value = h < 10 ? '0'+h : ''+h;
+        oh.textContent = (h < 10 ? '0'+h : ''+h) + ':00';
+        hourEl.appendChild(oh);
+      }
+    }
+    // Autocompletar creator_id si hay sesión activa
+    var userRaw = sessionStorage.getItem('session_user');
+    var hint = document.getElementById('creatorHint');
+    var input = document.getElementById('ev-creator');
+    if (userRaw) {
+      var user = JSON.parse(userRaw);
+      if (user.id && !input.value) {
+        input.value = user.id;
+        hint.textContent = '✅ Autocompletado desde la sesión activa (' + (user.email || user.id) + ')';
+        hint.style.color = '#4ade80';
+      }
+    }
+  }
+
+  function resetEventForm() {
+    document.getElementById('ev-title').value    = '';
+    document.getElementById('ev-desc').value     = '';
+    document.getElementById('ev-location').value = '';
+    document.getElementById('ev-day').value      = '';
+    document.getElementById('ev-month').value    = '';
+    document.getElementById('ev-year').value     = '';
+    document.getElementById('ev-hour').value     = '';
+    document.getElementById('ev-min').value      = '00';
+    document.getElementById('ev-max').value      = '';
+    document.getElementById('ev-img').value      = '';
+    document.getElementById('ev-creator').value  = '';
+    selectedType = null; selectedAccess = null;
+    ['deporte','concierto','cultura','fiesta','otro'].forEach(function(t) {
+      document.getElementById('type-' + t).className = 'type-opt';
+    });
+    document.getElementById('acc-publico').className = 'access-opt';
+    document.getElementById('acc-privado').className = 'access-opt';
+    var s = document.getElementById('createStatus');
+    s.className = 'create-status'; s.textContent = '';
+  }
+
+  function submitEvent() {
+    var title       = document.getElementById('ev-title').value.trim();
+    var description = document.getElementById('ev-desc').value.trim();
+    var location    = document.getElementById('ev-location').value.trim();
+    var day         = document.getElementById('ev-day').value;
+    var month       = document.getElementById('ev-month').value;
+    var year        = document.getElementById('ev-year').value;
+    var hour        = document.getElementById('ev-hour').value;
+    var min         = document.getElementById('ev-min').value;
+    var maxP        = document.getElementById('ev-max').value;
+    var imageUrl    = document.getElementById('ev-img').value.trim();
+    var creatorId   = document.getElementById('ev-creator').value.trim();
+
+    if (!title)         { showCreateErr('El nombre del evento es obligatorio'); return; }
+    if (!selectedType)  { showCreateErr('Seleccioná un tipo de evento'); return; }
+    if (!day || !month || !year) { showCreateErr('La fecha es obligatoria'); return; }
+    if (!hour)          { showCreateErr('La hora es obligatoria'); return; }
+    if (!selectedAccess){ showCreateErr('Seleccioná público o privado'); return; }
+    if (!creatorId)     { showCreateErr('El Creator ID es obligatorio. Iniciá sesión en la pestaña Auth'); return; }
+
+    // Construir ISO date
+    var mm = month < 10 ? '0' + month : '' + month;
+    var dd = day   < 10 ? '0' + day   : '' + day;
+    var dateISO = year + '-' + mm + '-' + dd + 'T' + hour + ':' + min + ':00.000Z';
+    if (isNaN(Date.parse(dateISO))) { showCreateErr('La fecha ingresada no es válida'); return; }
+
+    var body = { creator_id: creatorId, title: title, event_type: selectedType, accessibility: selectedAccess, event_date: dateISO };
+    if (description) body.description     = description;
+    if (location)    body.location        = location;
+    if (maxP)        body.max_participants = parseInt(maxP, 10);
+    if (imageUrl)    body.image_url       = imageUrl;
+
+    var status = document.getElementById('createStatus');
+    status.className = 'create-status';
+    status.textContent = 'Creando evento...';
+    status.style.display = 'block';
+
+    var token = sessionStorage.getItem('access_token');
+    var headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+
+    fetch(BASE + '/api/events', {
+      method: 'POST', headers: headers, body: JSON.stringify(body)
+    }).then(function(r) {
+      return r.json().then(function(d) { return { ok: r.ok, data: d }; });
+    }).then(function(res) {
+      if (!res.ok) { showCreateErr(res.data.error || 'Error al crear el evento'); return; }
+      status.className = 'create-status ok';
+      status.textContent = '✅ Evento "' + res.data.title + '" creado correctamente (ID: ' + res.data.id + ')';
+      document.getElementById('ev-title').value    = '';
+      document.getElementById('ev-desc').value     = '';
+      document.getElementById('ev-location').value = '';
+      document.getElementById('ev-day').value      = '';
+      document.getElementById('ev-month').value    = '';
+      document.getElementById('ev-year').value     = '';
+      document.getElementById('ev-hour').value     = '';
+      document.getElementById('ev-min').value      = '00';
+      document.getElementById('ev-max').value      = '';
+      document.getElementById('ev-img').value      = '';
+    }).catch(function(err) { showCreateErr('Error de red: ' + err.message); });
+  }
+
+  function showCreateErr(msg) {
+    var s = document.getElementById('createStatus');
+    s.className = 'create-status err';
+    s.textContent = '❌ ' + msg;
   }
 </script>
 </body>

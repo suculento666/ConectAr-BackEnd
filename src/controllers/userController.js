@@ -1,5 +1,5 @@
 // userController.js - maneja todo lo relacionado al usuario
-import { registerUser as registerUserService, loginUser as loginUserService, getUsers, getUser, editUser, searchUsers } from '../services/user.service.js';
+import { registerUser as registerUserService, loginUser as loginUserService, logoutUser as logoutUserService, getUsers, getUser, editUser, searchUsers, getUserParticipations } from '../services/user.service.js';
 
 // POST /api/users/register - crea un usuario nuevo via Supabase Auth
 const registerUser = async (req, res) => {
@@ -21,6 +21,16 @@ const loginUser = async (req, res) => {
     res.status(200).json(result);
   } catch (err) {
     res.status(401).json({ error: err.message });
+  }
+};
+
+// POST /api/users/logout - cierra sesión del usuario autenticado
+const logoutUser = async (_req, res) => {
+  try {
+    const result = await logoutUserService();
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };
 
@@ -54,15 +64,25 @@ const updateUser = async (req, res) => {
   }
 };
 
-// GET /api/users/search?username=xxx - busca usuarios por username
+// GET /api/users/search?q=xxx - busca usuarios por username o nombre
 const searchUsersByUsername = async (req, res) => {
   try {
-    const { username } = req.query;
-    const users = await searchUsers(username);
+    const query = req.query.q || req.query.username;
+    const users = await searchUsers(query);
     res.status(200).json(users);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 };
 
-export { registerUser, loginUser, getAllUsers, getUserById, updateUser, searchUsersByUsername };
+// GET /api/users/:id/events - trae los eventos en los que participa el usuario
+const getUserEvents = async (req, res) => {
+  try {
+    const participations = await getUserParticipations(req.params.id);
+    res.status(200).json(participations);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export { registerUser, loginUser, logoutUser, getAllUsers, getUserById, updateUser, searchUsersByUsername, getUserEvents };
