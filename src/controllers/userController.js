@@ -75,6 +75,17 @@ const searchUsersByUsername = async (req, res) => {
   }
 };
 
+// GET /api/users/:id/suggestions - sugerencias de personas basadas en eventos compartidos
+const getSuggestedUsers = async (req, res) => {
+  try {
+    const { getSuggestions } = await import('../repositories/people.repository.js');
+    const suggestions = await getSuggestions(req.params.id);
+    res.status(200).json(suggestions);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 // GET /api/users/:id/events - trae los eventos en los que participa el usuario
 const getUserEvents = async (req, res) => {
   try {
@@ -85,4 +96,4 @@ const getUserEvents = async (req, res) => {
   }
 };
 
-export { registerUser, loginUser, logoutUser, getAllUsers, getUserById, updateUser, searchUsersByUsername, getUserEvents };
+export { registerUser, loginUser, logoutUser, getAllUsers, getUserById, updateUser, searchUsersByUsername, getUserEvents, getSuggestedUsers };

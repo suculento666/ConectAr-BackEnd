@@ -1,8 +1,11 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import supabase from './src/configs/supabase.js';
 import userRoutes from './src/routes/userRoutes.js';
 import eventRoutes from './src/routes/eventRoutes.js';
+import friendshipRoutes from './src/routes/friendshipRoutes.js';
+import notificationRoutes from './src/routes/notificationRoutes.js';
 
 const app = express();
 
@@ -30,6 +33,8 @@ app.use(express.static('public'));
 // Rutas
 app.use('/api/users', userRoutes);
 app.use('/api/events', eventRoutes);
+app.use('/api/friendships', friendshipRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Ruta de prueba
 app.get('/', (_req, res) => {

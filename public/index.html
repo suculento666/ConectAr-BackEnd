@@ -94,8 +94,77 @@
     .btn-request { width:100%; padding:0.45rem; border-radius:6px; border:none; cursor:pointer; font-size:0.8rem; font-weight:600; background:#2d1010; color:#f87171; border:1px solid #f8717144; transition:background 0.15s; }
     .btn-request:hover { background:#3d1818; }
     .btn-joined  { width:100%; padding:0.45rem; border-radius:6px; border:none; cursor:pointer; font-size:0.8rem; font-weight:600; background:#0d3321; color:#4ade80; border:1px solid #4ade8044; cursor:default; }
+    .btn-leave   { width:100%; padding:0.45rem; border-radius:6px; border:none; cursor:pointer; font-size:0.8rem; font-weight:600; background:#2d1010; color:#f87171; border:1px solid #f8717144; transition:background 0.15s; }
+    .btn-leave:hover   { background:#3d1818; }
     .btn-noauth  { width:100%; padding:0.45rem; border-radius:6px; border:1px solid #2a2a3e; font-size:0.78rem; color:#555; background:transparent; cursor:pointer; transition:color 0.15s; }
     .btn-noauth:hover  { color:#888; }
+
+    /* modal evento */
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center; padding:1rem; }
+    .modal-overlay.open { display:flex; }
+    .modal { background:#16161e; border:1px solid #2a2a3e; border-radius:14px; width:100%; max-width:560px; max-height:90vh; overflow-y:auto; position:relative; }
+    .modal-img { width:100%; height:180px; object-fit:cover; border-radius:14px 14px 0 0; display:block; }
+    .modal-img-placeholder { width:100%; height:180px; display:flex; align-items:center; justify-content:center; font-size:4rem; background:#1e1e2e; border-radius:14px 14px 0 0; }
+    .modal-close { position:absolute; top:0.7rem; right:0.9rem; background:rgba(0,0,0,0.55); border:none; color:#ccc; font-size:1.2rem; width:2rem; height:2rem; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background 0.15s; z-index:10; }
+    .modal-close:hover { background:rgba(0,0,0,0.8); color:#fff; }
+    .modal-body { padding:1.3rem 1.4rem; }
+    .modal-type { display:inline-block; font-size:0.68rem; font-weight:700; padding:0.18rem 0.5rem; border-radius:4px; margin-bottom:0.6rem; text-transform:uppercase; letter-spacing:0.05em; }
+    .modal-title { font-size:1.2rem; font-weight:700; color:#e2e2e2; margin-bottom:0.8rem; line-height:1.3; }
+    .modal-desc { font-size:0.85rem; color:#999; line-height:1.6; margin-bottom:1.1rem; }
+    .modal-meta { display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:1.2rem; }
+    .modal-meta-item { display:flex; align-items:center; gap:0.3rem; background:#1e1e2e; border:1px solid #2a2a3e; padding:0.3rem 0.7rem; border-radius:6px; font-size:0.78rem; color:#aaa; }
+    .modal-section-title { font-size:0.75rem; font-weight:700; color:#a89cf7; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:0.7rem; }
+    .modal-participants { display:flex; flex-wrap:wrap; gap:0.6rem; margin-bottom:1.2rem; }
+    .modal-participant { display:flex; align-items:center; gap:0.5rem; background:#1e1e2e; border:1px solid #2a2a3e; border-radius:8px; padding:0.4rem 0.7rem; }
+    .modal-participant-avatar { width:28px; height:28px; border-radius:50%; object-fit:cover; background:#2a2a3e; }
+    .modal-participant-avatar-ph { width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,#7c6af7,#4a3abf); display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:700; color:#fff; }
+    .modal-participant-name { font-size:0.78rem; color:#ccc; }
+    .modal-footer { padding:1rem 1.4rem 1.3rem; border-top:1px solid #1e1e2e; }
+    .modal-loading { text-align:center; color:#555; font-size:0.85rem; padding:1.5rem 0; }
+
+    /* mis eventos */
+    .my-events-wrap { max-width:900px; margin:0 auto; }
+    .my-events-empty { text-align:center; padding:4rem 2rem; color:#444; }
+    .my-events-empty-icon { font-size:3rem; margin-bottom:1rem; }
+    .my-events-empty p { font-size:0.85rem; }
+    .my-events-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:1.1rem; }
+    .my-event-card { background:#16161e; border:1px solid #7c6af744; border-radius:12px; overflow:hidden; cursor:pointer; transition:border-color 0.15s,transform 0.15s; }
+    .my-event-card:hover { border-color:#7c6af7; transform:translateY(-2px); }
+
+    /* notificaciones */
+    .notif-tab-wrap { position:relative; display:inline-block; }
+    .notif-badge { position:absolute; top:-2px; right:-6px; background:#f87171; color:#fff; font-size:0.6rem; font-weight:700; border-radius:999px; min-width:16px; height:16px; display:none; align-items:center; justify-content:center; padding:0 4px; pointer-events:none; }
+    .notif-badge.visible { display:flex; }
+    .notif-list { display:flex; flex-direction:column; gap:0.7rem; }
+    .notif-item { display:flex; align-items:center; gap:0.9rem; background:#16161e; border:1px solid #2a2a3e; border-radius:10px; padding:0.8rem 1rem; }
+    .notif-avatar { width:40px; height:40px; border-radius:50%; object-fit:cover; background:#2a2a3e; flex-shrink:0; }
+    .notif-avatar-ph { width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,#7c6af7,#4a3abf); display:flex; align-items:center; justify-content:center; font-size:1rem; font-weight:700; color:#fff; flex-shrink:0; }
+    .notif-text { flex:1; min-width:0; }
+    .notif-text strong { color:#e2e2e2; font-size:0.85rem; }
+    .notif-text p { font-size:0.78rem; color:#888; margin-top:0.15rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .notif-text time { font-size:0.7rem; color:#444; display:block; margin-top:0.2rem; }
+    .notif-actions { display:flex; gap:0.5rem; flex-shrink:0; }
+    .notif-actions button { padding:0.35rem 0.75rem; border-radius:6px; border:none; cursor:pointer; font-size:0.75rem; font-weight:600; transition:background 0.15s; }
+    .btn-notif-accept { background:#0d3321; color:#4ade80; border:1px solid #4ade8044; }
+    .btn-notif-accept:hover { background:#143d28; }
+    .btn-notif-reject { background:#2d1010; color:#f87171; border:1px solid #f8717144; }
+    .btn-notif-reject:hover { background:#3d1818; }
+    .notif-empty { text-align:center; padding:4rem 2rem; color:#444; }
+    .notif-empty-icon { font-size:3rem; margin-bottom:1rem; }
+    .notif-wrap { max-width:700px; margin:0 auto; }
+
+    /* personas / amigos */
+    .people-wrap { max-width:960px; margin:0 auto; }
+    .people-section-title { font-size:0.78rem; font-weight:700; color:#a89cf7; text-transform:uppercase; letter-spacing:0.07em; margin-bottom:0.9rem; padding-bottom:0.4rem; border-bottom:1px solid #2a2a3e; }
+    .people-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:0.9rem; margin-bottom:2rem; }
+    .people-card { background:#16161e; border:1px solid #2a2a3e; border-radius:12px; padding:1rem; display:flex; flex-direction:column; align-items:center; gap:0.4rem; text-align:center; transition:border-color 0.15s,transform 0.15s; }
+    .people-card:hover { border-color:#7c6af7; transform:translateY(-2px); }
+    .people-card-avatar { width:52px; height:52px; border-radius:50%; object-fit:cover; background:#2a2a3e; border:2px solid #2a2a3e; cursor:pointer; }
+    .people-card-avatar-ph { width:52px; height:52px; border-radius:50%; background:linear-gradient(135deg,#7c6af7,#4a3abf); display:flex; align-items:center; justify-content:center; font-size:1.1rem; font-weight:700; color:#fff; cursor:pointer; }
+    .people-card-name { font-size:0.88rem; font-weight:600; color:#e2e2e2; cursor:pointer; }
+    .people-card-username { font-size:0.73rem; color:#7c6af7; cursor:pointer; }
+    .people-card-shared { font-size:0.7rem; color:#555; margin-top:0.1rem; }
+    .people-empty { text-align:center; padding:2rem; color:#444; font-size:0.83rem; }
 
     /* auth */
     .auth-wrap { max-width: 400px; margin: 2rem auto; }
@@ -132,6 +201,19 @@
     .search-empty { text-align: center; padding: 4rem 2rem; color: #444; }
     .search-empty-icon { font-size: 3rem; margin-bottom: 1rem; }
     .search-hint { font-size: 0.78rem; color: #555; margin-top: 0.5rem; }
+    /* botón amistad */
+    .btn-add-friend    { margin-top:0.5rem; width:100%; padding:0.4rem; border-radius:6px; border:1px solid #7c6af744; background:#2a1f6e; color:#c4baff; font-size:0.78rem; font-weight:600; cursor:pointer; transition:background 0.15s; }
+    .btn-add-friend:hover { background:#352a8a; }
+    .btn-remove-friend { margin-top:0.5rem; width:100%; padding:0.4rem; border-radius:6px; border:1px solid #f8717144; background:#2d1010; color:#f87171; font-size:0.78rem; font-weight:600; cursor:pointer; transition:background 0.15s; }
+    .btn-remove-friend:hover { background:#3d1818; }
+    .btn-friend-loading { margin-top:0.5rem; width:100%; padding:0.4rem; border-radius:6px; border:1px solid #2a2a3e; background:#1e1e2e; color:#555; font-size:0.78rem; cursor:default; }
+    /* modal de perfil */
+    .profile-modal-avatar { width:80px; height:80px; border-radius:50%; object-fit:cover; background:#2a2a3e; border:3px solid #2a2a3e; margin:0 auto 0.7rem; display:block; }
+    .profile-modal-avatar-ph { width:80px; height:80px; border-radius:50%; background:linear-gradient(135deg,#7c6af7,#4a3abf); display:flex; align-items:center; justify-content:center; font-size:2rem; font-weight:700; color:#fff; margin:0 auto 0.7rem; }
+    .profile-modal-name { font-size:1.15rem; font-weight:700; color:#e2e2e2; text-align:center; margin-bottom:0.2rem; }
+    .profile-modal-username { font-size:0.82rem; color:#7c6af7; text-align:center; margin-bottom:0.7rem; }
+    .profile-modal-bio { font-size:0.83rem; color:#888; text-align:center; line-height:1.5; margin-bottom:1rem; }
+    .profile-modal-pills { display:flex; justify-content:center; gap:0.6rem; flex-wrap:wrap; margin-bottom:1.2rem; }
 
     /* crear evento */
     .create-wrap { max-width: 620px; margin: 2rem auto; }
@@ -194,6 +276,12 @@
   <div class="tab" onclick="switchTab('auth')">Auth</div>
   <div class="tab" onclick="switchTab('search')">Buscador</div>
   <div class="tab" onclick="switchTab('create')">➕ Crear Evento</div>
+  <div class="tab" onclick="switchTab('myevents')">🎟 Mis Eventos</div>
+  <div class="tab notif-tab-wrap" onclick="switchTab('notifications')">
+    🔔 Notificaciones
+    <span class="notif-badge" id="notifBadge"></span>
+  </div>
+  <div class="tab" onclick="switchTab('people')">👥 Personas</div>
 </div>
 
 <!-- TAB: RUTAS -->
@@ -585,6 +673,53 @@
   </div>
 </div>
 
+<!-- TAB: MIS EVENTOS -->
+<div class="tab-content" id="tab-myevents">
+  <div class="page my-events-wrap">
+    <div id="myEventsGrid" class="my-events-grid">
+      <div class="feed-loading">Cargando...</div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB: NOTIFICACIONES -->
+<div class="tab-content" id="tab-notifications">
+  <div class="page notif-wrap">
+    <div id="notifList">
+      <div class="feed-loading">Cargando...</div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB: PERSONAS -->
+<div class="tab-content" id="tab-people">
+  <div class="page people-wrap">
+    <div id="peopleContent">
+      <div class="feed-loading">Cargando...</div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EVENTO -->
+<div class="modal-overlay" id="eventModal" onclick="closeModal(event)">
+  <div class="modal" id="eventModalBox">
+    <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    <div id="modalContent">
+      <div class="modal-loading">Cargando...</div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PERFIL -->
+<div class="modal-overlay" id="profileModal" onclick="closeProfileModal(event)">
+  <div class="modal" id="profileModalBox" style="max-width:420px">
+    <button class="modal-close" onclick="closeProfileModalDirect()">✕</button>
+    <div id="profileModalContent" style="padding:1.5rem 1.4rem 1.3rem">
+      <div class="modal-loading">Cargando...</div>
+    </div>
+  </div>
+</div>
+
 <script>
   var BASE = window.location.origin;
 
@@ -597,7 +732,7 @@
   });
 
   function switchTab(name) {
-    var names = ['routes','inserts','feed','tester','auth','search','create'];
+    var names = ['routes','inserts','feed','tester','auth','search','create','myevents','notifications','people'];
     var tabs = document.querySelectorAll('.tab');
     var contents = document.querySelectorAll('.tab-content');
     for (var i = 0; i < tabs.length; i++) {
@@ -606,9 +741,12 @@
     for (var j = 0; j < contents.length; j++) {
       contents[j].classList.toggle('active', contents[j].id === 'tab-' + name);
     }
-    if (name === 'feed')   loadFeed();
-    if (name === 'auth')   refreshAuthUI();
-    if (name === 'create') initEventForm();
+    if (name === 'feed')          loadFeed();
+    if (name === 'auth')          refreshAuthUI();
+    if (name === 'create')        initEventForm();
+    if (name === 'myevents')      loadMyEvents();
+    if (name === 'notifications') loadNotifications();
+    if (name === 'people')        loadPeople();
   }
 
   function goTester(method, path, body) {
@@ -662,7 +800,7 @@
     if (!userId) {
       footer = '<button class="btn-noauth" onclick="switchTab(\'auth\')">Iniciá sesión para unirte</button>';
     } else if (alreadyIn) {
-      footer = '<button class="btn-joined" disabled>✅ Ya estás anotado</button>';
+      footer = '<button class="btn-leave" onclick="leaveEvent(\'' + ev.id + '\',this)">🚪 Salir del evento</button>';
     } else if (isPrivado) {
       footer = '<button class="btn-request" onclick="joinEvent(\'' + ev.id + '\',\'' + ev.title.replace(/'/g,"\\'") + '\',true,this)">📩 Solicitar unirse</button>';
     } else {
@@ -672,7 +810,7 @@
     return '<div class="event-card">'
       + '<img class="event-card-img" src="' + img + '" alt="' + ev.title + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
       + '<div class="event-card-placeholder" style="display:none">' + emoji + '</div>'
-      + '<div class="event-card-body">'
+      + '<div class="event-card-body" style="cursor:pointer" onclick="openModal(\'' + ev.id + '\')">'
       + '<span class="event-card-type ' + color + '">' + emoji + ' ' + type + '</span>'
       + '<div class="event-card-title">' + ev.title + '</div>'
       + '<div class="event-card-desc">' + (ev.description || 'Sin descripción') + '</div>'
@@ -684,6 +822,37 @@
       + '</div></div>'
       + '<div class="event-card-footer">' + footer + '</div>'
       + '</div>';
+  }
+
+  function leaveEvent(eventId, btn) {
+    var userRaw = sessionStorage.getItem('session_user');
+    var token   = sessionStorage.getItem('access_token');
+    if (!userRaw || !token) { switchTab('auth'); return; }
+    var userId = JSON.parse(userRaw).id;
+    btn.disabled = true;
+    btn.textContent = 'Saliendo...';
+    fetch(BASE + '/api/events/' + eventId + '/join', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ user_id: userId })
+    }).then(function(r) {
+      return r.json().then(function(d) { return { ok: r.ok, data: d }; });
+    }).then(function(res) {
+      if (res.ok) {
+        btn.className = 'btn-join';
+        btn.textContent = '✅ Unirse al evento';
+        btn.disabled = false;
+        btn.onclick = function() { joinEvent(eventId, eventId, false, btn); };
+      } else {
+        btn.disabled = false;
+        btn.textContent = '🚪 Salir del evento';
+        alert('Error: ' + (res.data.error || 'No se pudo salir del evento'));
+      }
+    }).catch(function(err) {
+      btn.disabled = false;
+      btn.textContent = '🚪 Salir del evento';
+      alert('Error de red: ' + err.message);
+    });
   }
 
   function joinEvent(eventId, eventTitle, isPrivado, btn) {
@@ -701,19 +870,15 @@
       return r.json().then(function(d) { return { ok: r.ok, data: d }; });
     }).then(function(res) {
       if (res.ok) {
-        btn.className = 'btn-joined';
-        btn.textContent = isPrivado ? '📩 Solicitud enviada' : '✅ ¡Te uniste!';
+        btn.className = 'btn-leave';
+        btn.textContent = '🚪 Salir del evento';
+        btn.disabled = false;
+        btn.onclick = function() { leaveEvent(eventId, btn); };
       } else {
         var msg = res.data.error || '';
-        // Si ya estaba anotado, mostrar estado final en vez de error
-        if (msg.includes('Ya estás anotado')) {
-          btn.className = 'btn-joined';
-          btn.textContent = '✅ Ya estás anotado';
-        } else {
-          btn.disabled = false;
-          btn.textContent = isPrivado ? '📩 Solicitar unirse' : '✅ Unirse al evento';
-          alert('Error: ' + msg);
-        }
+        btn.disabled = false;
+        btn.textContent = isPrivado ? '📩 Solicitar unirse' : '✅ Unirse al evento';
+        alert('Error: ' + msg);
       }
     }).catch(function(err) {
       btn.disabled = false;
@@ -760,7 +925,7 @@
         grid.innerHTML = '<div class="feed-empty"><div class="feed-empty-icon">📭</div><p>No hay eventos' + label + '.<br>Creá uno desde <strong>Inserts rápidos</strong>.</p></div>';
         count.textContent = '0 eventos'; return;
       }
-      var sorted = evRes.data.slice().sort(function(a,b){ return new Date(a.event_date) - new Date(b.event_date); });
+      var sorted = evRes.data.slice().sort(function(a,b){ return new Date(b.created_at) - new Date(a.created_at); });
       grid.innerHTML = sorted.map(function(ev){ return renderCard(ev, joinedSet); }).join('');
       count.textContent = sorted.length + ' evento' + (sorted.length !== 1 ? 's' : '') + (activeFilter ? ' · ' + activeFilter : '');
     }).catch(function(err) {
@@ -910,6 +1075,7 @@
           return;
         }
         results.innerHTML = res.data.map(renderUserCard).join('');
+        loadFriendshipStates(res.data);
       })
       .catch(function(err) {
         results.innerHTML = '<div class="search-empty"><div class="search-empty-icon">❌</div><p>Error de red: ' + err.message + '</p></div>';
@@ -922,15 +1088,262 @@
       ? '<img class="user-avatar" src="' + user.avatar_url + '" alt="' + user.username + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
         + '<div class="user-avatar-placeholder" style="display:none">' + initials + '</div>'
       : '<div class="user-avatar-placeholder">' + initials + '</div>';
-    return '<div class="user-card">'
+
+    var myRaw = sessionStorage.getItem('session_user');
+    var myId  = myRaw ? JSON.parse(myRaw).id : null;
+    // No mostrar botón si es el propio usuario
+    var friendBtn = '';
+    if (myId && myId !== user.id) {
+      friendBtn = '<button class="btn-friend-loading" id="fbtn-' + user.id + '" disabled>...</button>';
+    }
+
+    return '<div class="user-card" style="cursor:pointer">'
+      + '<div onclick="openProfileModal(\'' + user.id + '\')" style="display:contents">'
       + avatar
       + '<div class="user-card-name">' + (user.full_name || user.username) + '</div>'
       + '<div class="user-card-username">@' + user.username + '</div>'
-      + (user.bio ? '<div class="user-card-bio">' + user.bio + '</div>' : '')
-      + '<div class="user-card-meta">'
-      + '<span class="user-meta-pill">⭐ Nv ' + (user.level || 1) + '</span>'
+      + '</div>'
+      + friendBtn
+      + '</div>';
+  }
+
+  // Después de renderizar, carga el estado de amistad de cada card
+  function loadFriendshipStates(users) {
+    var myRaw = sessionStorage.getItem('session_user');
+    var token = sessionStorage.getItem('access_token');
+    if (!myRaw || !token) {
+      // Sin sesión: mostrar botón login en cada card
+      users.forEach(function(u) {
+        var btn = document.getElementById('fbtn-' + u.id);
+        if (!btn) return;
+        btn.className = 'btn-add-friend';
+        btn.disabled = false;
+        btn.textContent = '➕ Agregar amigo';
+        btn.onclick = function() { switchTab('auth'); };
+      });
+      return;
+    }
+    var myId = JSON.parse(myRaw).id;
+    users.forEach(function(u) {
+      if (u.id === myId) return;
+      var btn = document.getElementById('fbtn-' + u.id);
+      if (!btn) return;
+      fetch(BASE + '/api/friendships/status/' + u.id, {
+        headers: { 'Authorization': 'Bearer ' + token }
+      }).then(function(r){ return r.json(); }).then(function(rel) {
+        renderFriendBtn(btn, u.id, rel);
+      }).catch(function() {
+        btn.className = 'btn-add-friend';
+        btn.disabled = false;
+        btn.textContent = '➕ Agregar amigo';
+        btn.onclick = function() { sendFriendReq(u.id, btn); };
+      });
+    });
+  }
+
+  function renderFriendBtn(btn, friendId, rel) {
+    if (!rel || rel.status === 'none') {
+      btn.className = 'btn-add-friend';
+      btn.disabled = false;
+      btn.textContent = '➕ Agregar amigo';
+      btn.onclick = function() { sendFriendReq(friendId, btn); };
+    } else if (rel.status === 'pending' && rel.direction === 'sent') {
+      btn.className = 'btn-remove-friend';
+      btn.disabled = false;
+      btn.textContent = '✕ Cancelar solicitud';
+      btn.onclick = function() { removeFriendReq(friendId, btn); };
+    } else if (rel.status === 'pending' && rel.direction === 'received') {
+      btn.className = 'btn-add-friend';
+      btn.disabled = false;
+      btn.textContent = '✅ Aceptar solicitud';
+      btn.onclick = function() { acceptFriendReq(friendId, btn); };
+    } else if (rel.status === 'accepted') {
+      btn.className = 'btn-remove-friend';
+      btn.disabled = false;
+      btn.textContent = '✖ Eliminar amigo';
+      btn.onclick = function() { removeFriendReq(friendId, btn); };
+    }
+  }
+
+  function sendFriendReq(friendId, btn) {
+    var token = sessionStorage.getItem('access_token');
+    if (!token) { switchTab('auth'); return; }
+    btn.disabled = true; btn.textContent = 'Enviando...';
+    fetch(BASE + '/api/friendships', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ friend_id: friendId })
+    }).then(function(r){ return r.json().then(function(d){ return { ok: r.ok, data: d }; }); })
+    .then(function(res) {
+      if (res.ok) {
+        renderFriendBtn(btn, friendId, { status: 'pending', direction: 'sent' });
+      } else {
+        btn.disabled = false; btn.textContent = '➕ Agregar amigo';
+        alert('Error: ' + (res.data.error || 'No se pudo enviar la solicitud'));
+      }
+    }).catch(function(){ btn.disabled = false; btn.textContent = '➕ Agregar amigo'; });
+  }
+
+  function acceptFriendReq(requesterId, btn) {
+    var token = sessionStorage.getItem('access_token');
+    if (!token) return;
+    btn.disabled = true; btn.textContent = 'Aceptando...';
+    fetch(BASE + '/api/friendships/' + requesterId + '/accept', {
+      method: 'PUT',
+      headers: { 'Authorization': 'Bearer ' + token }
+    }).then(function(r){ return r.json().then(function(d){ return { ok: r.ok, data: d }; }); })
+    .then(function(res) {
+      if (res.ok) {
+        renderFriendBtn(btn, requesterId, { status: 'accepted', direction: 'sent' });
+      } else {
+        btn.disabled = false; btn.textContent = '✅ Aceptar solicitud';
+        alert('Error: ' + (res.data.error || 'No se pudo aceptar'));
+      }
+    }).catch(function(){ btn.disabled = false; btn.textContent = '✅ Aceptar solicitud'; });
+  }
+
+  function removeFriendReq(friendId, btn) {
+    var token = sessionStorage.getItem('access_token');
+    if (!token) return;
+    btn.disabled = true; btn.textContent = 'Eliminando...';
+    fetch(BASE + '/api/friendships/' + friendId, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + token }
+    }).then(function(r){ return r.json().then(function(d){ return { ok: r.ok, data: d }; }); })
+    .then(function(res) {
+      if (res.ok) {
+        renderFriendBtn(btn, friendId, { status: 'none' });
+      } else {
+        btn.disabled = false; btn.textContent = '✖ Eliminar amigo';
+        alert('Error: ' + (res.data.error || 'No se pudo eliminar'));
+      }
+    }).catch(function(){ btn.disabled = false; btn.textContent = '✖ Eliminar amigo'; });
+  }
+
+  // --- MODAL DE PERFIL ---
+  function openProfileModal(userId) {
+    var overlay = document.getElementById('profileModal');
+    var content = document.getElementById('profileModalContent');
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    content.innerHTML = '<div class="modal-loading">⏳ Cargando perfil...</div>';
+
+    var token = sessionStorage.getItem('access_token');
+    Promise.all([
+      fetch(BASE + '/api/users/' + userId).then(function(r){ return r.json(); }),
+      token
+        ? fetch(BASE + '/api/friendships/status/' + userId, { headers: { 'Authorization': 'Bearer ' + token } }).then(function(r){ return r.json(); }).catch(function(){ return { status: 'none' }; })
+        : Promise.resolve({ status: 'none' })
+    ]).then(function(results) {
+      var user = results[0];
+      var rel  = results[1];
+      if (user.error) { content.innerHTML = '<div class="modal-loading">❌ ' + user.error + '</div>'; return; }
+      renderProfileModal(user, rel);
+    }).catch(function(err) {
+      content.innerHTML = '<div class="modal-loading">❌ Error: ' + err.message + '</div>';
+    });
+  }
+
+  function renderProfileModal(user, rel) {
+    var content  = document.getElementById('profileModalContent');
+    var initials = (user.full_name || user.username || '?').split(' ').map(function(w){ return w[0]; }).slice(0,2).join('').toUpperCase();
+    var myRaw = sessionStorage.getItem('session_user');
+    var myId  = myRaw ? JSON.parse(myRaw).id : null;
+
+    var avatarHtml = user.avatar_url
+      ? '<img class="profile-modal-avatar" src="' + user.avatar_url + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
+        + '<div class="profile-modal-avatar-ph" style="display:none">' + initials + '</div>'
+      : '<div class="profile-modal-avatar-ph">' + initials + '</div>';
+
+    // Botón de amistad
+    var btnHtml = '';
+    if (myId && myId !== user.id) {
+      if (!rel || rel.status === 'none') {
+        btnHtml = '<button class="btn-add-friend" style="margin-top:1rem" id="profileFriendBtn" onclick="profileSendReq(\'' + user.id + '\')">➕ Agregar amigo</button>';
+      } else if (rel.status === 'pending' && rel.direction === 'sent') {
+        btnHtml = '<button class="btn-remove-friend" style="margin-top:1rem" id="profileFriendBtn" onclick="profileRemoveReq(\'' + user.id + '\')">✕ Cancelar solicitud</button>';
+      } else if (rel.status === 'pending' && rel.direction === 'received') {
+        btnHtml = '<button class="btn-add-friend" style="margin-top:1rem" id="profileFriendBtn" onclick="profileAcceptReq(\'' + user.id + '\')">✅ Aceptar solicitud</button>';
+      } else if (rel.status === 'accepted') {
+        btnHtml = '<button class="btn-remove-friend" style="margin-top:1rem" id="profileFriendBtn" onclick="profileRemoveReq(\'' + user.id + '\')">✖ Eliminar amigo</button>';
+      }
+    }
+
+    content.innerHTML =
+      avatarHtml
+      + '<div class="profile-modal-name">' + (user.full_name || user.username) + '</div>'
+      + '<div class="profile-modal-username">@' + user.username + '</div>'
+      + (user.bio ? '<div class="profile-modal-bio">' + user.bio + '</div>' : '')
+      + '<div class="profile-modal-pills">'
+      + '<span class="user-meta-pill">⭐ Nivel ' + (user.level || 1) + '</span>'
       + '<span class="user-meta-pill">🔥 ' + (user.xp || 0) + ' XP</span>'
-      + '</div></div>';
+      + '<span class="user-meta-pill">📅 Desde ' + new Date(user.created_at).toLocaleDateString('es-AR', { month: 'short', year: 'numeric' }) + '</span>'
+      + '</div>'
+      + btnHtml;
+  }
+
+  function profileSendReq(friendId) {
+    var token = sessionStorage.getItem('access_token');
+    if (!token) { closeProfileModalDirect(); switchTab('auth'); return; }
+    var btn = document.getElementById('profileFriendBtn');
+    btn.disabled = true; btn.textContent = 'Enviando...';
+    fetch(BASE + '/api/friendships', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ friend_id: friendId })
+    }).then(function(r){ return r.json().then(function(d){ return { ok: r.ok, data: d }; }); })
+    .then(function(res) {
+      if (res.ok) {
+        btn.className = 'btn-friend-loading'; btn.textContent = '⏳ Solicitud enviada';
+      } else {
+        btn.disabled = false; btn.textContent = '➕ Agregar amigo';
+        alert('Error: ' + (res.data.error || 'No se pudo enviar'));
+      }
+    }).catch(function(){ btn.disabled = false; });
+  }
+
+  function profileAcceptReq(requesterId) {
+    var token = sessionStorage.getItem('access_token');
+    if (!token) return;
+    var btn = document.getElementById('profileFriendBtn');
+    btn.disabled = true; btn.textContent = 'Aceptando...';
+    fetch(BASE + '/api/friendships/' + requesterId + '/accept', {
+      method: 'PUT', headers: { 'Authorization': 'Bearer ' + token }
+    }).then(function(r){ return r.json().then(function(d){ return { ok: r.ok, data: d }; }); })
+    .then(function(res) {
+      if (res.ok) {
+        btn.className = 'btn-remove-friend'; btn.textContent = '✖ Eliminar amigo'; btn.disabled = false;
+        btn.onclick = function() { profileRemoveReq(requesterId); };
+      } else {
+        btn.disabled = false; btn.textContent = '✅ Aceptar solicitud';
+      }
+    }).catch(function(){ btn.disabled = false; });
+  }
+
+  function profileRemoveReq(friendId) {
+    var token = sessionStorage.getItem('access_token');
+    if (!token) return;
+    var btn = document.getElementById('profileFriendBtn');
+    btn.disabled = true; btn.textContent = 'Eliminando...';
+    fetch(BASE + '/api/friendships/' + friendId, {
+      method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token }
+    }).then(function(r){ return r.json().then(function(d){ return { ok: r.ok, data: d }; }); })
+    .then(function(res) {
+      if (res.ok) {
+        btn.className = 'btn-add-friend'; btn.textContent = '➕ Agregar amigo'; btn.disabled = false;
+        btn.onclick = function() { profileSendReq(friendId); };
+      } else {
+        btn.disabled = false; btn.textContent = '✖ Eliminar amigo';
+      }
+    }).catch(function(){ btn.disabled = false; });
+  }
+
+  function closeProfileModal(e) {
+    if (e.target === document.getElementById('profileModal')) closeProfileModalDirect();
+  }
+  function closeProfileModalDirect() {
+    document.getElementById('profileModal').classList.remove('open');
+    document.body.style.overflow = '';
   }
   // --- CREAR EVENTO ---
   var selectedType   = null;
@@ -1065,18 +1478,8 @@
       return r.json().then(function(d) { return { ok: r.ok, data: d }; });
     }).then(function(res) {
       if (!res.ok) { showCreateErr(res.data.error || 'Error al crear el evento'); return; }
-      status.className = 'create-status ok';
-      status.textContent = '✅ Evento "' + res.data.title + '" creado correctamente (ID: ' + res.data.id + ')';
-      document.getElementById('ev-title').value    = '';
-      document.getElementById('ev-desc').value     = '';
-      document.getElementById('ev-location').value = '';
-      document.getElementById('ev-day').value      = '';
-      document.getElementById('ev-month').value    = '';
-      document.getElementById('ev-year').value     = '';
-      document.getElementById('ev-hour').value     = '';
-      document.getElementById('ev-min').value      = '00';
-      document.getElementById('ev-max').value      = '';
-      document.getElementById('ev-img').value      = '';
+      resetEventForm();
+      switchTab('feed');
     }).catch(function(err) { showCreateErr('Error de red: ' + err.message); });
   }
 
@@ -1085,6 +1488,355 @@
     s.className = 'create-status err';
     s.textContent = '❌ ' + msg;
   }
+
+  // --- MIS EVENTOS ---
+  function loadMyEvents() {
+    var grid = document.getElementById('myEventsGrid');
+    var userRaw = sessionStorage.getItem('session_user');
+    if (!userRaw) {
+      grid.innerHTML = '<div class="my-events-empty"><div class="my-events-empty-icon">🔐</div><p>Iniciá sesión para ver tus eventos.</p></div>';
+      return;
+    }
+    var userId = JSON.parse(userRaw).id;
+    grid.innerHTML = '<div class="feed-loading">Cargando tus eventos...</div>';
+
+    // Traer participaciones del usuario → luego todos los eventos para cruzar
+    Promise.all([
+      fetch(BASE + '/api/users/' + userId + '/events').then(function(r){ return r.ok ? r.json() : []; }).catch(function(){ return []; }),
+      fetch(BASE + '/api/events').then(function(r){ return r.json(); }).catch(function(){ return []; })
+    ]).then(function(results) {
+      var participations = results[0];
+      var allEvents      = results[1];
+      if (!Array.isArray(participations) || !Array.isArray(allEvents)) {
+        grid.innerHTML = '<div class="my-events-empty"><div class="my-events-empty-icon">⚠️</div><p>Error al cargar tus eventos.</p></div>';
+        return;
+      }
+      var joinedIds = {};
+      participations.forEach(function(p) { if (p.event_id) joinedIds[p.event_id] = true; });
+      var myEvents = allEvents.filter(function(ev) { return joinedIds[ev.id]; });
+      if (!myEvents.length) {
+        grid.innerHTML = '<div class="my-events-empty"><div class="my-events-empty-icon">🎟</div><p>Todavía no te uniste a ningún evento.<br>Explorá la <strong>Home</strong> para encontrar uno.</p></div>';
+        return;
+      }
+      myEvents.sort(function(a,b){ return new Date(b.created_at) - new Date(a.created_at); });
+      grid.innerHTML = myEvents.map(function(ev){ return renderMyEventCard(ev); }).join('');
+    });
+  }
+
+  function renderMyEventCard(ev) {
+    var type  = ev.event_type || 'otro';
+    var emoji = TYPE_EMOJI[type] || '📌';
+    var color = TYPE_COLOR[type] || 'type-otro';
+    var img   = ev.image_url || TYPE_IMG[type] || TYPE_IMG.otro;
+    return '<div class="my-event-card" onclick="openModal(\'' + ev.id + '\')">'
+      + '<img class="event-card-img" src="' + img + '" alt="' + ev.title + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
+      + '<div class="event-card-placeholder" style="display:none">' + emoji + '</div>'
+      + '<div class="event-card-body">'
+      + '<span class="event-card-type ' + color + '">' + emoji + ' ' + type + '</span>'
+      + '<div class="event-card-title">' + ev.title + '</div>'
+      + '<div class="event-card-meta" style="margin-top:0.4rem">'
+      + '<span class="event-meta-item">📅 ' + formatDate(ev.event_date) + '</span>'
+      + '<span class="event-meta-item">📍 ' + (ev.location || 'Sin ubicación') + '</span>'
+      + '</div></div>'
+      + '</div>';
+  }
+
+  // --- MODAL ---
+  function openModal(eventId) {
+    var overlay = document.getElementById('eventModal');
+    var content = document.getElementById('modalContent');
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    content.innerHTML = '<div class="modal-loading">⏳ Cargando...</div>';
+
+    Promise.all([
+      fetch(BASE + '/api/events/' + eventId).then(function(r){ return r.json(); }),
+      fetch(BASE + '/api/events/' + eventId + '/participants').then(function(r){ return r.ok ? r.json() : []; }).catch(function(){ return []; })
+    ]).then(function(results) {
+      var ev           = results[0];
+      var participants = results[1];
+      if (ev.error) { content.innerHTML = '<div class="modal-loading">❌ ' + ev.error + '</div>'; return; }
+      renderModal(ev, participants);
+    }).catch(function(err) {
+      content.innerHTML = '<div class="modal-loading">❌ Error: ' + err.message + '</div>';
+    });
+  }
+
+  function renderModal(ev, participants) {
+    var content = document.getElementById('modalContent');
+    var type    = ev.event_type || 'otro';
+    var emoji   = TYPE_EMOJI[type] || '📌';
+    var color   = TYPE_COLOR[type] || 'type-otro';
+    var img     = ev.image_url || TYPE_IMG[type] || TYPE_IMG.otro;
+    var isPrivado = ev.accessibility === 'privado';
+
+    var userRaw = sessionStorage.getItem('session_user');
+    var userId  = userRaw ? JSON.parse(userRaw).id : null;
+    var token   = sessionStorage.getItem('access_token');
+
+    // Participantes
+    var pHtml = '';
+    if (!participants || !participants.length) {
+      pHtml = '<span style="color:#555;font-size:0.8rem">Nadie se unió todavía.</span>';
+    } else {
+      pHtml = participants.map(function(p) {
+        var u = p.users || {};
+        var name = u.full_name || u.username || 'Usuario';
+        var initials = name.split(' ').map(function(w){ return w[0]; }).slice(0,2).join('').toUpperCase();
+        var avatarHtml = u.avatar_url
+          ? '<img class="modal-participant-avatar" src="' + u.avatar_url + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
+            + '<div class="modal-participant-avatar-ph" style="display:none">' + initials + '</div>'
+          : '<div class="modal-participant-avatar-ph">' + initials + '</div>';
+        return '<div class="modal-participant">' + avatarHtml + '<span class="modal-participant-name">' + name + '</span></div>';
+      }).join('');
+    }
+
+    // Botón acción
+    var btnHtml = '';
+    if (!userId) {
+      btnHtml = '<button class="btn-noauth" style="width:100%" onclick="switchTab(\'auth\')">Iniciá sesión para unirte</button>';
+    } else {
+      // Chequeamos si el usuario ya está en la lista
+      var alreadyIn = participants && participants.some(function(p){ return p.user_id === userId; });
+      if (alreadyIn) {
+        btnHtml = '<button class="btn-leave" style="width:100%" id="modalJoinBtn" onclick="modalLeave(\'' + ev.id + '\')">🚪 Salir del evento</button>';
+      } else if (isPrivado) {
+        btnHtml = '<button class="btn-request" style="width:100%" id="modalJoinBtn" onclick="modalJoin(\'' + ev.id + '\',true)">📩 Solicitar unirse</button>';
+      } else {
+        btnHtml = '<button class="btn-join" style="width:100%" id="modalJoinBtn" onclick="modalJoin(\'' + ev.id + '\',false)">✅ Unirse al evento</button>';
+      }
+    }
+
+    content.innerHTML =
+      '<img class="modal-img" src="' + img + '" alt="' + ev.title + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
+      + '<div class="modal-img-placeholder" style="display:none">' + emoji + '</div>'
+      + '<div class="modal-body">'
+      + '<span class="modal-type ' + color + '">' + emoji + ' ' + type + '</span>'
+      + '<div class="modal-title">' + ev.title + '</div>'
+      + '<div class="modal-desc">' + (ev.description || 'Sin descripción.') + '</div>'
+      + '<div class="modal-meta">'
+      + '<span class="modal-meta-item">📅 ' + formatDate(ev.event_date) + '</span>'
+      + '<span class="modal-meta-item">📍 ' + (ev.location || 'Sin ubicación') + '</span>'
+      + '<span class="modal-meta-item">👥 ' + (ev.max_participants ? ev.max_participants + ' cupos' : 'Sin límite') + '</span>'
+      + '<span class="modal-meta-item">' + (isPrivado ? '<span class="access-privado">🔒 Privado</span>' : '<span class="access-publico">🌐 Público</span>') + '</span>'
+      + '</div>'
+      + '<div class="modal-section-title">Participantes (' + (participants ? participants.length : 0) + ')</div>'
+      + '<div class="modal-participants">' + pHtml + '</div>'
+      + '</div>'
+      + '<div class="modal-footer">' + btnHtml + '</div>';
+  }
+
+  function modalJoin(eventId, isPrivado) {
+    var btn = document.getElementById('modalJoinBtn');
+    var userRaw = sessionStorage.getItem('session_user');
+    var token   = sessionStorage.getItem('access_token');
+    if (!userRaw || !token) { closeModalDirect(); switchTab('auth'); return; }
+    var userId = JSON.parse(userRaw).id;
+    btn.disabled = true;
+    btn.textContent = isPrivado ? 'Solicitando...' : 'Uniéndose...';
+    fetch(BASE + '/api/events/' + eventId + '/join', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ user_id: userId })
+    }).then(function(r){ return r.json().then(function(d){ return { ok: r.ok, data: d }; }); })
+    .then(function(res) {
+      if (res.ok) {
+        btn.className = 'btn-leave';
+        btn.textContent = '🚪 Salir del evento';
+        btn.disabled = false;
+        btn.onclick = function() { modalLeave(eventId); };
+      } else {
+        btn.disabled = false;
+        btn.textContent = isPrivado ? '📩 Solicitar unirse' : '✅ Unirse al evento';
+        alert('Error: ' + (res.data.error || 'No se pudo unir al evento'));
+      }
+    }).catch(function(err) {
+      btn.disabled = false;
+      alert('Error de red: ' + err.message);
+    });
+  }
+
+  function modalLeave(eventId) {
+    var btn = document.getElementById('modalJoinBtn');
+    var userRaw = sessionStorage.getItem('session_user');
+    var token   = sessionStorage.getItem('access_token');
+    if (!userRaw || !token) return;
+    var userId = JSON.parse(userRaw).id;
+    btn.disabled = true;
+    btn.textContent = 'Saliendo...';
+    fetch(BASE + '/api/events/' + eventId + '/join', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ user_id: userId })
+    }).then(function(r){ return r.json().then(function(d){ return { ok: r.ok, data: d }; }); })
+    .then(function(res) {
+      if (res.ok) {
+        btn.className = 'btn-join';
+        btn.textContent = '✅ Unirse al evento';
+        btn.disabled = false;
+        btn.onclick = function() { modalJoin(eventId, false); };
+      } else {
+        btn.disabled = false;
+        btn.textContent = '🚪 Salir del evento';
+        alert('Error: ' + (res.data.error || 'No se pudo salir'));
+      }
+    }).catch(function(err) {
+      btn.disabled = false;
+      alert('Error de red: ' + err.message);
+    });
+  }
+
+  function closeModal(e) {
+    if (e.target === document.getElementById('eventModal')) closeModalDirect();
+  }
+  function closeModalDirect() {
+    document.getElementById('eventModal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  // Cerrar con Escape
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') { closeModalDirect(); closeProfileModalDirect(); }
+  });
+
+  // --- NOTIFICACIONES ---
+  function timeAgo(iso) {
+    var diff = Math.floor((Date.now() - new Date(iso)) / 1000);
+    if (diff < 60)   return 'hace un momento';
+    if (diff < 3600) return 'hace ' + Math.floor(diff/60) + ' min';
+    if (diff < 86400)return 'hace ' + Math.floor(diff/3600) + ' h';
+    return 'hace ' + Math.floor(diff/86400) + ' d';
+  }
+
+  function loadNotifications() {
+    var container = document.getElementById('notifList');
+    var token = sessionStorage.getItem('access_token');
+    if (!token) {
+      container.innerHTML = '<div class="notif-empty"><div class="notif-empty-icon">🔐</div><p>Iniciá sesión para ver tus notificaciones.</p></div>';
+      return;
+    }
+    container.innerHTML = '<div class="feed-loading">Cargando notificaciones...</div>';
+    fetch(BASE + '/api/notifications', { headers: { 'Authorization': 'Bearer ' + token } })
+      .then(function(r){ return r.json().then(function(d){ return { ok: r.ok, data: d }; }); })
+      .then(function(res) {
+        if (!res.ok) { container.innerHTML = '<div class="notif-empty"><div class="notif-empty-icon">⚠️</div><p>' + (res.data.error || 'Error') + '</p></div>'; return; }
+        renderNotifications(res.data);
+      })
+      .catch(function(err) { container.innerHTML = '<div class="notif-empty"><div class="notif-empty-icon">❌</div><p>Error: ' + err.message + '</p></div>'; });
+  }
+
+  function renderNotifications(items) {
+    var container = document.getElementById('notifList');
+    // Actualizar badge
+    var badge = document.getElementById('notifBadge');
+    var friendReqs = items.filter(function(n){ return n.type === 'friend_request'; });
+    if (items.length > 0) {
+      badge.textContent = items.length > 9 ? '9+' : items.length;
+      badge.classList.add('visible');
+    } else {
+      badge.classList.remove('visible');
+    }
+
+    if (!items.length) {
+      container.innerHTML = '<div class="notif-empty"><div class="notif-empty-icon">🔔</div><p>No tenés notificaciones por ahora.</p></div>';
+      return;
+    }
+
+    container.innerHTML = '<div class="notif-list">' + items.map(function(n) { return renderNotifItem(n); }).join('') + '</div>';
+  }
+
+  function renderNotifItem(n) {
+    var u = n.user || {};
+    var initials = (u.full_name || u.username || '?').split(' ').map(function(w){ return w[0]; }).slice(0,2).join('').toUpperCase();
+    var avatarHtml = u.avatar_url
+      ? '<img class="notif-avatar" src="' + u.avatar_url + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
+        + '<div class="notif-avatar-ph" style="display:none">' + initials + '</div>'
+      : '<div class="notif-avatar-ph">' + initials + '</div>';
+
+    var textHtml, actionsHtml = '';
+
+    if (n.type === 'friend_request') {
+      textHtml = '<strong>' + (u.full_name || u.username) + '</strong>'
+        + '<p>te envió una solicitud de amistad</p>'
+        + '<time>' + timeAgo(n.created_at) + '</time>';
+      actionsHtml = '<div class="notif-actions">'
+        + '<button class="btn-notif-accept" onclick="notifAcceptFriend(\'' + n.requester_id + '\',this)">✓ Aceptar</button>'
+        + '<button class="btn-notif-reject" onclick="notifRejectFriend(\'' + n.requester_id + '\',this)">✕ Rechazar</button>'
+        + '</div>';
+    } else if (n.type === 'event_join') {
+      textHtml = '<strong>' + (u.full_name || u.username) + '</strong>'
+        + '<p>se unió a tu evento <em>' + (n.event ? n.event.title : '') + '</em></p>'
+        + '<time>' + timeAgo(n.created_at) + '</time>';
+    }
+
+    return '<div class="notif-item" id="notif-' + n.id + '">'
+      + avatarHtml
+      + '<div class="notif-text">' + textHtml + '</div>'
+      + actionsHtml
+      + '</div>';
+  }
+
+  function notifAcceptFriend(requesterId, btn) {
+    var token = sessionStorage.getItem('access_token');
+    btn.disabled = true; btn.textContent = '...';
+    fetch(BASE + '/api/friendships/' + requesterId + '/accept', {
+      method: 'PUT', headers: { 'Authorization': 'Bearer ' + token }
+    }).then(function(r){ return r.json().then(function(d){ return { ok: r.ok, data: d }; }); })
+    .then(function(res) {
+      if (res.ok) {
+        // Reemplazar la notificación con mensaje de confirmación
+        var item = btn.closest('.notif-item');
+        var actionsDiv = item.querySelector('.notif-actions');
+        actionsDiv.innerHTML = '<span style="color:#4ade80;font-size:0.78rem;font-weight:600">✅ Aceptada</span>';
+        updateNotifBadge(-1);
+      } else {
+        btn.disabled = false; btn.textContent = '✓ Aceptar';
+        alert('Error: ' + (res.data.error || 'No se pudo aceptar'));
+      }
+    }).catch(function(){ btn.disabled = false; btn.textContent = '✓ Aceptar'; });
+  }
+
+  function notifRejectFriend(requesterId, btn) {
+    var token = sessionStorage.getItem('access_token');
+    btn.disabled = true; btn.textContent = '...';
+    fetch(BASE + '/api/friendships/' + requesterId, {
+      method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token }
+    }).then(function(r){ return r.json().then(function(d){ return { ok: r.ok, data: d }; }); })
+    .then(function(res) {
+      if (res.ok) {
+        var item = btn.closest('.notif-item');
+        item.style.opacity = '0.4';
+        item.style.pointerEvents = 'none';
+        var actionsDiv = item.querySelector('.notif-actions');
+        actionsDiv.innerHTML = '<span style="color:#888;font-size:0.78rem">Rechazada</span>';
+        updateNotifBadge(-1);
+      } else {
+        btn.disabled = false; btn.textContent = '✕ Rechazar';
+      }
+    }).catch(function(){ btn.disabled = false; btn.textContent = '✕ Rechazar'; });
+  }
+
+  function updateNotifBadge(delta) {
+    var badge = document.getElementById('notifBadge');
+    var cur = parseInt(badge.textContent) || 0;
+    var next = cur + delta;
+    if (next <= 0) { badge.classList.remove('visible'); }
+    else { badge.textContent = next > 9 ? '9+' : next; }
+  }
+
+  // Cargar badge de notificaciones al iniciar si hay sesión
+  function initNotifBadge() {
+    var token = sessionStorage.getItem('access_token');
+    if (!token) return;
+    fetch(BASE + '/api/notifications', { headers: { 'Authorization': 'Bearer ' + token } })
+      .then(function(r){ return r.ok ? r.json() : []; })
+      .then(function(items) {
+        if (!Array.isArray(items) || !items.length) return;
+        var badge = document.getElementById('notifBadge');
+        badge.textContent = items.length > 9 ? '9+' : items.length;
+        badge.classList.add('visible');
+      }).catch(function(){});
+  }
+  initNotifBadge();
 </script>
 </body>
 </html>
