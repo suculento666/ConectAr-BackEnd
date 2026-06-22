@@ -30,7 +30,7 @@ const createEvent = async ({ creator_id, title, description, location, event_dat
 const getAllEvents = async (filters = {}) => {
   let query = supabase
     .from('events')
-    .select('*, users(id, username, full_name, avatar_url)');
+    .select('*, users!events_creator_id_fkey(id, username, full_name, avatar_url)');
 
   if (filters.event_type) {
     query = query.eq('event_type', filters.event_type);

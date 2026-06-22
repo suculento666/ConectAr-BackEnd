@@ -1,5 +1,6 @@
 // friendshipController.js - maneja las relaciones de amistad
 import { sendFriendRequest, acceptFriendRequest, deleteFriendship, getRelationshipStatus, getUserFriends, getIncomingRequests } from '../services/friendship.service.js';
+import { getSuggestions } from '../repositories/people.repository.js';
 
 // POST /api/friendships - enviar solicitud de amistad
 const sendRequest = async (req, res) => {
@@ -73,4 +74,15 @@ const getPending = async (req, res) => {
   }
 };
 
-export { sendRequest, acceptRequest, removeRequest, getStatus, getFriends, getPending };
+// GET /api/friendships/suggestions - posibles amistades (comparten eventos, no son amigos aún)
+const getPeopleSuggestions = async (req, res) => {
+  try {
+    const user_id = req.user.id;
+    const suggestions = await getSuggestions(user_id);
+    res.status(200).json(suggestions);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export { sendRequest, acceptRequest, removeRequest, getStatus, getFriends, getPending, getPeopleSuggestions };
