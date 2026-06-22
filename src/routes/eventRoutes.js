@@ -5,21 +5,21 @@ import {
   createFeedback,
 } from '../controllers/eventController.js';
 import { like, unlike, save, unsave, bulkStatus, listComments, postComment, removeComment } from '../controllers/interactionController.js';
-import { authenticate } from '../middlewares/auth.js';
+import { authenticate } from '../middlewares/auth.js';  
 
 const router = express.Router();
 
 router.get('/', getAllEvents);
 router.get('/:id', getEventById);
-router.post('/', createEvent);
-router.put('/:id', updateEvent);
-router.delete('/:id', deleteEvent);
+router.post('/', authenticate, createEvent);
+router.put('/:id', authenticate, updateEvent);
+router.delete('/:id', authenticate, deleteEvent);
 
-router.post('/:id/join', joinEvent);
-router.delete('/:id/join', leaveEvent);
+router.post('/:id/join', authenticate, joinEvent);
+router.delete('/:id/join', authenticate, leaveEvent);
 router.get('/:id/participants', getParticipants);
 
-router.post('/:id/feedback', createFeedback);
+router.post('/:id/feedback', authenticate, createFeedback);
 
 // Likes
 router.post('/:id/like',   authenticate, like);

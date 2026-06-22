@@ -59,7 +59,8 @@ const validarActualizacionUsuario = (req, res, next) => {
 const validarEvento = (req, res, next) => {
   const { title, event_date, event_type, accessibility } = req.body;
 
-  if (!title || !event_date || !event_type || !accessibility) {
+  if (title == null || event_date == null || event_type == null || accessibility == null) 
+ {
     return res.status(400).json({ 
       error: 'Todos los campos son obligatorios: title, event_date, event_type, accessibility' 
     });
