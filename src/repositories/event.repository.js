@@ -64,7 +64,8 @@ const getAllEvents = async (filters = {}) => {
         username,
         full_name,
         avatar_url
-      )
+      ),
+      event_participants(count)
     `);
 
   if (filters.event_type) {
@@ -100,7 +101,8 @@ const getEventById = async (id) => {
         username,
         full_name,
         avatar_url
-      )
+      ),
+      event_participants(count)
     `)
     .eq('id', id)
     .single();

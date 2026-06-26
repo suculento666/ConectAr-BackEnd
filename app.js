@@ -1,6 +1,8 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
+import morgan from 'morgan';
 import supabase from './src/configs/supabase.js';
 import userRoutes from './src/routes/userRoutes.js';
 import eventRoutes from './src/routes/eventRoutes.js';
@@ -10,6 +12,8 @@ import notificationRoutes from './src/routes/notificationRoutes.js';
 const app = express();
 
 // Middlewares
+app.use(helmet());
+app.use(morgan('dev'));
 app.use(cors({
   origin: function (origin, callback) {
     const baseOrigins = ['http://localhost:5173', 'http://localhost:3000'];
@@ -49,6 +53,12 @@ supabase.from('_test_').select('*').limit(1).then(({ error }) => {
   } else {
     console.error('❌ Error conectando a Supabase:', error.message);
   }
+});
+
+// Manejo centralizado de errores
+app.use((err, _req, res, _next) => {
+  console.error(err);
+  res.status(err.status || 500).json({ error: err.message || 'Error interno del servidor' });
 });
 
 // Puerto
