@@ -113,6 +113,13 @@ const getEventById = async (id) => {
 };
 
 const updateEvent = async (id, fields, creator_id) => {
+
+  // No permitir modificar campos protegidos
+  delete fields.id;
+  delete fields.creator_id;
+  delete fields.created_at;
+  delete fields.updated_at;
+
   const { data, error } = await supabase
     .from('events')
     .update({
@@ -146,6 +153,8 @@ const deleteEvent = async (id, creator_id) => {
 // --- Event Participants ---
 
 const joinEvent = async ({ user_id, event_id }) => {
+
+  // Verificar si ya participa
   const { data: existing } = await supabase
     .from('event_participants')
     .select('user_id')
@@ -157,9 +166,46 @@ const joinEvent = async ({ user_id, event_id }) => {
     throw new Error('Ya estás anotado en este evento');
   }
 
+  // Obtener capacidad del evento
+  const { data: event, error: eventError } = await supabase
+    .from('events')
+    .select('max_participants')
+    .eq('id', event_id)
+    .single();
+
+  if (eventError) {
+    throw new Error(eventError.message);
+  }
+
+  // Contar participantes actuales
+  const { count, error: countError } = await supabase
+    .from('event_participants')
+    .select('*', {
+      count: 'exact',
+      head: true,
+    })
+    .eq('event_id', event_id);
+
+  if (countError) {
+    throw new Error(countError.message);
+  }
+
+  // Verificar límite
+  if (
+    event.max_participants &&
+    count >= event.max_participants
+  ) {
+    throw new Error('El evento alcanzó el máximo de participantes');
+  }
+
   const { data, error } = await supabase
     .from('event_participants')
-    .insert([{ user_id, event_id }])
+    .insert([
+      {
+        user_id,
+        event_id,
+      },
+    ])
     .select()
     .single();
 

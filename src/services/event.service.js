@@ -24,15 +24,20 @@ const newEvent = async ({
 }) => {
 
   if (
-    title == null ||
-    event_date == null ||
-    event_type == null ||
-    accessibility == null
-  ) {
-    throw new Error(
-      'title, event_date, event_type y accessibility son obligatorios'
-    );
-  }
+  title == null ||
+  event_date == null ||
+  event_type == null ||
+  accessibility == null
+) {
+  throw new Error(
+    'title, event_date, event_type y accessibility son obligatorios'
+  );
+}
+
+// Nueva validación
+if (new Date(event_date) < new Date()) {
+  throw new Error('La fecha del evento debe ser futura');
+}
 
   const tipoNormalizado = event_type
     .toLowerCase()
