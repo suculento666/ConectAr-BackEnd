@@ -88,29 +88,35 @@ const getAllEvents = async (filters = {}) => {
 
   if (error) throw new Error(error.message);
 
-  return data.map(applyDefaultImage);
-};
+  return data.map(event => ({
+  ...applyDefaultImage(event),
+  participant_count: event.event_participants?.[0]?.count || 0,
+  }))};
 
-const getEventById = async (id) => {
-  const { data, error } = await supabase
-    .from('events')
-    .select(`
-      *,
-      users!events_creator_id_fkey(
-        id,
-        username,
-        full_name,
-        avatar_url
-      ),
-      event_participants(count)
-    `)
-    .eq('id', id)
-    .single();
+
+  const getEventById = async (id) => {
+    const { data, error } = await supabase
+  .from('events')
+  .select(`
+    *,
+    users!events_creator_id_fkey(
+     id,
+     username,
+     full_name,
+     avatar_url
+    ),
+    event_participants(count)
+  `)
+  .eq('id', id)
+  .single();
 
   if (error) throw new Error(error.message);
 
-  return applyDefaultImage(data);
-};
+  return {
+  ...applyDefaultImage(data),
+  participant_count: data.event_participants?.[0]?.count || 0,
+  };
+  };
 
 const updateEvent = async (id, fields, creator_id) => {
 
