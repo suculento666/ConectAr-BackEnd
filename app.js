@@ -12,7 +12,9 @@ import notificationRoutes from './src/routes/notificationRoutes.js';
 const app = express();
 
 // Middlewares
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: false  // el panel HTML usa JS inline; la CSP lo bloquearía
+}));
 app.use(morgan('dev'));
 app.use(cors({
   origin: function (origin, callback) {
@@ -39,11 +41,6 @@ app.use('/api/users', userRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/friendships', friendshipRoutes);
 app.use('/api/notifications', notificationRoutes);
-
-// Ruta de prueba
-app.get('/', (_req, res) => {
-  res.json({ message: 'ConectAr API funcionando' });
-});
 
 // Verificar conexión con Supabase
 supabase.from('_test_').select('*').limit(1).then(({ error }) => {
