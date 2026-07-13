@@ -5,6 +5,8 @@ import {
   createFeedback,
 } from '../controllers/eventController.js';
 import { like, unlike, save, unsave, bulkStatus, listComments, postComment, removeComment } from '../controllers/interactionController.js';
+import { listMessages, sendMessage, removeMessage } from '../controllers/chatController.js';
+import { participantAgeRanges } from '../controllers/statsController.js';
 import { authenticate } from '../middlewares/auth.js';  
 
 const router = express.Router();
@@ -36,5 +38,13 @@ router.post('/bulk-status', authenticate, bulkStatus);
 router.get('/:id/comments',                  listComments);
 router.post('/:id/comments',                 authenticate, postComment);
 router.delete('/:id/comments/:comment_id',   authenticate, removeComment);
+
+// Chat grupal del evento
+router.get('/:id/chat',                      listMessages);
+router.post('/:id/chat',                     authenticate, sendMessage);
+router.delete('/:id/chat/:message_id',       authenticate, removeMessage);
+
+// Estadísticas del evento (solo creador)
+router.get('/:id/stats/age-ranges',          authenticate, participantAgeRanges);
 
 export default router;

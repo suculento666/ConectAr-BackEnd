@@ -25,7 +25,7 @@ const signIn = async ({ email, password }) => {
 const getAllUsers = async () => {
   const { data, error } = await supabase
     .from('users')
-    .select('id, username, full_name, bio, avatar_url, xp, level, created_at');
+    .select('id, username, full_name, bio, avatar_url, xp, level, birth_date, created_at');
   if (error) throw new Error(error.message);
   return data;
 };
@@ -34,7 +34,7 @@ const getAllUsers = async () => {
 const getUserById = async (id) => {
   const { data, error } = await supabase
     .from('users')
-    .select('id, username, full_name, bio, avatar_url, xp, level, created_at')
+    .select('id, username, full_name, bio, avatar_url, xp, level, birth_date, created_at')
     .eq('id', id)
     .single();
   if (error) throw new Error(error.message);
@@ -47,7 +47,7 @@ const updateUser = async (id, fields) => {
     .from('users')
     .update({ ...fields, updated_at: new Date().toISOString() })
     .eq('id', id)
-    .select('id, username, full_name, bio, avatar_url, xp, level')
+    .select('id, username, full_name, bio, avatar_url, xp, level, birth_date')
     .single();
   if (error) throw new Error(error.message);
   return data;
@@ -63,7 +63,7 @@ const signOut = async () => {
 const searchUsersByUsername = async (query) => {
   const { data, error } = await supabase
     .from('users')
-    .select('id, username, full_name, bio, avatar_url, xp, level, created_at')
+    .select('id, username, full_name, bio, avatar_url, xp, level, birth_date, created_at')
     .or(`username.ilike.%${query}%,full_name.ilike.%${query}%`);
   if (error) throw new Error(error.message);
   return data;
