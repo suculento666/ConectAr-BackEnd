@@ -4,7 +4,7 @@ import {
   joinEvent, leaveEvent, getParticipants,
   createFeedback,
 } from '../controllers/eventController.js';
-import { like, unlike, save, unsave, bulkStatus, listComments, postComment, removeComment } from '../controllers/interactionController.js';
+import { like, unlike, eventLikes, save, unsave, bulkStatus, listComments, postComment, removeComment } from '../controllers/interactionController.js';
 import { listMessages, sendMessage, removeMessage } from '../controllers/chatController.js';
 import { participantAgeRanges } from '../controllers/statsController.js';
 import { authenticate } from '../middlewares/auth.js';  
@@ -24,6 +24,7 @@ router.get('/:id/participants', getParticipants);
 router.post('/:id/feedback', authenticate, createFeedback);
 
 // Likes
+router.get('/:id/like',    eventLikes);               // público
 router.post('/:id/like',   authenticate, like);
 router.delete('/:id/like', authenticate, unlike);
 

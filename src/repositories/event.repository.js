@@ -201,7 +201,7 @@ const joinEvent = async ({ user_id, event_id }) => {
     event.max_participants &&
     count >= event.max_participants
   ) {
-    throw new Error('El evento alcanzó el máximo de participantes');
+    throw new Error('Sin cupos disponibles');
   }
 
   const { data, error } = await supabase

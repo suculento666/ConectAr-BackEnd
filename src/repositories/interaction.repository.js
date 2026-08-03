@@ -19,7 +19,7 @@ const unlikeEvent = async ({ user_id, event_id }) => {
     `DELETE FROM event_likes WHERE user_id = $1 AND event_id = $2`,
     [user_id, event_id]
   );
-  return { message: 'Like eliminado' };
+  return { message: 'like eliminado' };
 };
 
 const getLikedEvents = async (user_id) => {
@@ -32,6 +32,15 @@ const getLikedEvents = async (user_id) => {
     [user_id]
   );
   return rows;
+};
+
+// Todos los likes de un evento (para GET /events/:id/like)
+const getEventLikes = async (event_id) => {
+  const { rows } = await pool.query(
+    `SELECT user_id FROM event_likes WHERE event_id = $1`,
+    [event_id]
+  );
+  return rows; // [{ user_id }, { user_id }, ...]
 };
 
 // Contar likes de un evento y si el usuario lo likeó
@@ -159,7 +168,7 @@ const deleteComment = async ({ comment_id, user_id }) => {
 };
 
 export {
-  likeEvent, unlikeEvent, getLikedEvents, getEventLikeStatus, getBulkLikeStatus,
+  likeEvent, unlikeEvent, getLikedEvents, getEventLikes, getEventLikeStatus, getBulkLikeStatus,
   saveEvent, unsaveEvent, getSavedEvents, getBulkSaveStatus,
   addComment, getComments, deleteComment,
 };

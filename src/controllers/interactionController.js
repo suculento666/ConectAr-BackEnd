@@ -1,6 +1,6 @@
 // interactionController.js - likes, saves y comments de eventos
 import {
-  likeEvent, unlikeEvent, getLikedEvents, getBulkLikeStatus,
+  likeEvent, unlikeEvent, getLikedEvents, getEventLikes, getBulkLikeStatus,
   saveEvent, unsaveEvent, getSavedEvents, getBulkSaveStatus,
   addComment, getComments, deleteComment,
 } from '../repositories/interaction.repository.js';
@@ -10,8 +10,8 @@ const like = async (req, res) => {
   try {
     const user_id  = req.user.id;
     const event_id = req.params.id;
-    const result   = await likeEvent({ user_id, event_id });
-    res.status(201).json(result);
+    await likeEvent({ user_id, event_id });
+    res.status(201).json({ message: 'like agregado' });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -22,10 +22,20 @@ const unlike = async (req, res) => {
   try {
     const user_id  = req.user.id;
     const event_id = req.params.id;
-    const result   = await unlikeEvent({ user_id, event_id });
-    res.status(200).json(result);
+    await unlikeEvent({ user_id, event_id });
+    res.status(200).json({ message: 'like eliminado' });
   } catch (err) {
     res.status(400).json({ error: err.message });
+  }
+};
+
+// GET /api/events/:id/like  → todos los likes de ese evento (público)
+const eventLikes = async (req, res) => {
+  try {
+    const likes = await getEventLikes(req.params.id);
+    res.status(200).json(likes);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };
 
@@ -125,4 +135,4 @@ const removeComment = async (req, res) => {
   }
 };
 
-export { like, unlike, myLikes, bulkStatus, save, unsave, mySaves, listComments, postComment, removeComment };
+export { like, unlike, eventLikes, myLikes, bulkStatus, save, unsave, mySaves, listComments, postComment, removeComment };
