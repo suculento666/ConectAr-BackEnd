@@ -1617,3 +1617,211 @@ function renderMyEventCard(ev) {
     +'<span class="event-meta-item">📍 '+(ev.location||'Sin ubicación')+'</span>'
     +'</div></div></div>';
 }
+
+// ── Comentarios ───────────────────────────────────────────────────────────
+var currentCommentEventId = null;
+function openCommentsModal(eventId) {
+  currentCommentEventId=eventId;
+  document.getElementById('commentsModal').classList.add('open'); document.body.style.overflow='hidden';
+  loadComments(eventId);
+}
+function loadComments(eventId) {
+  var content=document.getElementById('commentsModalContent');
+  content.innerHTML='<div class="modal-loading">Cargando comentarios...</div>';
+  fetch(BASE+'/api/events/'+eventId+'/comments').then(function(r){ return r.json(); }).then(function(comments){ renderComments(comments,eventId); }).catch(function(err){ content.innerHTML='<div class="modal-loading">❌ '+err.message+'</div>'; });
+}
+function renderComments(comments, eventId) {
+  var content=document.getElementById('commentsModalContent');
+  var myRaw=sessionStorage.getItem('session_user'); var myId=myRaw?JSON.parse(myRaw).id:null;
+  var token=sessionStorage.getItem('access_token');
+  var listHtml='';
+  if (!comments.length) listHtml='<div class="comments-empty">Todavía no hay comentarios. ¡Sé el primero!</div>';
+  else listHtml='<div class="comments-list">'+comments.map(function(c) {
+    var u=c.user||{}; var initials=(u.full_name||u.username||'?').split(' ').map(function(w){ return w[0]; }).slice(0,2).join('').toUpperCase();
+    var av=u.avatar_url?'<img src="'+u.avatar_url+'" onerror="this.style.display=\'none\'">':initials;
+    var del=myId&&myId===u.id?'<button class="comment-delete" onclick="deleteComment(\''+c.id+'\',\''+eventId+'\')" title="Eliminar">✕</button>':'';
+    return '<div class="comment-item"><div class="comment-avatar">'+av+'</div><div class="comment-bubble"><div class="comment-author">'+(u.full_name||u.username)+' <span style="color:#555;font-weight:400">@'+u.username+'</span>'+del+'</div><div class="comment-text">'+c.content.replace(/</g,'&lt;')+'</div><div class="comment-time">'+timeAgo(c.created_at)+'</div></div></div>';
+  }).join('')+'</div>';
+  var inputHtml=token
+    ?'<div class="comment-input-row"><input id="commentInput" type="text" placeholder="Escribí un comentario..." maxlength="500" onkeydown="if(event.key===\'Enter\') submitComment(\''+eventId+'\')" /><button onclick="submitComment(\''+eventId+'\')">Enviar</button></div>'
+    :'<div style="text-align:center;color:#555;font-size:0.8rem;margin-top:0.5rem">Iniciá sesión para comentar.</div>';
+  content.innerHTML=listHtml+inputHtml;
+}
+function submitComment(eventId) {
+  var token=sessionStorage.getItem('access_token'); if (!token) { switchTab('auth'); return; }
+  var input=document.getElementById('commentInput');
+  var text=input?input.value.trim():''; if (!text) return;
+  input.disabled=true;
+  fetch(BASE+'/api/events/'+eventId+'/comments', { method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token}, body:JSON.stringify({content:text}) })
+    .then(function(r){ return r.json().then(function(d){ return {ok:r.ok,data:d}; }); })
+    .then(function(res) { if (res.ok) loadComments(eventId); else { input.disabled=false; alert('Error: '+(res.data.error||'No se pudo enviar')); } })
+    .catch(function(){ input.disabled=false; });
+}
+function deleteComment(commentId, eventId) {
+  var token=sessionStorage.getItem('access_token'); if (!token||!confirm('¿Eliminar este comentario?')) return;
+  fetch(BASE+'/api/events/'+eventId+'/comments/'+commentId, { method:'DELETE', headers:{'Authorization':'Bearer '+token} })
+    .then(function(r){ return r.json().then(function(d){ return {ok:r.ok,data:d}; }); })
+    .then(function(res){ if (res.ok) loadComments(eventId); });
+}
+function closeCommentsModal(e) { if (e.target===document.getElementById('commentsModal')) closeCommentsModalDirect(); }
+function closeCommentsModalDirect() { document.getElementById('commentsModal').classList.remove('open'); document.body.style.overflow=''; currentCommentEventId=null; }
+
+// ── Chat grupal ────────────────────────────────────────────────────────────
+var currentChatEventId=null, currentChatEventTitle=null, chatOldestMessageId=null, chatHasMore=false, chatPollingInterval=null, currentUserIsParticipant=false;
+function openChatModal(eventId, eventTitle) {
+  currentChatEventId=eventId; currentChatEventTitle=eventTitle; chatOldestMessageId=null; chatHasMore=false; currentUserIsParticipant=false;
+  document.getElementById('chatModal').classList.add('open'); document.body.style.overflow='hidden';
+  var inner=document.getElementById('chatModalInner'); inner.innerHTML='<div class="modal-loading">Cargando chat...</div>';
+  var myRaw=sessionStorage.getItem('session_user'); var myId=myRaw?JSON.parse(myRaw).id:null;
+  Promise.all([
+    fetch(BASE+'/api/events/'+eventId+'/participants').then(function(r){ return r.ok?r.json():[]; }).catch(function(){ return []; }),
+    fetch(BASE+'/api/events/'+eventId+'/chat?limit=40').then(function(r){ return r.json().then(function(d){ return {ok:r.ok,data:d}; }); })
+  ]).then(function(res) {
+    var participants=res[0]; var chatRes=res[1];
+    if (myId&&Array.isArray(participants)) currentUserIsParticipant=participants.some(function(p){ return p.user_id===myId||(p.users&&p.users.id===myId); });
+    if (!chatRes.ok) { inner.innerHTML='<div class="modal-loading">Error al cargar el chat</div>'; return; }
+    var messages=chatRes.data; chatHasMore=messages.length>=40;
+    if (messages.length>0) chatOldestMessageId=messages[0].id;
+    renderChatFull(messages,eventId);
+  }).catch(function(err){ inner.innerHTML='<div class="modal-loading">Error: '+err.message+'</div>'; });
+  clearInterval(chatPollingInterval);
+  chatPollingInterval=setInterval(function(){ if (currentChatEventId) refreshChatMessages(currentChatEventId); },5000);
+}
+function renderChatFull(messages, eventId) {
+  var myRaw=sessionStorage.getItem('session_user'); var myId=myRaw?JSON.parse(myRaw).id:null;
+  var token=sessionStorage.getItem('access_token');
+  var loadMoreHtml=chatHasMore?'<div class="chat-load-more" id="chatLoadMore"><button onclick="loadMoreChat()">↑ Cargar mensajes anteriores</button></div>':'';
+  var msgsHtml=messages.length?messages.map(function(m){ return renderChatMessage(m,myId); }).join(''):'<div class="chat-empty">Todavía no hay mensajes. ¡Sé el primero!</div>';
+  var inputHtml;
+  if (!token) inputHtml='<div class="chat-unauth"><a href="#" onclick="closeChatModalDirect();switchTab(\'auth\');return false;" style="color:#7c6af7">Iniciá sesión</a> para participar.</div>';
+  else if (!currentUserIsParticipant) inputHtml='<div class="chat-unauth" style="color:#fb923c">🔒 Unite al evento para participar del chat.</div>';
+  else inputHtml='<div class="chat-input-row"><input id="chatInput" type="text" placeholder="Escribí un mensaje..." maxlength="2000" onkeydown="if(event.key===\'Enter\') submitChatMessage()" /><button onclick="submitChatMessage()">Enviar</button></div>';
+  document.getElementById('chatModalInner').innerHTML=
+    '<div class="chat-modal-header"><h3>🗨️ Chat grupal</h3><span>'+(currentChatEventTitle||'')+'</span></div>'
+    +'<div class="chat-messages" id="chatMessages">'+loadMoreHtml+'<div id="chatMsgList">'+msgsHtml+'</div></div>'
+    +inputHtml;
+  scrollChatToBottom();
+}
+function renderChatMessage(m, myId) {
+  var isOwn=myId&&m.user&&m.user.id===myId;
+  var u=m.user||{}; var initials=(u.full_name||u.username||'?').split(' ').map(function(w){ return w[0]; }).slice(0,2).join('').toUpperCase();
+  var av=u.avatar_url?'<img src="'+u.avatar_url+'" onerror="this.style.display=\'none\'">':initials;
+  var del=isOwn?'<button style="background:none;border:none;color:#444;cursor:pointer;font-size:0.68rem;padding:0 0.3rem;border-radius:4px" onmouseover="this.style.color=\'#f87171\'" onmouseout="this.style.color=\'#444\'" onclick="deleteChatMessage(\''+m.id+'\')" title="Eliminar">✕</button>':'';
+  return '<div class="chat-msg'+(isOwn?' own':'')+'" id="cmsg-'+m.id+'"><div class="chat-avatar">'+av+'</div><div class="chat-bubble"><div class="chat-bubble-author">'+(u.full_name||u.username||'Usuario')+'<span style="font-weight:400;color:#555;margin-left:4px">@'+(u.username||'')+'</span>'+del+'</div><div class="chat-bubble-text">'+m.content.replace(/</g,'&lt;').replace(/\n/g,'<br>')+'</div><div class="chat-bubble-time">'+timeAgo(m.created_at)+'</div></div></div>';
+}
+function submitChatMessage() {
+  var token=sessionStorage.getItem('access_token'); if (!token) { closeChatModalDirect(); switchTab('auth'); return; }
+  var input=document.getElementById('chatInput'); if (!input) return;
+  var text=input.value.trim(); if (!text) return;
+  input.disabled=true;
+  fetch(BASE+'/api/events/'+currentChatEventId+'/chat', { method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token}, body:JSON.stringify({content:text}) })
+    .then(function(r){ return r.json().then(function(d){ return {ok:r.ok,data:d}; }); })
+    .then(function(res) {
+      input.value=''; input.disabled=false; input.focus();
+      if (res.ok) {
+        var list=document.getElementById('chatMsgList'); var myRaw=sessionStorage.getItem('session_user'); var myId=myRaw?JSON.parse(myRaw).id:null;
+        if (list&&!document.getElementById('cmsg-'+res.data.id)) list.insertAdjacentHTML('beforeend',renderChatMessage(res.data,myId));
+        scrollChatToBottom();
+      } else alert('Error: '+(res.data.error||'No se pudo enviar'));
+    }).catch(function(err){ input.disabled=false; alert('Error: '+err.message); });
+}
+function deleteChatMessage(messageId) {
+  var token=sessionStorage.getItem('access_token'); if (!token||!confirm('¿Eliminar este mensaje?')) return;
+  fetch(BASE+'/api/events/'+currentChatEventId+'/chat/'+messageId, { method:'DELETE', headers:{'Authorization':'Bearer '+token} })
+    .then(function(r){ return r.json().then(function(d){ return {ok:r.ok,data:d}; }); })
+    .then(function(res){ if (res.ok) { var el=document.getElementById('cmsg-'+messageId); if (el) el.remove(); } else alert('Error: '+(res.data.error||'No se pudo eliminar')); });
+}
+function refreshChatMessages(eventId) {
+  fetch(BASE+'/api/events/'+eventId+'/chat?limit=20').then(function(r){ return r.ok?r.json():[]; })
+    .then(function(messages) {
+      var list=document.getElementById('chatMsgList'); var msgs=document.getElementById('chatMessages');
+      if (!list||!messages.length) return;
+      var myRaw=sessionStorage.getItem('session_user'); var myId=myRaw?JSON.parse(myRaw).id:null;
+      var newMsgs=messages.filter(function(m){ return !document.getElementById('cmsg-'+m.id); });
+      if (!newMsgs.length) return;
+      var wasAtBottom=msgs.scrollHeight-msgs.scrollTop-msgs.clientHeight<60;
+      newMsgs.forEach(function(m){ list.insertAdjacentHTML('beforeend',renderChatMessage(m,myId)); });
+      if (wasAtBottom) scrollChatToBottom();
+    }).catch(function(){});
+}
+function loadMoreChat() {
+  if (!currentChatEventId||!chatOldestMessageId) return;
+  var btn=document.querySelector('#chatLoadMore button'); if (btn) { btn.disabled=true; btn.textContent='Cargando...'; }
+  var url=BASE+'/api/events/'+currentChatEventId+'/chat?limit=40&before_id='+chatOldestMessageId;
+  fetch(url).then(function(r){ return r.json().then(function(d){ return {ok:r.ok,data:d}; }); })
+    .then(function(res) {
+      if (!res.ok) return;
+      var messages=res.data; chatHasMore=messages.length>=40;
+      if (messages.length>0) chatOldestMessageId=messages[0].id;
+      var list=document.getElementById('chatMsgList'); var msgs=document.getElementById('chatMessages');
+      if (!list) return;
+      var myRaw=sessionStorage.getItem('session_user'); var myId=myRaw?JSON.parse(myRaw).id:null;
+      var prevH=msgs.scrollHeight;
+      list.insertAdjacentHTML('afterbegin',messages.map(function(m){ return renderChatMessage(m,myId); }).join(''));
+      var lm=document.getElementById('chatLoadMore'); if (!chatHasMore&&lm) lm.remove();
+      msgs.scrollTop=msgs.scrollHeight-prevH;
+    });
+}
+function scrollChatToBottom() { var msgs=document.getElementById('chatMessages'); if (msgs) msgs.scrollTop=msgs.scrollHeight; }
+function closeChatModal(e) { if (e.target===document.getElementById('chatModal')) closeChatModalDirect(); }
+function closeChatModalDirect() { clearInterval(chatPollingInterval); chatPollingInterval=null; currentChatEventId=null; document.getElementById('chatModal').classList.remove('open'); document.body.style.overflow=''; }
+
+// ── Crear evento ────────────────────────────────────────────────────────────
+var selectedType=null, selectedAccess=null;
+var TYPE_SEL_CLASS={deporte:'sel-dep',concierto:'sel-con',cultura:'sel-cul',fiesta:'sel-fie',otro:'sel-otr'};
+function selectType(type) { selectedType=type; ['deporte','concierto','cultura','fiesta','otro'].forEach(function(t){ document.getElementById('type-'+t).className='type-opt'+(t===type?' selected '+TYPE_SEL_CLASS[t]:''); }); }
+function selectAccess(acc) { selectedAccess=acc; document.getElementById('acc-publico').className='access-opt'+(acc==='publico'?' sel-pub':''); document.getElementById('acc-privado').className='access-opt'+(acc==='privado'?' sel-priv':''); }
+function initEventForm() {
+  var dayEl=document.getElementById('ev-day'); if (dayEl.options.length===1) { for (var d=1;d<=31;d++){var o=document.createElement('option');o.value=d;o.textContent=d;dayEl.appendChild(o);} }
+  var yearEl=document.getElementById('ev-year'); if (yearEl.options.length===1) { var cy=new Date().getFullYear(); for (var y=cy;y<=cy+3;y++){var oy=document.createElement('option');oy.value=y;oy.textContent=y;yearEl.appendChild(oy);} }
+  var hourEl=document.getElementById('ev-hour'); if (hourEl.options.length===1) { for (var h=0;h<=23;h++){var oh=document.createElement('option');oh.value=h<10?'0'+h:''+h;oh.textContent=(h<10?'0'+h:''+h)+':00';hourEl.appendChild(oh);} }
+  var userRaw=sessionStorage.getItem('session_user'); var input=document.getElementById('ev-creator'); var hint=document.getElementById('creatorHint');
+  if (userRaw&&input&&!input.value) { var user=JSON.parse(userRaw); if (user.id) { input.value=user.id; hint.textContent='✅ Autocompletado: '+(user.email||user.id); hint.style.color='#4ade80'; } }
+}
+function resetEventForm() {
+  ['ev-title','ev-desc','ev-location','ev-max','ev-img','ev-creator'].forEach(function(id){ document.getElementById(id).value=''; });
+  ['ev-day','ev-month','ev-year','ev-hour'].forEach(function(id){ document.getElementById(id).value=''; });
+  document.getElementById('ev-min').value='00'; selectedType=null; selectedAccess=null;
+  ['deporte','concierto','cultura','fiesta','otro'].forEach(function(t){ document.getElementById('type-'+t).className='type-opt'; });
+  document.getElementById('acc-publico').className='access-opt'; document.getElementById('acc-privado').className='access-opt';
+  var s=document.getElementById('createStatus'); s.className='create-status'; s.textContent='';
+}
+function submitEvent() {
+  var title=document.getElementById('ev-title').value.trim(); var desc=document.getElementById('ev-desc').value.trim(); var loc=document.getElementById('ev-location').value.trim();
+  var day=document.getElementById('ev-day').value; var month=document.getElementById('ev-month').value; var year=document.getElementById('ev-year').value;
+  var hour=document.getElementById('ev-hour').value; var min=document.getElementById('ev-min').value;
+  var maxP=document.getElementById('ev-max').value; var imgUrl=document.getElementById('ev-img').value.trim(); var creatorId=document.getElementById('ev-creator').value.trim();
+  if (!title)         { showCreateErr('El nombre es obligatorio'); return; }
+  if (!selectedType)  { showCreateErr('Seleccioná un tipo'); return; }
+  if (!day||!month||!year) { showCreateErr('La fecha es obligatoria'); return; }
+  if (!hour)          { showCreateErr('La hora es obligatoria'); return; }
+  if (!selectedAccess){ showCreateErr('Seleccioná público o privado'); return; }
+  if (!creatorId)     { showCreateErr('Iniciá sesión en Auth para autocompletar el Creator ID'); return; }
+  var mm=month<10?'0'+month:''+month; var dd=day<10?'0'+day:''+day;
+  var dateISO=year+'-'+mm+'-'+dd+'T'+hour+':'+min+':00.000Z';
+  if (isNaN(Date.parse(dateISO))) { showCreateErr('Fecha inválida'); return; }
+  var body={creator_id:creatorId,title:title,event_type:selectedType,accessibility:selectedAccess,event_date:dateISO};
+  if (desc)  body.description    =desc;
+  if (loc)   body.location       =loc;
+  if (maxP)  body.max_participants=parseInt(maxP,10);
+  if (imgUrl)body.image_url      =imgUrl;
+  var s=document.getElementById('createStatus'); s.className='create-status'; s.textContent='Creando evento...'; s.style.display='block';
+  var token=sessionStorage.getItem('access_token');
+  var headers={'Content-Type':'application/json'}; if (token) headers['Authorization']='Bearer '+token;
+  fetch(BASE+'/api/events', { method:'POST', headers:headers, body:JSON.stringify(body) })
+    .then(function(r){ return r.json().then(function(d){ return {ok:r.ok,data:d}; }); })
+    .then(function(res){ if (!res.ok) { showCreateErr(res.data.error||'Error al crear'); return; } resetEventForm(); switchTab('feed'); })
+    .catch(function(err){ showCreateErr('Error de red: '+err.message); });
+}
+function showCreateErr(msg) { var s=document.getElementById('createStatus'); s.className='create-status err'; s.textContent='❌ '+msg; }
+
+// Escape cierra todos los modales
+document.addEventListener('keydown', function(e) {
+  if (e.key==='Escape') { closeModalDirect(); closeProfileModalDirect(); closeCommentsModalDirect(); closeChatModalDirect(); }
+});
+
+// Cargar Home al inicio
+loadFeed();
+</script>
+</body>
+</html>
