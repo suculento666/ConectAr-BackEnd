@@ -1,5 +1,5 @@
 // Servicio User - lógica de negocio para usuarios
-import { signUp, signIn, signOut, getAllUsers, getUserById, updateUser, searchUsersByUsername, getUserEvents } from '../repositories/user.repository.js';
+import { signUp, signIn, signOut, getAllUsers, getUserById, updateUser, searchUsersByUsername, getUserEvents, getAttendedEvents } from '../repositories/user.repository.js';
 
 const registerUser = async ({ email, password, username, full_name, bio, avatar_url }) => {
   if (!email || !password || !username || !full_name) {
@@ -69,4 +69,8 @@ const getUserParticipations = async (user_id) => {
   return await getUserEvents(user_id);
 };
 
-export { registerUser, loginUser, logoutUser, getUsers, getUser, editUser, searchUsers, getUserParticipations };
+const getAttendedEventsService = async (user_id) => {
+  return await getAttendedEvents(user_id);
+};
+
+export { registerUser, loginUser, logoutUser, getUsers, getUser, editUser, searchUsers, getUserParticipations, getAttendedEventsService };

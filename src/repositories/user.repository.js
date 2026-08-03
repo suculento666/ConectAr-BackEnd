@@ -1,5 +1,6 @@
 // Repositorio User - acceso a la base de datos (tabla: users + auth)
 import supabase from '../configs/supabase.js';
+import pool    from '../configs/db.js';
 
 // Auth: registro con email/password, los metadatos van al trigger
 const signUp = async ({ email, password, username, full_name, bio, avatar_url }) => {
@@ -79,4 +80,22 @@ const getUserEvents = async (user_id) => {
   return data;
 };
 
-export { signUp, signIn, signOut, getAllUsers, getUserById, updateUser, searchUsersByUsername, getUserEvents };
+// Eventos pasados a los que asistió un usuario (para GET /users/:id/events/attended)
+const getAttendedEvents = async (user_id) => {
+  const { rows } = await pool.query(
+    `SELECT
+       e.id,
+       e.title,
+       e.event_date,
+       e.event_type
+     FROM event_participants ep
+     JOIN events e ON e.id = ep.event_id
+     WHERE ep.user_id = $1
+       AND e.event_date < NOW()
+     ORDER BY e.event_date DESC`,
+    [user_id]
+  );
+  return rows;
+};
+
+export { signUp, signIn, signOut, getAllUsers, getUserById, updateUser, searchUsersByUsername, getUserEvents, getAttendedEvents };

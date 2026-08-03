@@ -85,7 +85,7 @@ const getPendingRequests = async (user_id) => {
        AND f.status = 'pending'`,
     [user_id]
   );
-  // Formatear igual que antes para no romper el frontend
+  // Formato legacy (no rompe el frontend existente)
   return rows.map(r => ({
     id: r.id,
     user_id: r.user_id,
@@ -99,4 +99,97 @@ const getPendingRequests = async (user_id) => {
   }));
 };
 
-export { sendRequest, acceptRequest, removeFriendship, getFriendshipStatus, getAcceptedFriends, getPendingRequests };
+// ── Funciones para las rutas nuevas del front ─────────────────────────────
+
+/**
+ * Enviar solicitud usando receiver_id como nombre del campo.
+ * Reutiliza sendRequest internamente (user_id = sender, friend_id = receiver).
+ * Dispara notificación friend_request al receptor.
+ */
+const sendRequestByReceiver = async ({ sender_id, receiver_id }) => {
+  if (sender_id === receiver_id) throw new Error('No podés agregarte a vos mismo');
+  const existing = await getFriendshipStatus({ user_id: sender_id, friend_id: receiver_id });
+  if (existing) throw new Error('Ya existe una relación con este usuario');
+  const { rows } = await pool.query(
+    `INSERT INTO friendships (user_id, friend_id, status)
+     VALUES ($1, $2, 'pending')
+     RETURNING *`,
+    [sender_id, receiver_id]
+  );
+
+  // Notificar al receptor de forma no bloqueante — si falla no interrumpe el flujo
+  pool.query(
+    `INSERT INTO notifications (user_id, type, actor_id)
+     VALUES ($1, 'friend_request', $2)`,
+    [receiver_id, sender_id]
+  ).catch(() => {});
+
+  return rows[0];
+};
+
+/**
+ * Solicitudes pendientes recibidas — formato nuevo del front:
+ * { id, sender_id, sender: { id, full_name, username, avatar_url }, created_at }
+ */
+const getPendingRequestsNew = async (user_id) => {
+  const { rows } = await pool.query(
+    `SELECT f.id, f.user_id AS sender_id, f.created_at,
+            u.id AS u_id, u.username, u.full_name, u.avatar_url
+     FROM friendships f
+     JOIN users u ON u.id = f.user_id
+     WHERE f.friend_id = $1
+       AND f.status = 'pending'
+     ORDER BY f.created_at DESC`,
+    [user_id]
+  );
+  return rows.map(r => ({
+    id:         r.id,
+    sender_id:  r.sender_id,
+    sender: {
+      id:         r.u_id,
+      full_name:  r.full_name,
+      username:   r.username,
+      avatar_url: r.avatar_url,
+    },
+    created_at: r.created_at,
+  }));
+};
+
+/**
+ * Aceptar solicitud por ID de fila (friendships.id).
+ * Verifica que el receptor sea el usuario logueado.
+ */
+const acceptRequestById = async ({ friendship_id, current_user_id }) => {
+  const { rows } = await pool.query(
+    `UPDATE friendships
+     SET status = 'accepted', updated_at = NOW()
+     WHERE id = $1
+       AND friend_id = $2
+       AND status = 'pending'
+     RETURNING *`,
+    [friendship_id, current_user_id]
+  );
+  if (!rows[0]) throw new Error('Solicitud no encontrada o no tenés permiso para aceptarla');
+  return rows[0];
+};
+
+/**
+ * Rechazar solicitud por ID de fila (friendships.id).
+ * Verifica que el receptor sea el usuario logueado.
+ */
+const rejectRequestById = async ({ friendship_id, current_user_id }) => {
+  const { rowCount } = await pool.query(
+    `DELETE FROM friendships
+     WHERE id = $1
+       AND friend_id = $2
+       AND status = 'pending'`,
+    [friendship_id, current_user_id]
+  );
+  if (!rowCount) throw new Error('Solicitud no encontrada o no tenés permiso para rechazarla');
+  return { message: 'Solicitud rechazada' };
+};
+
+export {
+  sendRequest, acceptRequest, removeFriendship, getFriendshipStatus, getAcceptedFriends, getPendingRequests,
+  sendRequestByReceiver, getPendingRequestsNew, acceptRequestById, rejectRequestById,
+};

@@ -7,6 +7,7 @@ import {
 import { like, unlike, eventLikes, save, unsave, bulkStatus, listComments, postComment, removeComment } from '../controllers/interactionController.js';
 import { listMessages, sendMessage, removeMessage } from '../controllers/chatController.js';
 import { participantAgeRanges } from '../controllers/statsController.js';
+import { rateEvent, getAverage, getMyRating } from '../controllers/ratingController.js';
 import { authenticate } from '../middlewares/auth.js';  
 
 const router = express.Router();
@@ -47,5 +48,11 @@ router.delete('/:id/chat/:message_id',       authenticate, removeMessage);
 
 // Estadísticas del evento (solo creador)
 router.get('/:id/stats/age-ranges',          authenticate, participantAgeRanges);
+
+// Ratings (calificaciones)
+// IMPORTANTE: /rating/me debe ir antes de /rating para que Express no lo trate como param
+router.get('/:id/rating/me',                 authenticate, getMyRating);   // GET  - calificación del usuario logueado
+router.get('/:id/rating',                    getAverage);                  // GET  - promedio y total (público)
+router.post('/:id/rating',                   authenticate, rateEvent);     // POST - calificar evento
 
 export default router;

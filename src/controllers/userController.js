@@ -1,5 +1,5 @@
 // userController.js - maneja todo lo relacionado al usuario
-import { registerUser as registerUserService, loginUser as loginUserService, logoutUser as logoutUserService, getUsers, getUser, editUser, searchUsers, getUserParticipations } from '../services/user.service.js';
+import { registerUser as registerUserService, loginUser as loginUserService, logoutUser as logoutUserService, getUsers, getUser, editUser, searchUsers, getUserParticipations, getAttendedEventsService } from '../services/user.service.js';
 
 // POST /api/users/register - crea un usuario nuevo via Supabase Auth
 const registerUser = async (req, res) => {
@@ -96,4 +96,14 @@ const getUserEvents = async (req, res) => {
   }
 };
 
-export { registerUser, loginUser, logoutUser, getAllUsers, getUserById, updateUser, searchUsersByUsername, getUserEvents, getSuggestedUsers };
+// GET /api/users/:id/events/attended - eventos pasados a los que asistió el usuario
+const getAttendedEvents = async (req, res) => {
+  try {
+    const events = await getAttendedEventsService(req.params.id);
+    res.status(200).json(events);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export { registerUser, loginUser, logoutUser, getAllUsers, getUserById, updateUser, searchUsersByUsername, getUserEvents, getAttendedEvents, getSuggestedUsers };

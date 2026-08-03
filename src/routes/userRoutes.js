@@ -1,5 +1,5 @@
 import express from 'express';
-import { registerUser, loginUser, logoutUser, getAllUsers, getUserById, updateUser, searchUsersByUsername, getUserEvents, getSuggestedUsers } from '../controllers/userController.js';
+import { registerUser, loginUser, logoutUser, getAllUsers, getUserById, updateUser, searchUsersByUsername, getUserEvents, getAttendedEvents, getSuggestedUsers } from '../controllers/userController.js';
 import { validarRegistro, validarLogin } from '../middlewares/validaciones.js';
 import { authenticate } from '../middlewares/auth.js';
 import { myLikes, mySaves } from '../controllers/interactionController.js';
@@ -15,7 +15,8 @@ router.get('/me/likes',  authenticate,   myLikes);
 router.get('/me/saves',  authenticate,   mySaves);
 router.get('/',          getAllUsers);
 router.get('/:id/stats/events-per-month', eventsPerMonth); // estadística: eventos por mes
-router.get('/:id/events',      getUserEvents);
+router.get('/:id/events/attended',  authenticate, getAttendedEvents); // eventos pasados asistidos
+router.get('/:id/events',           getUserEvents);
 router.get('/:id/suggestions', getSuggestedUsers);
 router.get('/:id',       getUserById);
 router.put('/:id',       updateUser);
