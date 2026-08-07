@@ -239,63 +239,38 @@ const FAKE_PARTICIPANTS = [
     user_id: 'fake-1',
     event_id: null,
     joined_at: new Date().toISOString(),
-    users: {
-      id: 'fake-1',
-      username: 'martina_g',
-      full_name: 'Martina González',
-      avatar_url: 'https://i.pravatar.cc/150?img=1',
-    },
+    users: { id: 'fake-1', username: 'martina_g',    full_name: 'Martina González', avatar_url: 'https://i.pravatar.cc/150?img=1', birth_date: '1998-03-12' },
   },
   {
     user_id: 'fake-2',
     event_id: null,
     joined_at: new Date().toISOString(),
-    users: {
-      id: 'fake-2',
-      username: 'lucas_rr',
-      full_name: 'Lucas Ramírez',
-      avatar_url: 'https://i.pravatar.cc/150?img=2',
-    },
+    users: { id: 'fake-2', username: 'lucas_rr',     full_name: 'Lucas Ramírez',    avatar_url: 'https://i.pravatar.cc/150?img=2', birth_date: '2001-07-25' },
   },
   {
     user_id: 'fake-3',
     event_id: null,
     joined_at: new Date().toISOString(),
-    users: {
-      id: 'fake-3',
-      username: 'sofi.lopez',
-      full_name: 'Sofía López',
-      avatar_url: 'https://i.pravatar.cc/150?img=3',
-    },
+    users: { id: 'fake-3', username: 'sofi.lopez',   full_name: 'Sofía López',      avatar_url: 'https://i.pravatar.cc/150?img=3', birth_date: '1995-11-03' },
   },
   {
     user_id: 'fake-4',
     event_id: null,
     joined_at: new Date().toISOString(),
-    users: {
-      id: 'fake-4',
-      username: 'tomifernandez',
-      full_name: 'Tomás Fernández',
-      avatar_url: 'https://i.pravatar.cc/150?img=4',
-    },
+    users: { id: 'fake-4', username: 'tomifernandez',full_name: 'Tomás Fernández',  avatar_url: 'https://i.pravatar.cc/150?img=4', birth_date: '2000-01-18' },
   },
   {
     user_id: 'fake-5',
     event_id: null,
     joined_at: new Date().toISOString(),
-    users: {
-      id: 'fake-5',
-      username: 'caro.diaz',
-      full_name: 'Carolina Díaz',
-      avatar_url: 'https://i.pravatar.cc/150?img=5',
-    },
+    users: { id: 'fake-5', username: 'caro.diaz',    full_name: 'Carolina Díaz',    avatar_url: 'https://i.pravatar.cc/150?img=5', birth_date: '1993-06-30' },
   },
 ];
 
 const getParticipants = async (event_id) => {
   const { data, error } = await supabase
     .from('event_participants')
-    .select('*, users(id, username, full_name, avatar_url)')
+    .select('*, users(id, username, full_name, avatar_url, birth_date)')
     .eq('event_id', event_id);
 
   if (error) throw new Error(error.message);

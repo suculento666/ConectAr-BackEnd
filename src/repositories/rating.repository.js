@@ -76,4 +76,20 @@ const getUserRating = async ({ event_id, user_id }) => {
   return { score: rows[0] ? rows[0].score : null };
 };
 
-export { createRating, getEventRating, getUserRating };
+/**
+ * Actualiza la calificación existente de un usuario para un evento.
+ * Lanza error si no existe calificación previa.
+ */
+const updateRating = async ({ event_id, user_id, score }) => {
+  const { rows } = await pool.query(
+    `UPDATE event_ratings
+     SET score = $3
+     WHERE event_id = $1 AND user_id = $2
+     RETURNING *`,
+    [event_id, user_id, score]
+  );
+  if (!rows.length) throw new Error('No encontramos una calificación previa');
+  return rows[0];
+};
+
+export { createRating, updateRating, getEventRating, getUserRating };

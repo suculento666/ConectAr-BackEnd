@@ -5,8 +5,8 @@ import { registerUser as registerUserService, loginUser as loginUserService, log
 const registerUser = async (req, res) => {
   try {
     console.log('📥 Body recibido en /register:', JSON.stringify(req.body));
-    const { email, password, username, full_name, bio, avatar_url } = req.body;
-    const result = await registerUserService({ email, password, username, full_name, bio, avatar_url });
+    const { email, password, username, full_name, bio, avatar_url, birth_date } = req.body;
+    const result = await registerUserService({ email, password, username, full_name, bio, avatar_url, birth_date });
     res.status(201).json(result);
   } catch (err) {
     res.status(400).json({ error: err.message });

@@ -1,11 +1,11 @@
 // Servicio User - lógica de negocio para usuarios
 import { signUp, signIn, signOut, getAllUsers, getUserById, updateUser, searchUsersByUsername, getUserEvents, getAttendedEvents } from '../repositories/user.repository.js';
 
-const registerUser = async ({ email, password, username, full_name, bio, avatar_url }) => {
+const registerUser = async ({ email, password, username, full_name, bio, avatar_url, birth_date }) => {
   if (!email || !password || !username || !full_name) {
     throw new Error('email, password, username y full_name son obligatorios');
   }
-  const data = await signUp({ email, password, username, full_name, bio, avatar_url });
+  const data = await signUp({ email, password, username, full_name, bio, avatar_url, birth_date });
   // data.user contiene el usuario de auth, data.session el JWT
   return {
     user: {

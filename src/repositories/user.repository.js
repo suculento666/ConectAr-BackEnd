@@ -3,12 +3,12 @@ import supabase from '../configs/supabase.js';
 import pool    from '../configs/db.js';
 
 // Auth: registro con email/password, los metadatos van al trigger
-const signUp = async ({ email, password, username, full_name, bio, avatar_url }) => {
+const signUp = async ({ email, password, username, full_name, bio, avatar_url, birth_date }) => {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
-      data: { username, full_name, bio, avatar_url }
+      data: { username, full_name, bio, avatar_url, birth_date }
     }
   });
   if (error) throw new Error(error.message);
