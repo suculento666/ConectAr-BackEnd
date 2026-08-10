@@ -27,11 +27,17 @@ const like = async (req, res) => {
             actor_id: user_id,
             event_id,
           });
+          console.log(`🔔 Notificación de like creada → destinatario: ${event.creator_id}`);
+        } else if (event && event.creator_id === user_id) {
+          console.log('ℹ️  Like propio — no se crea notificación');
         }
       } catch (notifErr) {
         // No bloquear el like si falla la notificación
         console.error('⚠️  No se pudo crear notificación de like:', notifErr.message);
+        console.error(notifErr.stack);
       }
+    } else {
+      console.log('ℹ️  Like duplicado — no se crea notificación');
     }
 
     res.status(201).json({ message: 'like agregado' });

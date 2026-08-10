@@ -13,11 +13,6 @@ const getNotifications = async (req, res) => {
   } catch (err) {
     console.error('❌ GET /api/notifications error:', err.message);
     console.error(err.stack);
-    // Si la tabla todavía no existe (durante desarrollo), devolver array vacío
-    // en lugar de 500 para no bloquear al front
-    if (err.message && err.message.includes('notifications')) {
-      return res.status(200).json([]);
-    }
     res.status(500).json({ error: err.message });
   }
 };
