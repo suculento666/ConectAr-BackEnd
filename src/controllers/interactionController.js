@@ -4,13 +4,36 @@ import {
   saveEvent, unsaveEvent, getSavedEvents, getBulkSaveStatus,
   addComment, getComments, deleteComment,
 } from '../repositories/interaction.repository.js';
+import { getEventById } from '../repositories/event.repository.js';
+import { insertNotification } from '../repositories/notification.repository.js';
 
 // POST /api/events/:id/like
 const like = async (req, res) => {
   try {
     const user_id  = req.user.id;
     const event_id = req.params.id;
-    await likeEvent({ user_id, event_id });
+
+    const result = await likeEvent({ user_id, event_id });
+
+    // Notificar al creador del evento, pero no si se likeó a sí mismo
+    // y solo si el like fue nuevo (no ya existente)
+    if (!result.already) {
+      try {
+        const event = await getEventById(event_id);
+        if (event && event.creator_id !== user_id) {
+          await insertNotification({
+            user_id:  event.creator_id,
+            type:     'like',
+            actor_id: user_id,
+            event_id,
+          });
+        }
+      } catch (notifErr) {
+        // No bloquear el like si falla la notificación
+        console.error('⚠️  No se pudo crear notificación de like:', notifErr.message);
+      }
+    }
+
     res.status(201).json({ message: 'like agregado' });
   } catch (err) {
     res.status(400).json({ error: err.message });
