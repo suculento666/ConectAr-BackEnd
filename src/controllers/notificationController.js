@@ -1,5 +1,5 @@
 // notificationController.js - feed de notificaciones del usuario
-import { getNotificationsByUser, markNotificationAsRead } from '../repositories/notification.repository.js';
+import { getNotificationsByUser, markNotificationAsRead, getUnreadCount, markAllNotificationsAsRead } from '../repositories/notification.repository.js';
 
 /**
  * GET /api/notifications
@@ -33,4 +33,34 @@ const markAsRead = async (req, res) => {
   }
 };
 
-export { getNotifications, markAsRead };
+/**
+ * GET /api/notifications/unread-count
+ * Devuelve la cantidad de notificaciones no leídas del usuario.
+ * Usado por el badge del botón de notificaciones.
+ */
+const unreadCount = async (req, res) => {
+  try {
+    const result = await getUnreadCount(req.user.id);
+    res.status(200).json(result);
+  } catch (err) {
+    console.error('❌ GET /api/notifications/unread-count error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+/**
+ * PATCH /api/notifications/read-all
+ * Marca todas las notificaciones del usuario como leídas.
+ * Llamado cuando el usuario abre el panel de notificaciones.
+ */
+const markAllAsRead = async (req, res) => {
+  try {
+    const result = await markAllNotificationsAsRead(req.user.id);
+    res.status(200).json(result);
+  } catch (err) {
+    console.error('❌ PATCH /api/notifications/read-all error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export { getNotifications, markAsRead, unreadCount, markAllAsRead };

@@ -1,5 +1,5 @@
 // userController.js - maneja todo lo relacionado al usuario
-import { registerUser as registerUserService, loginUser as loginUserService, logoutUser as logoutUserService, getUsers, getUser, editUser, searchUsers, getUserParticipations, getAttendedEventsService } from '../services/user.service.js';
+import { registerUser as registerUserService, loginUser as loginUserService, logoutUser as logoutUserService, getUsers, getUser, editUser, searchUsers, getUserParticipations, getAttendedEventsService, forgotPassword as forgotPasswordService, resetPassword as resetPasswordService } from '../services/user.service.js';
 
 // POST /api/users/register - crea un usuario nuevo via Supabase Auth
 const registerUser = async (req, res) => {
@@ -106,4 +106,26 @@ const getAttendedEvents = async (req, res) => {
   }
 };
 
-export { registerUser, loginUser, logoutUser, getAllUsers, getUserById, updateUser, searchUsersByUsername, getUserEvents, getAttendedEvents, getSuggestedUsers };
+// POST /api/users/forgot-password - envía email para restablecer contraseña
+const forgotPassword = async (req, res) => {
+  try {
+    const { email, redirectTo } = req.body;
+    const result = await forgotPasswordService({ email, redirectTo });
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+// POST /api/users/reset-password - actualiza la contraseña con el token del email
+const resetPassword = async (req, res) => {
+  try {
+    const { access_token, newPassword } = req.body;
+    const result = await resetPasswordService({ accessToken: access_token, newPassword });
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+export { registerUser, loginUser, logoutUser, getAllUsers, getUserById, updateUser, searchUsersByUsername, getUserEvents, getAttendedEvents, getSuggestedUsers, forgotPassword, resetPassword };

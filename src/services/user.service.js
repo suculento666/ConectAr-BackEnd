@@ -1,5 +1,5 @@
 // Servicio User - lógica de negocio para usuarios
-import { signUp, signIn, signOut, getAllUsers, getUserById, updateUser, searchUsersByUsername, getUserEvents, getAttendedEvents } from '../repositories/user.repository.js';
+import { signUp, signIn, signOut, getAllUsers, getUserById, updateUser, searchUsersByUsername, getUserEvents, getAttendedEvents, sendPasswordReset, updatePassword } from '../repositories/user.repository.js';
 
 const registerUser = async ({ email, password, username, full_name, bio, avatar_url, birth_date }) => {
   if (!email || !password || !username || !full_name) {
@@ -73,4 +73,23 @@ const getAttendedEventsService = async (user_id) => {
   return await getAttendedEvents(user_id);
 };
 
-export { registerUser, loginUser, logoutUser, getUsers, getUser, editUser, searchUsers, getUserParticipations, getAttendedEventsService };
+// Envía el email de recuperación de contraseña
+const forgotPassword = async ({ email, redirectTo }) => {
+  if (!email) throw new Error('El email es obligatorio');
+  await sendPasswordReset({ email, redirectTo });
+  return { message: 'Si el email existe, recibirás un enlace para restablecer tu contraseña' };
+};
+
+// Actualiza la contraseña usando el access_token del link de recuperación
+const resetPassword = async ({ accessToken, newPassword }) => {
+  if (!accessToken || !newPassword) {
+    throw new Error('access_token y newPassword son obligatorios');
+  }
+  if (newPassword.length < 6) {
+    throw new Error('La contraseña debe tener al menos 6 caracteres');
+  }
+  await updatePassword({ accessToken, newPassword });
+  return { message: 'Contraseña actualizada correctamente' };
+};
+
+export { registerUser, loginUser, logoutUser, getUsers, getUser, editUser, searchUsers, getUserParticipations, getAttendedEventsService, forgotPassword, resetPassword };
