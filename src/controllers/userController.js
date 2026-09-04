@@ -1,6 +1,5 @@
 // userController.js - maneja todo lo relacionado al usuario
-import { registerUser as registerUserService, loginUser as loginUserService, logoutUser as logoutUserService, getUsers, getUser, editUser, searchUsers, getUserParticipations, getAttendedEventsService } from '../services/user.service.js';
-import supabase from '../configs/supabase.js';
+import { registerUser as registerUserService, loginUser as loginUserService, logoutUser as logoutUserService, getUsers, getUser, editUser, searchUsers, getUserParticipations, getAttendedEventsService, forgotPassword as forgotPasswordService, resetPassword as resetPasswordService } from '../services/user.service.js';
 
 // POST /api/users/register - crea un usuario nuevo via Supabase Auth
 const registerUser = async (req, res) => {
@@ -107,23 +106,26 @@ const getAttendedEvents = async (req, res) => {
   }
 };
 
-// POST /api/users/forgot-password — envía email de reset via Supabase Auth
+// POST /api/users/forgot-password - envía email para restablecer contraseña
 const forgotPassword = async (req, res) => {
   try {
-    const { email } = req.body;
-    if (!email) return res.status(400).json({ error: 'email es requerido' });
-
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: process.env.PASSWORD_RESET_REDIRECT_URL || 'http://localhost:5174/reset-password',
-    });
-
-    // Siempre respondemos 200 para no revelar si el email existe o no
-    if (error) console.error('⚠️ resetPasswordForEmail error:', error.message);
-
-    res.status(200).json({ message: 'Si el email está registrado, vas a recibir un enlace para restablecer tu contraseña.' });
+    const { email, redirectTo } = req.body;
+    const result = await forgotPasswordService({ email, redirectTo });
+    res.status(200).json(result);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(400).json({ error: err.message });
   }
 };
 
-export { registerUser, loginUser, logoutUser, getAllUsers, getUserById, updateUser, searchUsersByUsername, getUserEvents, getAttendedEvents, getSuggestedUsers, forgotPassword };
+// POST /api/users/reset-password - actualiza la contraseña con el token del email
+const resetPassword = async (req, res) => {
+  try {
+    const { access_token, newPassword } = req.body;
+    const result = await resetPasswordService({ accessToken: access_token, newPassword });
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+export { registerUser, loginUser, logoutUser, getAllUsers, getUserById, updateUser, searchUsersByUsername, getUserEvents, getAttendedEvents, getSuggestedUsers, forgotPassword, resetPassword };

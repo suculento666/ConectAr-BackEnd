@@ -6,7 +6,7 @@ import pool from '../configs/db.js';
  * Llamado internamente por otros repositorios/servicios cuando ocurre un evento.
  *
  * @param {string} user_id   - destinatario
- * @param {string} type      - 'like' | 'friend_request' | 'message'
+ * @param {string} type      - 'like' | 'friend_request' | 'new_message' | 'comment' | 'new_participant' | 'friend_accepted' | 'event_reminder'
  * @param {string} actor_id  - quién generó la acción
  * @param {string} [event_id] - evento relacionado (opcional)
  */
@@ -82,4 +82,32 @@ const markNotificationAsRead = async ({ notification_id, user_id }) => {
   return { message: 'Notificación marcada como leída' };
 };
 
-export { insertNotification, getNotificationsByUser, markNotificationAsRead };
+/**
+ * Cuenta las notificaciones no leídas de un usuario.
+ * Usado por el botón del front para mostrar el badge con el número.
+ */
+const getUnreadCount = async (user_id) => {
+  const { rows } = await pool.query(
+    `SELECT COUNT(*) AS count
+     FROM notifications
+     WHERE user_id = $1 AND read = false`,
+    [user_id]
+  );
+  return { count: parseInt(rows[0].count) };
+};
+
+/**
+ * Marca todas las notificaciones de un usuario como leídas.
+ * Llamado cuando el usuario abre el panel de notificaciones.
+ */
+const markAllNotificationsAsRead = async (user_id) => {
+  const { rowCount } = await pool.query(
+    `UPDATE notifications
+     SET read = true
+     WHERE user_id = $1 AND read = false`,
+    [user_id]
+  );
+  return { updated: rowCount };
+};
+
+export { insertNotification, getNotificationsByUser, markNotificationAsRead, getUnreadCount, markAllNotificationsAsRead };

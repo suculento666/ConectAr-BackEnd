@@ -1,12 +1,14 @@
 import express from 'express';
-import { getNotifications, markAsRead } from '../controllers/notificationController.js';
+import { getNotifications, markAsRead, unreadCount, markAllAsRead } from '../controllers/notificationController.js';
 import { authenticate } from '../middlewares/auth.js';
 
 const router = express.Router();
 
 router.use(authenticate);
 
-router.get('/',           getNotifications); // GET   /api/notifications
-router.patch('/:id/read', markAsRead);       // PATCH /api/notifications/:id/read
+router.get('/',               getNotifications); // GET   /api/notifications
+router.get('/unread-count',   unreadCount);      // GET   /api/notifications/unread-count
+router.patch('/read-all',     markAllAsRead);    // PATCH /api/notifications/read-all
+router.patch('/:id/read',     markAsRead);       // PATCH /api/notifications/:id/read
 
 export default router;

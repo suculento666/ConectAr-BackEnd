@@ -98,4 +98,27 @@ const getAttendedEvents = async (user_id) => {
   return rows;
 };
 
-export { signUp, signIn, signOut, getAllUsers, getUserById, updateUser, searchUsersByUsername, getUserEvents, getAttendedEvents };
+// Auth: envía email de recuperación de contraseña
+const sendPasswordReset = async ({ email, redirectTo }) => {
+  const redirect = redirectTo || `${process.env.FRONTEND_URL}/reset-password`;
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: redirect,
+  });
+  if (error) throw new Error(error.message);
+};
+
+// Auth: actualiza la contraseña del usuario usando su access_token de sesión
+const updatePassword = async ({ accessToken, newPassword }) => {
+  // Creamos un cliente con el token del usuario para actuar en su nombre
+  const { createClient } = await import('@supabase/supabase-js');
+  const userClient = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_ANON_KEY,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } }
+  );
+  const { data, error } = await userClient.auth.updateUser({ password: newPassword });
+  if (error) throw new Error(error.message);
+  return data;
+};
+
+export { signUp, signIn, signOut, getAllUsers, getUserById, updateUser, searchUsersByUsername, getUserEvents, getAttendedEvents, sendPasswordReset, updatePassword };

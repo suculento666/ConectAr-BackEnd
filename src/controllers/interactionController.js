@@ -146,6 +146,24 @@ const postComment = async (req, res) => {
     const { content } = req.body;
     if (!content || !content.trim()) return res.status(400).json({ error: 'El comentario no puede estar vacío' });
     const comment = await addComment({ user_id, event_id, content: content.trim() });
+
+    // Notificar al creador del evento, pero no si comentó su propio evento
+    try {
+      const event = await getEventById(event_id);
+      if (event && event.creator_id !== user_id) {
+        await insertNotification({
+          user_id:  event.creator_id,
+          type:     'comment',
+          actor_id: user_id,
+          event_id,
+        });
+        console.log(`🔔 Notificación de comentario creada → destinatario: ${event.creator_id}`);
+      }
+    } catch (notifErr) {
+      // No bloquear la respuesta si falla la notificación
+      console.error('⚠️  No se pudo crear notificación de comentario:', notifErr.message);
+    }
+
     res.status(201).json(comment);
   } catch (err) {
     res.status(400).json({ error: err.message });
