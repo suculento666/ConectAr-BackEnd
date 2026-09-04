@@ -81,8 +81,8 @@ if (new Date(event_date) < new Date()) {
   });
 };
 
-const getEvents = async (filters = {}) => {
-  return await getAllEvents(filters);
+const getEvents = async (filters = {}, user_id = null) => {
+  return await getAllEvents(filters, user_id);
 };
 
 const getEvent = async (id) => {

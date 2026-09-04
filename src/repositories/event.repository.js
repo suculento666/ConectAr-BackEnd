@@ -54,7 +54,7 @@ const createEvent = async ({
   return applyDefaultImage(data);
 };
 
-const getAllEvents = async (filters = {}) => {
+const getAllEvents = async (filters = {}, user_id = null) => {
   let query = supabase
     .from('events')
     .select(`
@@ -77,7 +77,20 @@ const getAllEvents = async (filters = {}) => {
   }
 
   if (filters.accessibility) {
-    query = query.eq('accessibility', filters.accessibility);
+    // Si filtra explícitamente por 'privado', solo mostrar los propios
+    if (filters.accessibility === 'privado') {
+      if (!user_id) return [];
+      query = query.eq('accessibility', 'privado').eq('creator_id', user_id);
+    } else {
+      query = query.eq('accessibility', filters.accessibility);
+    }
+  } else {
+    // Sin filtro: públicos + privados propios (si hay sesión)
+    if (user_id) {
+      query = query.or(`accessibility.eq.publico,and(accessibility.eq.privado,creator_id.eq.${user_id})`);
+    } else {
+      query = query.eq('accessibility', 'publico');
+    }
   }
 
   query = query
@@ -89,9 +102,10 @@ const getAllEvents = async (filters = {}) => {
   if (error) throw new Error(error.message);
 
   return data.map(event => ({
-  ...applyDefaultImage(event),
-  participant_count: event.event_participants?.[0]?.count || 0,
-  }))};
+    ...applyDefaultImage(event),
+    participant_count: event.event_participants?.[0]?.count || 0,
+  }));
+};;
 
 
   const getEventById = async (id) => {
@@ -311,6 +325,18 @@ const createFeedback = async ({
   return data;
 };
 
+// --- Eventos donde participan amigos del usuario ---
+
+/**
+ * Devuelve eventos futuros donde al menos un amigo aceptado participa o es creador.
+ * Excluye eventos privados de otros usuarios.
+ */
+const getFriendEvents = async (user_id) => {
+  const { data, error } = await supabase.rpc('get_friend_events', { p_user_id: user_id });
+  if (error) throw new Error(error.message);
+  return (data || []).map(applyDefaultImage);
+};
+
 export {
   createEvent,
   getAllEvents,
@@ -321,4 +347,5 @@ export {
   leaveEvent,
   getParticipants,
   createFeedback,
+  getFriendEvents,
 };

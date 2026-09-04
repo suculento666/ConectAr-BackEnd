@@ -1,32 +1,26 @@
 // eventController.js
 import {newEvent, getEvents, getEvent, editEvent, removeEvent, participateInEvent, cancelParticipation, getEventParticipants, submitFeedback,
 } from '../services/event.service.js';
+import { insertNotification } from '../repositories/notification.repository.js';
+import { getFriendEvents } from '../repositories/event.repository.js';
 
 // GET /api/events
 const getAllEvents = async (req, res) => {
   try {
-
     const { type, location, accessibility } = req.query;
 
     const filters = {};
+    if (type)          filters.event_type    = type.toLowerCase();
+    if (location)      filters.location      = location;
+    if (accessibility) filters.accessibility = accessibility;
 
-    if (type)
-      filters.event_type = type.toLowerCase();
+    // Extraer user_id del token si viene — sin obligar auth
+    const user_id = req.user?.id || null;
 
-    if (location)
-      filters.location = location;
-
-    if (accessibility)
-      filters.accessibility = accessibility;
-
-    const events = await getEvents(filters);
-
+    const events = await getEvents(filters, user_id);
     res.status(200).json(events);
-
   } catch (err) {
-    res.status(500).json({
-      error: err.message
-    });
+    res.status(500).json({ error: err.message });
   }
 };
 
@@ -100,18 +94,29 @@ const deleteEvent = async (req, res) => {
 // POST /api/events/:id/join
 const joinEvent = async (req, res) => {
   try {
+    const user_id  = req.user.id;
+    const event_id = req.params.id;
 
-    const participation = await participateInEvent({
-      user_id: req.user.id,
-      event_id: req.params.id
-    });
+    const participation = await participateInEvent({ user_id, event_id });
+
+    // Notificar al creador del evento, pero no si se anota él mismo
+    try {
+      const event = await getEvent(event_id);
+      if (event && event.creator_id !== user_id) {
+        await insertNotification({
+          user_id:  event.creator_id,
+          type:     'join',
+          actor_id: user_id,
+          event_id,
+        });
+      }
+    } catch (notifErr) {
+      console.error('⚠️ No se pudo crear notificación de join:', notifErr.message);
+    }
 
     res.status(201).json(participation);
-
   } catch (err) {
-    res.status(400).json({
-      error: err.message
-    });
+    res.status(400).json({ error: err.message });
   }
 };
 
@@ -170,4 +175,15 @@ const createFeedback = async (req, res) => {
   }
 };
 
-export {getAllEvents,getEventById,createEvent,updateEvent,deleteEvent,joinEvent,leaveEvent,getParticipants,createFeedback,};
+// GET /api/events/friends — eventos donde participan amigos del usuario logueado
+const friendEvents = async (req, res) => {
+  try {
+    const user_id = req.user.id;
+    const events  = await getFriendEvents(user_id);
+    res.status(200).json(events);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export {getAllEvents,getEventById,createEvent,updateEvent,deleteEvent,joinEvent,leaveEvent,getParticipants,createFeedback,friendEvents,};

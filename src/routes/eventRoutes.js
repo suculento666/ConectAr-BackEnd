@@ -2,17 +2,18 @@ import express from 'express';
 import {
   getAllEvents, getEventById, createEvent, updateEvent, deleteEvent,
   joinEvent, leaveEvent, getParticipants,
-  createFeedback,
+  createFeedback, friendEvents,
 } from '../controllers/eventController.js';
 import { like, unlike, eventLikes, save, unsave, bulkStatus, listComments, postComment, removeComment } from '../controllers/interactionController.js';
 import { listMessages, sendMessage, removeMessage } from '../controllers/chatController.js';
 import { participantAgeRanges } from '../controllers/statsController.js';
 import { rateEvent, updateRatingHandler, getAverage, getMyRating } from '../controllers/ratingController.js';
-import { authenticate } from '../middlewares/auth.js';  
+import { authenticate, optionalAuth } from '../middlewares/auth.js';  
 
 const router = express.Router();
 
-router.get('/', getAllEvents);
+router.get('/', optionalAuth, getAllEvents);
+router.get('/friends', authenticate, friendEvents);  // eventos donde participan amigos
 router.get('/:id', getEventById);
 router.post('/', authenticate, createEvent);
 router.put('/:id', authenticate, updateEvent);

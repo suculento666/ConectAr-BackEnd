@@ -23,6 +23,14 @@ const acceptRequest = async ({ user_id, friend_id }) => {
     [user_id, friend_id]
   );
   if (!rows[0]) throw new Error('No se encontró la solicitud para aceptar');
+
+  // Notificar al que envió la solicitud (user_id) que fue aceptado
+  pool.query(
+    `INSERT INTO notifications (user_id, type, actor_id)
+     VALUES ($1, 'friend_request_accepted', $2)`,
+    [user_id, friend_id]
+  ).catch(err => console.error('⚠️ No se pudo crear notificación de amistad aceptada:', err.message));
+
   return rows[0];
 };
 
@@ -158,6 +166,7 @@ const getPendingRequestsNew = async (user_id) => {
 /**
  * Aceptar solicitud por ID de fila (friendships.id).
  * Verifica que el receptor sea el usuario logueado.
+ * Emite notificación 'friend_request_accepted' al que envió la solicitud.
  */
 const acceptRequestById = async ({ friendship_id, current_user_id }) => {
   const { rows } = await pool.query(
@@ -170,6 +179,15 @@ const acceptRequestById = async ({ friendship_id, current_user_id }) => {
     [friendship_id, current_user_id]
   );
   if (!rows[0]) throw new Error('Solicitud no encontrada o no tenés permiso para aceptarla');
+
+  // Notificar al que envió la solicitud (user_id) que fue aceptado
+  const sender_id = rows[0].user_id;
+  pool.query(
+    `INSERT INTO notifications (user_id, type, actor_id)
+     VALUES ($1, 'friend_request_accepted', $2)`,
+    [sender_id, current_user_id]
+  ).catch(err => console.error('⚠️ No se pudo crear notificación de amistad aceptada:', err.message));
+
   return rows[0];
 };
 

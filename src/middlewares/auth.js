@@ -34,4 +34,28 @@ const authenticate = async (req, res, next) => {
   }
 };
 
-export { authenticate };
+/**
+ * Middleware opcional: si viene token lo valida y popula req.user,
+ * pero si no viene (o es inválido) deja pasar igual sin req.user.
+ * Útil para endpoints públicos que se comportan distinto con sesión.
+ */
+const optionalAuth = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return next(); // sin token, continuar sin req.user
+    }
+
+    const token = authHeader.split(' ')[1];
+    const { data } = await supabaseAuth.auth.getUser(token);
+
+    if (data?.user) {
+      req.user = data.user;
+    }
+    next();
+  } catch {
+    next(); // error silencioso, continuar sin req.user
+  }
+};
+
+export { authenticate, optionalAuth };

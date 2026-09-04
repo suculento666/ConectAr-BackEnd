@@ -1,5 +1,6 @@
 // userController.js - maneja todo lo relacionado al usuario
 import { registerUser as registerUserService, loginUser as loginUserService, logoutUser as logoutUserService, getUsers, getUser, editUser, searchUsers, getUserParticipations, getAttendedEventsService } from '../services/user.service.js';
+import supabase from '../configs/supabase.js';
 
 // POST /api/users/register - crea un usuario nuevo via Supabase Auth
 const registerUser = async (req, res) => {
@@ -106,4 +107,23 @@ const getAttendedEvents = async (req, res) => {
   }
 };
 
-export { registerUser, loginUser, logoutUser, getAllUsers, getUserById, updateUser, searchUsersByUsername, getUserEvents, getAttendedEvents, getSuggestedUsers };
+// POST /api/users/forgot-password — envía email de reset via Supabase Auth
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: 'email es requerido' });
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: process.env.PASSWORD_RESET_REDIRECT_URL || 'http://localhost:5174/reset-password',
+    });
+
+    // Siempre respondemos 200 para no revelar si el email existe o no
+    if (error) console.error('⚠️ resetPasswordForEmail error:', error.message);
+
+    res.status(200).json({ message: 'Si el email está registrado, vas a recibir un enlace para restablecer tu contraseña.' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export { registerUser, loginUser, logoutUser, getAllUsers, getUserById, updateUser, searchUsersByUsername, getUserEvents, getAttendedEvents, getSuggestedUsers, forgotPassword };

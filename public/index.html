@@ -343,6 +343,7 @@
     🔔 Notificaciones<span class="notif-badge" id="notifBadge"></span>
   </div>
   <div class="tab"                      onclick="switchTab('people')">👥 Amigos</div>
+  <div class="tab"                      onclick="switchTab('messages')">💬 Mensajes</div>
   <div class="tab"                      onclick="switchTab('search')">🔍 Buscar</div>
   <div class="tab"                      onclick="switchTab('stats')">📊 Estadísticas</div>
   <div class="tab"                      onclick="switchTab('auth')">🔐 Auth</div>
@@ -362,6 +363,9 @@
         <span class="chip chip-cul"        onclick="setFilter('cultura',this)">🎨 Cultura</span>
         <span class="chip chip-fie"        onclick="setFilter('fiesta',this)">🎉 Fiesta</span>
         <span class="chip chip-otr"        onclick="setFilter('otro',this)">📌 Otro</span>
+        <span class="chip" style="margin-left:0.5rem" onclick="setAccessFilter('publico',this)">🌐 Públicos</span>
+        <span class="chip" onclick="setAccessFilter('privado',this)">🔒 Mis privados</span>
+        <span class="chip" id="chip-friends" style="margin-left:0.5rem" onclick="toggleFriendsFilter(this)">👥 Con amigos</span>
       </div>
       <h3 id="feedCount"></h3>
       <button class="refresh-btn" onclick="loadFeed()">↻ Actualizar</button>
@@ -519,6 +523,9 @@
           <div class="auth-field"><label>Email</label><input id="authEmail" type="email" value="carlos.perez@gmail.com" /></div>
           <div class="auth-field"><label>Password</label><input id="authPassword" type="password" value="Pass1234!" /></div>
           <div class="auth-actions"><button class="btn-login" onclick="doLogin()">Iniciar sesión</button></div>
+          <div style="margin-top:0.8rem;text-align:center">
+            <button onclick="switchTab('forgotpw')" style="background:none;border:none;color:#7c6af7;font-size:0.78rem;cursor:pointer;text-decoration:underline">¿Olvidaste tu contraseña?</button>
+          </div>
         </div>
         <div id="authLoggedIn" style="display:none">
           <div class="session-box">
@@ -599,6 +606,14 @@
         <div class="route" onclick="goTester('GET','/api/users/me/likes','')"><span class="method GET">GET</span><span class="route-path">/api/users/me/likes</span><span class="route-desc">Mis likes</span></div>
         <div class="route" onclick="goTester('GET','/api/users/me/saves','')"><span class="method GET">GET</span><span class="route-path">/api/users/me/saves</span><span class="route-desc">Mis guardados</span></div>
       </div>
+      <div class="card">
+        <h2>💬 Mensajes directos</h2>
+        <div class="route" onclick="goTester('GET','/api/messages','')"><span class="method GET">GET</span><span class="route-path">/api/messages</span><span class="route-desc">Inbox</span></div>
+        <div class="route" onclick="goTester('GET','/api/messages/:userId','')"><span class="method GET">GET</span><span class="route-path">/api/messages/:userId</span><span class="route-desc">Conversación</span></div>
+        <div class="route" onclick="goTester('POST','/api/messages/:userId',JSON.stringify({content:'Hola!'},null,2))"><span class="method POST">POST</span><span class="route-path">/api/messages/:userId</span><span class="route-desc">Enviar mensaje</span></div>
+        <div class="route" onclick="goTester('DELETE','/api/messages/:messageId','')"><span class="method DELETE">DEL</span><span class="route-path">/api/messages/:messageId</span><span class="route-desc">Eliminar mensaje</span></div>
+        <div class="route" onclick="goTester('POST','/api/users/forgot-password',JSON.stringify({email:'usuario@gmail.com'},null,2))"><span class="method POST">POST</span><span class="route-path">/api/users/forgot-password</span><span class="route-desc">Reset contraseña</span></div>
+      </div>
     </div>
   </div>
 </div>
@@ -623,6 +638,86 @@
         <div class="insert-btn" onclick="goTester('POST','/api/events',JSON.stringify({title:'Jam session de jazz',description:'Noche de improvisacion.',location:'San Telmo',event_date:'2026-12-22T21:00:00Z',event_type:'concierto',accessibility:'privado',max_participants:30},null,2))"><div class="ib-method"><span class="method POST">POST</span></div><div class="ib-label">Jam jazz</div><div class="ib-desc">concierto · privado · 30 cupos</div></div>
         <div class="insert-btn" onclick="goTester('POST','/api/events',JSON.stringify({title:'Workshop de fotografia',description:'Recorrido por microcentro.',location:'Microcentro',event_date:'2026-12-28T10:00:00Z',event_type:'cultura',accessibility:'publico',max_participants:15},null,2))"><div class="ib-method"><span class="method POST">POST</span></div><div class="ib-label">Workshop foto</div><div class="ib-desc">cultura · publico · 15 cupos</div></div>
         <div class="insert-btn" onclick="goTester('POST','/api/events',JSON.stringify({title:'Meetup de desarrollo web',description:'Charlas sobre React y Node.',location:'Online',event_date:'2027-01-05T19:00:00Z',event_type:'otro',accessibility:'publico',max_participants:100},null,2))"><div class="ib-method"><span class="method POST">POST</span></div><div class="ib-label">Meetup dev</div><div class="ib-desc">otro · publico · 100 cupos</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ TAB: OLVIDÉ MI CONTRASEÑA -->
+<div class="tab-content" id="tab-forgotpw">
+  <div class="page">
+    <div class="card auth-wrap">
+      <h2>🔑 Olvidé mi contraseña</h2>
+      <div style="padding:1.1rem">
+        <p style="font-size:0.8rem;color:#888;margin-bottom:1rem;line-height:1.5">Ingresá tu email y te vamos a mandar un enlace para restablecer tu contraseña.</p>
+        <div class="auth-field"><label>Email</label><input id="forgotEmail" type="email" placeholder="tu@email.com" /></div>
+        <div class="auth-actions">
+          <button class="btn-login" onclick="doForgotPassword()">Enviar enlace</button>
+        </div>
+        <div style="margin-top:0.7rem;text-align:center">
+          <button onclick="switchTab('auth')" style="background:none;border:none;color:#555;font-size:0.78rem;cursor:pointer;text-decoration:underline">← Volver al login</button>
+        </div>
+        <div class="auth-status" id="forgotStatus"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ TAB: MENSAJES DIRECTOS -->
+<div class="tab-content" id="tab-messages">
+  <div style="max-width:900px;margin:1.5rem auto;padding:0 1.5rem">
+
+    <!-- Sin sesión -->
+    <div id="dmNoAuth" style="text-align:center;padding:4rem 2rem;color:#555;display:none">
+      <div style="font-size:3rem;margin-bottom:1rem">💬</div>
+      <p>Iniciá sesión para ver tus mensajes.</p>
+    </div>
+
+    <!-- Layout chat -->
+    <div id="dmLayout" style="display:flex;height:580px;border:1px solid #2a2a3e;border-radius:14px;overflow:hidden;background:#0f0f13">
+
+      <!-- SIDEBAR izquierdo -->
+      <div style="width:300px;min-width:260px;border-right:1px solid #2a2a3e;display:flex;flex-direction:column;background:#13131a">
+        <div style="padding:0.85rem 1rem;border-bottom:1px solid #2a2a3e">
+          <div style="font-size:0.85rem;font-weight:700;color:#a89cf7;margin-bottom:0.65rem">💬 Mensajes</div>
+          <input id="dmSearchInput" type="text" placeholder="🔍 Buscar usuario..." oninput="dmSearchUsers()" style="width:100%;font-size:0.8rem;padding:0.42rem 0.7rem;background:#0f0f13;border:1px solid #2a2a3e;border-radius:8px;color:#e2e2e2" />
+        </div>
+        <!-- Resultados de búsqueda -->
+        <div id="dmSearchResults" style="display:none;border-bottom:1px solid #2a2a3e;max-height:220px;overflow-y:auto"></div>
+        <!-- Lista de conversaciones -->
+        <div id="dmInboxList" style="flex:1;overflow-y:auto">
+          <div style="text-align:center;padding:2rem;color:#555;font-size:0.8rem">Cargando...</div>
+        </div>
+      </div>
+
+      <!-- PANEL derecho: conversación -->
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+
+        <!-- Estado vacío (no hay conv seleccionada) -->
+        <div id="dmEmptyState" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#444">
+          <div style="font-size:3.5rem;margin-bottom:1rem">💬</div>
+          <p style="font-size:0.85rem">Seleccioná una conversación o buscá a alguien</p>
+        </div>
+
+        <!-- Conversación activa -->
+        <div id="dmConvPanel" style="display:none;flex:1;flex-direction:column;min-height:0">
+          <!-- Header -->
+          <div style="padding:0.85rem 1.1rem;border-bottom:1px solid #2a2a3e;display:flex;align-items:center;gap:0.75rem;background:#13131a;flex-shrink:0">
+            <div id="dmConvAvatar" style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#7c6af7,#4a3abf);display:flex;align-items:center;justify-content:center;font-size:0.82rem;font-weight:700;color:#fff;flex-shrink:0"></div>
+            <div>
+              <div id="dmConvName" style="font-size:0.9rem;font-weight:700;color:#e2e2e2"></div>
+              <div id="dmConvUser" style="font-size:0.72rem;color:#555"></div>
+            </div>
+          </div>
+          <!-- Mensajes -->
+          <div id="dmMessages" style="flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:0.5rem;min-height:0"></div>
+          <!-- Input -->
+          <div style="padding:0.75rem 1rem;border-top:1px solid #2a2a3e;display:flex;gap:0.6rem;flex-shrink:0;background:#13131a">
+            <input id="dmInput" type="text" placeholder="Escribí un mensaje..." onkeydown="if(event.key==='Enter')sendDMMessage()" style="flex:1;font-size:0.85rem;padding:0.5rem 0.85rem;border-radius:20px;background:#1e1e2e;border:1px solid #2a2a3e;color:#e2e2e2" />
+            <button onclick="sendDMMessage()" style="background:#7c6af7;color:#fff;border:none;border-radius:20px;padding:0.5rem 1.2rem;cursor:pointer;font-size:0.83rem;font-weight:600;white-space:nowrap;transition:background 0.15s" onmouseover="this.style.background='#6a58e0'" onmouseout="this.style.background='#7c6af7'">Enviar</button>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -722,7 +817,7 @@ fetch(BASE + '/api/events').then(function(r) {
 });
 
 // ── Tabs ───────────────────────────────────────────────────────────────────
-var TAB_NAMES = ['feed','create','myevents','likes','saves','notifications','people','search','stats','auth','routes','inserts','tester'];
+var TAB_NAMES = ['feed','create','myevents','likes','saves','notifications','people','messages','search','stats','auth','routes','inserts','tester'];
 function switchTab(name) {
   var tabs     = document.querySelectorAll('.tab');
   var contents = document.querySelectorAll('.tab-content');
@@ -737,6 +832,7 @@ function switchTab(name) {
   if (name === 'likes')         loadLikedEvents();
   if (name === 'saves')         loadSavedEvents();
   if (name === 'stats')         loadStats();
+  if (name === 'messages')      loadDMInbox();
 }
 function goTester(method, path, body) {
   switchTab('tester');
@@ -851,10 +947,44 @@ refreshAuthUI();
 
 // ── Feed ───────────────────────────────────────────────────────────────────
 var activeFilter = null;
+var activeAccessFilter = null;
+var activeFriendsFilter = false;
+
 function setFilter(type, chipEl) {
   activeFilter = type;
+  activeFriendsFilter = false;
+  document.getElementById('chip-friends').classList.remove('active');
   document.querySelectorAll('.filter-chips .chip').forEach(function(c){ c.classList.remove('active'); });
   chipEl.classList.add('active');
+  loadFeed();
+}
+function setAccessFilter(access, chipEl) {
+  activeFriendsFilter = false;
+  document.getElementById('chip-friends').classList.remove('active');
+  if (activeAccessFilter === access) {
+    activeAccessFilter = null;
+    chipEl.classList.remove('active');
+  } else {
+    activeAccessFilter = access;
+    document.querySelectorAll('.filter-chips .chip').forEach(function(c){
+      if (c.textContent.includes('Públicos') || c.textContent.includes('privados')) c.classList.remove('active');
+    });
+    chipEl.classList.add('active');
+  }
+  loadFeed();
+}
+function toggleFriendsFilter(chipEl) {
+  var token = sessionStorage.getItem('access_token');
+  if (!token) { switchTab('auth'); return; }
+  activeFriendsFilter = !activeFriendsFilter;
+  chipEl.classList.toggle('active', activeFriendsFilter);
+  // Limpiar otros filtros de accesibilidad cuando activamos amigos
+  if (activeFriendsFilter) {
+    activeAccessFilter = null;
+    document.querySelectorAll('.filter-chips .chip').forEach(function(c){
+      if (c.textContent.includes('Públicos') || c.textContent.includes('privados')) c.classList.remove('active');
+    });
+  }
   loadFeed();
 }
 function loadFeed() {
@@ -865,7 +995,15 @@ function loadFeed() {
   var token   = sessionStorage.getItem('access_token');
   grid.innerHTML = '<div class="feed-loading">Cargando eventos...</div>';
   count.textContent = '';
-  var url = BASE + '/api/events' + (activeFilter ? '?type='+activeFilter : '');
+  var url = BASE + '/api/events';
+  var params = [];
+  if (activeFriendsFilter) {
+    url = BASE + '/api/events/friends';
+  } else {
+    if (activeFilter)       params.push('type='+activeFilter);
+    if (activeAccessFilter) params.push('accessibility='+activeAccessFilter);
+    if (params.length)      url += '?' + params.join('&');
+  }
   Promise.all([
     fetch(url).then(function(r){ return r.json().then(function(d){ return {ok:r.ok,data:d}; }); }),
     userId ? fetch(BASE+'/api/users/'+userId+'/events').then(function(r){ return r.ok?r.json():[]; }).catch(function(){ return []; }) : Promise.resolve([])
@@ -1131,13 +1269,15 @@ function renderProfileModal(user, rel, friends, myId) {
       + '</div></div>';
   }
 
-  // Botón amistad
+  // Botón amistad + mensaje
   var btnHtml = '';
+  var msgBtn  = '';
   if (myId && myId !== user.id) {
     if (!rel||rel.status==='none')                                   btnHtml='<button class="btn-add-friend"    style="margin-top:1rem" id="profileFriendBtn" onclick="profileSendReq(\''+user.id+'\')">➕ Agregar amigo</button>';
     else if (rel.status==='pending'&&rel.direction==='sent')         btnHtml='<button class="btn-remove-friend" style="margin-top:1rem" id="profileFriendBtn" onclick="profileRemoveReq(\''+user.id+'\')">✕ Cancelar solicitud</button>';
     else if (rel.status==='pending'&&rel.direction==='received')     btnHtml='<button class="btn-add-friend"    style="margin-top:1rem" id="profileFriendBtn" onclick="profileAcceptReq(\''+user.id+'\')">✅ Aceptar solicitud</button>';
     else if (rel.status==='accepted')                                btnHtml='<button class="btn-remove-friend" style="margin-top:1rem" id="profileFriendBtn" onclick="profileRemoveReq(\''+user.id+'\')">✖ Eliminar amigo</button>';
+    msgBtn = '<button onclick="closeProfileModalDirect();switchTab(\'messages\');openDMConv(\''+user.id+'\',\''+escHtml(user.full_name||user.username)+'\')" style="margin-top:0.6rem;width:100%;padding:0.42rem;border-radius:6px;border:1px solid #7c6af744;background:#1e1e2e;color:#a89cf7;font-size:0.78rem;font-weight:600;cursor:pointer">💬 Enviar mensaje</button>';
   }
 
   content.innerHTML =
@@ -1148,7 +1288,8 @@ function renderProfileModal(user, rel, friends, myId) {
     + pills
     + achievements
     + friendsHtml
-    + btnHtml;
+    + btnHtml
+    + msgBtn;
 }
 
 function profileSendReq(friendId) {
@@ -1822,6 +1963,207 @@ document.addEventListener('keydown', function(e) {
 
 // Cargar Home al inicio
 loadFeed();
+
+// ── Mensajes directos ──────────────────────────────────────────────────────
+var dmCurrentUserId   = null;
+var dmCurrentUsername = null;
+var dmSearchTimeout   = null;
+
+function loadDMInbox() {
+  var token = sessionStorage.getItem('access_token');
+  var noAuth  = document.getElementById('dmNoAuth');
+  var layout  = document.getElementById('dmLayout');
+  if (!token) {
+    if (noAuth)  noAuth.style.display  = 'block';
+    if (layout)  layout.style.display  = 'none';
+    return;
+  }
+  if (noAuth)  noAuth.style.display  = 'none';
+  if (layout)  layout.style.display  = 'flex';
+
+  var list = document.getElementById('dmInboxList');
+  list.innerHTML = '<div style="text-align:center;padding:2rem;color:#555;font-size:0.78rem">Cargando...</div>';
+
+  fetch(BASE + '/api/messages', { headers: { 'Authorization': 'Bearer ' + token } })
+    .then(function(r){ return r.json().then(function(d){ return { ok: r.ok, data: d }; }); })
+    .then(function(res) {
+      if (!res.ok) { list.innerHTML = '<div style="padding:1.5rem;color:#555;font-size:0.78rem;text-align:center">'+( res.data.error||'Error')+'</div>'; return; }
+      if (!res.data.length) { list.innerHTML = '<div style="padding:2rem 1rem;color:#555;font-size:0.78rem;text-align:center">No tenés conversaciones todavía.<br>Buscá a alguien arriba para empezar.</div>'; return; }
+      list.innerHTML = '';
+      res.data.forEach(function(conv) {
+        var u  = conv.user;
+        var lm = conv.last_message;
+        var initials = (u.full_name||u.username||'?').split(' ').map(function(w){ return w[0]; }).join('').substring(0,2).toUpperCase();
+        var isActive = dmCurrentUserId === u.id;
+        var item = document.createElement('div');
+        item.id = 'dm-inbox-item-' + u.id;
+        item.style.cssText = 'display:flex;align-items:center;gap:0.65rem;padding:0.8rem 1rem;cursor:pointer;border-bottom:1px solid #1e1e2e;transition:background 0.12s;'+(isActive?'background:#1e1e2e':'');
+        item.onmouseover = function(){ if(dmCurrentUserId!==u.id) this.style.background='#16161e'; };
+        item.onmouseout  = function(){ if(dmCurrentUserId!==u.id) this.style.background=''; };
+        var av = u.avatar_url
+          ? '<img src="'+u.avatar_url+'" style="width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0" onerror="this.style.display=\'none\'">'
+          : '<div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#7c6af7,#4a3abf);display:flex;align-items:center;justify-content:center;font-size:0.82rem;font-weight:700;color:#fff;flex-shrink:0">'+initials+'</div>';
+        var unread = conv.unread_count > 0 ? '<span style="background:#7c6af7;color:#fff;font-size:0.6rem;font-weight:700;border-radius:999px;min-width:18px;height:18px;display:flex;align-items:center;justify-content:center;padding:0 4px;flex-shrink:0">'+conv.unread_count+'</span>' : '';
+        var preview = lm ? (lm.is_mine ? 'Vos: ' : '') + escHtml(lm.content.substring(0,35)) + (lm.content.length>35?'...':'') : '';
+        item.innerHTML = av
+          + '<div style="flex:1;min-width:0">'
+          +   '<div style="display:flex;align-items:center;justify-content:space-between;gap:0.4rem">'
+          +     '<span style="font-size:0.83rem;font-weight:600;color:#e2e2e2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(u.full_name||u.username)+'</span>'
+          +     (lm ? '<span style="font-size:0.68rem;color:#444;white-space:nowrap">'+timeAgo(lm.created_at)+'</span>' : '')
+          +   '</div>'
+          +   '<div style="display:flex;align-items:center;gap:0.35rem;margin-top:0.15rem">'
+          +     '<span style="font-size:0.74rem;color:#555;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1">'+preview+'</span>'
+          +     unread
+          +   '</div>'
+          + '</div>';
+        item.onclick = function(){ openDMConv(u.id, u.full_name||u.username, u.avatar_url); };
+        list.appendChild(item);
+      });
+    }).catch(function(err){ list.innerHTML = '<div style="padding:1rem;color:#f87171;font-size:0.78rem">Error: '+err.message+'</div>'; });
+}
+
+function openDMConv(userId, username, avatarUrl) {
+  if (!userId) return;
+  var token = sessionStorage.getItem('access_token');
+  if (!token) { switchTab('auth'); return; }
+  dmCurrentUserId   = userId;
+  dmCurrentUsername = username || 'Usuario';
+
+  // Actualizar highlight en sidebar
+  document.querySelectorAll('[id^="dm-inbox-item-"]').forEach(function(el){ el.style.background=''; });
+  var activeItem = document.getElementById('dm-inbox-item-' + userId);
+  if (activeItem) activeItem.style.background = '#1e1e2e';
+
+  // Mostrar panel conversación
+  document.getElementById('dmEmptyState').style.display  = 'none';
+  var panel = document.getElementById('dmConvPanel');
+  panel.style.display = 'flex';
+
+  // Header
+  var initials = (username||'?').split(' ').map(function(w){ return w[0]; }).join('').substring(0,2).toUpperCase();
+  var avEl = document.getElementById('dmConvAvatar');
+  avEl.innerHTML = avatarUrl
+    ? '<img src="'+avatarUrl+'" style="width:36px;height:36px;border-radius:50%;object-fit:cover" onerror="this.style.display=\'none\'">'
+    : initials;
+  if (!avatarUrl) avEl.style.background = 'linear-gradient(135deg,#7c6af7,#4a3abf)';
+  document.getElementById('dmConvName').textContent = username || 'Usuario';
+  document.getElementById('dmConvUser').textContent = '';
+
+  loadDMMessages();
+}
+
+function loadDMMessages() {
+  if (!dmCurrentUserId) return;
+  var token   = sessionStorage.getItem('access_token');
+  var userRaw = sessionStorage.getItem('session_user');
+  var myId    = userRaw ? JSON.parse(userRaw).id : null;
+  var box     = document.getElementById('dmMessages');
+  box.innerHTML = '<div style="text-align:center;color:#555;font-size:0.8rem;padding:2rem">Cargando...</div>';
+
+  fetch(BASE + '/api/messages/' + dmCurrentUserId, { headers: { 'Authorization': 'Bearer ' + token } })
+    .then(function(r){ return r.json().then(function(d){ return { ok: r.ok, data: d }; }); })
+    .then(function(res) {
+      if (!res.ok) { box.innerHTML = '<div style="text-align:center;color:#f87171;font-size:0.8rem;padding:2rem">Error: '+(res.data.error||'')+'</div>'; return; }
+      if (!res.data.length) { box.innerHTML = '<div style="text-align:center;color:#555;font-size:0.8rem;padding:2rem">No hay mensajes.<br>¡Mandá el primero! 👋</div>'; return; }
+      box.innerHTML = '';
+      res.data.forEach(function(msg) {
+        var isOwn = msg.sender_id === myId;
+        var bubble = document.createElement('div');
+        bubble.style.cssText = 'display:flex;flex-direction:'+(isOwn?'row-reverse':'row')+';align-items:flex-end;gap:0.45rem;margin-bottom:0.1rem';
+        var initials = (msg.sender.full_name||msg.sender.username||'?').split(' ').map(function(w){ return w[0]; }).join('').substring(0,2).toUpperCase();
+        var av = !isOwn ? (msg.sender.avatar_url
+          ? '<img src="'+msg.sender.avatar_url+'" style="width:26px;height:26px;border-radius:50%;object-fit:cover;flex-shrink:0" onerror="this.style.display=\'none\'">'
+          : '<div style="width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#7c6af7,#4a3abf);display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:700;color:#fff;flex-shrink:0">'+initials+'</div>'
+        ) : '';
+        bubble.innerHTML = av
+          + '<div style="max-width:68%;background:'+(isOwn?'#7c6af7':'#1e1e2e')+';border-radius:'+(isOwn?'16px 16px 4px 16px':'16px 16px 16px 4px')+';padding:0.5rem 0.85rem">'
+          +   '<div style="font-size:0.83rem;color:'+(isOwn?'#fff':'#ddd')+';line-height:1.45;word-break:break-word">'+escHtml(msg.content)+'</div>'
+          +   '<div style="font-size:0.62rem;color:'+(isOwn?'rgba(255,255,255,0.55)':'#444')+';margin-top:0.2rem;text-align:right">'+timeAgo(msg.created_at)+'</div>'
+          + '</div>';
+        box.appendChild(bubble);
+      });
+      box.scrollTop = box.scrollHeight;
+    }).catch(function(err){ box.innerHTML = '<div style="text-align:center;color:#f87171;font-size:0.8rem;padding:2rem">Error: '+err.message+'</div>'; });
+}
+
+function sendDMMessage() {
+  if (!dmCurrentUserId) return;
+  var token   = sessionStorage.getItem('access_token');
+  if (!token) return;
+  var input   = document.getElementById('dmInput');
+  var content = input.value.trim();
+  if (!content) return;
+  input.value = '';
+  fetch(BASE + '/api/messages/' + dmCurrentUserId, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+    body: JSON.stringify({ content: content })
+  }).then(function(r){ return r.json().then(function(d){ return { ok: r.ok, data: d }; }); })
+  .then(function(res) {
+    if (res.ok) { loadDMMessages(); loadDMInbox(); }
+    else { alert('Error: ' + (res.data.error||'No se pudo enviar')); }
+  }).catch(function(err){ alert('Error: ' + err.message); });
+}
+
+function dmSearchUsers() {
+  var q = document.getElementById('dmSearchInput').value.trim();
+  var resultsDiv = document.getElementById('dmSearchResults');
+  clearTimeout(dmSearchTimeout);
+  if (!q) { resultsDiv.style.display = 'none'; resultsDiv.innerHTML = ''; return; }
+  dmSearchTimeout = setTimeout(function() {
+    fetch(BASE + '/api/users/search?q=' + encodeURIComponent(q))
+      .then(function(r){ return r.json(); })
+      .then(function(users) {
+        if (!Array.isArray(users)||!users.length) {
+          resultsDiv.innerHTML = '<div style="padding:0.75rem 1rem;font-size:0.78rem;color:#555">Sin resultados</div>';
+          resultsDiv.style.display = 'block'; return;
+        }
+        resultsDiv.style.display = 'block';
+        resultsDiv.innerHTML = users.slice(0,6).map(function(u) {
+          var initials = (u.full_name||u.username||'?').split(' ').map(function(w){ return w[0]; }).join('').substring(0,2).toUpperCase();
+          var av = u.avatar_url
+            ? '<img src="'+u.avatar_url+'" style="width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0">'
+            : '<div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#7c6af7,#4a3abf);display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;color:#fff;flex-shrink:0">'+initials+'</div>';
+          return '<div onclick="dmSearchSelect(\''+u.id+'\',\''+escHtml(u.full_name||u.username)+'\',\''+( u.avatar_url||'')+'\')" style="display:flex;align-items:center;gap:0.65rem;padding:0.65rem 1rem;cursor:pointer;transition:background 0.12s;border-bottom:1px solid #1e1e2e" onmouseover="this.style.background=\'#1e1e2e\'" onmouseout="this.style.background=\'\'">'
+            + av
+            + '<div><div style="font-size:0.82rem;font-weight:600;color:#e2e2e2">'+(u.full_name||u.username)+'</div><div style="font-size:0.72rem;color:#7c6af7">@'+u.username+'</div></div>'
+            + '</div>';
+        }).join('');
+      }).catch(function(){ resultsDiv.style.display='none'; });
+  }, 280);
+}
+
+function dmSearchSelect(userId, username, avatarUrl) {
+  document.getElementById('dmSearchInput').value = '';
+  document.getElementById('dmSearchResults').style.display = 'none';
+  document.getElementById('dmSearchResults').innerHTML = '';
+  openDMConv(userId, username, avatarUrl);
+}
+
+function escHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Olvidé mi contraseña ───────────────────────────────────────────────────
+function doForgotPassword() {
+  var email  = document.getElementById('forgotEmail').value.trim();
+  var status = document.getElementById('forgotStatus');
+  if (!email) { status.className='auth-status err'; status.textContent='⚠️ Ingresá tu email'; return; }
+  status.className='auth-status'; status.textContent='Enviando...'; status.style.display='block';
+  fetch(BASE + '/api/users/forgot-password', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email })
+  }).then(function(r){ return r.json().then(function(d){ return { ok: r.ok, data: d }; }); })
+  .then(function(res) {
+    status.className = 'auth-status ok';
+    status.textContent = '✅ ' + (res.data.message || 'Revisá tu email.');
+  }).catch(function(err){
+    status.className = 'auth-status err';
+    status.textContent = '❌ ' + err.message;
+  });
+}
 </script>
 </body>
 </html>
