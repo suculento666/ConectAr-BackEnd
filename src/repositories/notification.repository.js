@@ -12,8 +12,8 @@ import pool from '../configs/db.js';
  */
 const insertNotification = async ({ user_id, type, actor_id, event_id = null }) => {
   const { rows } = await pool.query(
-    `INSERT INTO notifications (user_id, type, actor_id, event_id)
-     VALUES ($1, $2, $3, $4)
+    `INSERT INTO notifications (user_id, type, actor_id, event_id, message)
+     VALUES ($1, $2, $3, $4, '')
      RETURNING *`,
     [user_id, type, actor_id, event_id]
   );

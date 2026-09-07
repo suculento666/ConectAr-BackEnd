@@ -4,7 +4,7 @@ import {
   saveEvent, unsaveEvent, getSavedEvents, getBulkSaveStatus,
   addComment, getComments, deleteComment,
 } from '../repositories/interaction.repository.js';
-import { getEventById } from '../repositories/event.repository.js';
+import pool from '../configs/db.js';
 import { insertNotification } from '../repositories/notification.repository.js';
 
 // POST /api/events/:id/like
@@ -15,29 +15,23 @@ const like = async (req, res) => {
 
     const result = await likeEvent({ user_id, event_id });
 
-    // Notificar al creador del evento, pero no si se likeó a sí mismo
-    // y solo si el like fue nuevo (no ya existente)
+    // Notificar al creador si el like fue nuevo y no es auto-like
     if (!result.already) {
-      try {
-        const event = await getEventById(event_id);
-        if (event && event.creator_id !== user_id) {
-          await insertNotification({
-            user_id:  event.creator_id,
-            type:     'like',
-            actor_id: user_id,
-            event_id,
-          });
-          console.log(`🔔 Notificación de like creada → destinatario: ${event.creator_id}`);
-        } else if (event && event.creator_id === user_id) {
-          console.log('ℹ️  Like propio — no se crea notificación');
-        }
-      } catch (notifErr) {
-        // No bloquear el like si falla la notificación
-        console.error('⚠️  No se pudo crear notificación de like:', notifErr.message);
-        console.error(notifErr.stack);
-      }
+      pool.query('SELECT creator_id FROM events WHERE id = $1', [event_id])
+        .then(({ rows }) => {
+          const creator_id = rows[0]?.creator_id;
+          console.log(`🔔 [like] event_id=${event_id} liker=${user_id} creator=${creator_id}`);
+          if (creator_id && creator_id !== user_id) {
+            return insertNotification({ user_id: creator_id, type: 'like', actor_id: user_id, event_id })
+              .then(() => console.log(`✅ [like] notificación insertada para ${creator_id}`))
+              .catch(err => console.error(`❌ [like] insertNotification falló:`, err.message));
+          } else {
+            console.log(`ℹ️  [like] auto-like o creator no encontrado — sin notificación`);
+          }
+        })
+        .catch(err => console.error('❌ [like] SELECT creator_id falló:', err.message));
     } else {
-      console.log('ℹ️  Like duplicado — no se crea notificación');
+      console.log(`ℹ️  [like] duplicado para event_id=${event_id} — sin notificación`);
     }
 
     res.status(201).json({ message: 'like agregado' });
@@ -147,22 +141,15 @@ const postComment = async (req, res) => {
     if (!content || !content.trim()) return res.status(400).json({ error: 'El comentario no puede estar vacío' });
     const comment = await addComment({ user_id, event_id, content: content.trim() });
 
-    // Notificar al creador del evento, pero no si comentó su propio evento
-    try {
-      const event = await getEventById(event_id);
-      if (event && event.creator_id !== user_id) {
-        await insertNotification({
-          user_id:  event.creator_id,
-          type:     'comment',
-          actor_id: user_id,
-          event_id,
-        });
-        console.log(`🔔 Notificación de comentario creada → destinatario: ${event.creator_id}`);
-      }
-    } catch (notifErr) {
-      // No bloquear la respuesta si falla la notificación
-      console.error('⚠️  No se pudo crear notificación de comentario:', notifErr.message);
-    }
+    // Notificar al creador si no es auto-comentario
+    pool.query('SELECT creator_id FROM events WHERE id = $1', [event_id])
+      .then(({ rows }) => {
+        const creator_id = rows[0]?.creator_id;
+        if (creator_id && creator_id !== user_id) {
+          return insertNotification({ user_id: creator_id, type: 'comment', actor_id: user_id, event_id });
+        }
+      })
+      .catch(err => console.error('⚠️ No se pudo crear notificación de comentario:', err.message));
 
     res.status(201).json(comment);
   } catch (err) {

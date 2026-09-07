@@ -1,5 +1,6 @@
 // Controller de mensajes directos (DMs)
 import { sendDM, getConversation, getInbox, markConversationRead, deleteDM } from '../repositories/dm.repository.js';
+import { insertNotification } from '../repositories/notification.repository.js';
 import pool from '../configs/db.js';
 
 /**
@@ -82,6 +83,11 @@ const send = async (req, res) => {
     }
 
     const message = await sendDM({ sender_id, receiver_id, content: content.trim() });
+
+    // Notificar al receptor de forma no bloqueante
+    insertNotification({ user_id: receiver_id, type: 'new_message', actor_id: sender_id })
+      .catch(err => console.error('⚠️ No se pudo crear notificación de mensaje:', err.message));
+
     res.status(201).json(message);
   } catch (err) {
     console.error('❌ POST /api/messages/:userId error:', err.message);

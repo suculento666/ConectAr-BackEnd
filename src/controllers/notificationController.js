@@ -9,6 +9,7 @@ import { getNotificationsByUser, markNotificationAsRead, getUnreadCount, markAll
 const getNotifications = async (req, res) => {
   try {
     const notifications = await getNotificationsByUser(req.user.id);
+    res.setHeader('Cache-Control', 'no-store');
     res.status(200).json(notifications);
   } catch (err) {
     console.error('❌ GET /api/notifications error:', err.message);
