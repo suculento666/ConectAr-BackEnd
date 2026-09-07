@@ -8,7 +8,8 @@ import { like, unlike, eventLikes, save, unsave, bulkStatus, listComments, postC
 import { listMessages, sendMessage, removeMessage } from '../controllers/chatController.js';
 import { participantAgeRanges } from '../controllers/statsController.js';
 import { rateEvent, updateRatingHandler, getAverage, getMyRating } from '../controllers/ratingController.js';
-import { authenticate, optionalAuth } from '../middlewares/auth.js';  
+import { inviteUser, listInvitations } from '../controllers/invitationController.js';
+import { authenticate, optionalAuth } from '../middlewares/auth.js';
 
 const router = express.Router();
 
@@ -23,6 +24,10 @@ router.delete('/:id', authenticate, deleteEvent);
 router.post('/:id/join', authenticate, joinEvent);
 router.delete('/:id/join', authenticate, leaveEvent);
 router.get('/:id/participants', getParticipants);
+
+// Invitaciones (solo eventos privados, solo el creador puede invitar)
+router.post('/:id/invite',       authenticate, inviteUser);
+router.get('/:id/invitations',   authenticate, listInvitations);
 
 router.post('/:id/feedback', authenticate, createFeedback);
 

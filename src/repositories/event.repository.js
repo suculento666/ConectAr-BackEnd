@@ -1,6 +1,7 @@
 // Repositorio Event - acceso a la base de datos (tablas: events, event_participants, feedback)
 import supabase from '../configs/supabase.js';
 import pool from '../configs/db.js';
+import { getInvitedEventIds } from './invitation.repository.js';
 
 // Imágenes por defecto según event_type
 const DEFAULT_IMAGES = {
@@ -56,6 +57,9 @@ const createEvent = async ({
 };
 
 const getAllEvents = async (filters = {}, user_id = null) => {
+  // Obtener event_ids donde el usuario tiene invitación (pending o accepted)
+  const invitedIds = user_id ? await getInvitedEventIds(user_id).catch(() => []) : [];
+
   let query = supabase
     .from('events')
     .select(`
@@ -78,17 +82,28 @@ const getAllEvents = async (filters = {}, user_id = null) => {
   }
 
   if (filters.accessibility) {
-    // Si filtra explícitamente por 'privado', solo mostrar los propios
+    // Si filtra explícitamente por 'privado', mostrar propios + invitados
     if (filters.accessibility === 'privado') {
       if (!user_id) return [];
-      query = query.eq('accessibility', 'privado').eq('creator_id', user_id);
+      if (invitedIds.length) {
+        query = query.eq('accessibility', 'privado')
+          .or(`creator_id.eq.${user_id},id.in.(${invitedIds.join(',')})`);
+      } else {
+        query = query.eq('accessibility', 'privado').eq('creator_id', user_id);
+      }
     } else {
       query = query.eq('accessibility', filters.accessibility);
     }
   } else {
-    // Sin filtro: públicos + privados propios (si hay sesión)
+    // Sin filtro: públicos + privados propios + privados con invitación
     if (user_id) {
-      query = query.or(`accessibility.eq.publico,and(accessibility.eq.privado,creator_id.eq.${user_id})`);
+      if (invitedIds.length) {
+        query = query.or(
+          `accessibility.eq.publico,and(accessibility.eq.privado,creator_id.eq.${user_id}),id.in.(${invitedIds.join(',')})`
+        );
+      } else {
+        query = query.or(`accessibility.eq.publico,and(accessibility.eq.privado,creator_id.eq.${user_id})`);
+      }
     } else {
       query = query.eq('accessibility', 'publico');
     }
@@ -102,11 +117,14 @@ const getAllEvents = async (filters = {}, user_id = null) => {
 
   if (error) throw new Error(error.message);
 
+  const invitedSet = new Set(invitedIds);
+
   return data.map(event => ({
     ...applyDefaultImage(event),
     participant_count: event.event_participants?.[0]?.count || 0,
+    is_invited: invitedSet.has(event.id) && event.creator_id !== user_id,
   }));
-};;
+};
 
 
   const getEventById = async (id) => {
