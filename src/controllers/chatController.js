@@ -32,7 +32,7 @@ const sendMessage = async (req, res) => {
     const event_id = req.params.id;
     const { content } = req.body;
 
-    if (!content || !content.trim()) {
+    if (!content || !content.trim()) { 
       return res.status(400).json({ error: 'El mensaje no puede estar vacío' });
     }
 

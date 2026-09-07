@@ -2,7 +2,7 @@ import express from 'express';
 import {
   getAllEvents, getEventById, createEvent, updateEvent, deleteEvent,
   joinEvent, leaveEvent, getParticipants,
-  createFeedback, friendEvents,
+  createFeedback, friendEvents, friendsAttending,
 } from '../controllers/eventController.js';
 import { like, unlike, eventLikes, save, unsave, bulkStatus, listComments, postComment, removeComment } from '../controllers/interactionController.js';
 import { listMessages, sendMessage, removeMessage } from '../controllers/chatController.js';
@@ -14,6 +14,7 @@ const router = express.Router();
 
 router.get('/', optionalAuth, getAllEvents);
 router.get('/friends', authenticate, friendEvents);  // eventos donde participan amigos
+router.get('/:id/friends-attending', authenticate, friendsAttending); // amigos que van a un evento
 router.get('/:id', getEventById);
 router.post('/', authenticate, createEvent);
 router.put('/:id', authenticate, updateEvent);

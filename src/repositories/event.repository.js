@@ -1,5 +1,6 @@
 // Repositorio Event - acceso a la base de datos (tablas: events, event_participants, feedback)
 import supabase from '../configs/supabase.js';
+import pool from '../configs/db.js';
 
 // Imágenes por defecto según event_type
 const DEFAULT_IMAGES = {
@@ -337,6 +338,28 @@ const getFriendEvents = async (user_id) => {
   return (data || []).map(applyDefaultImage);
 };
 
+/**
+ * Devuelve los amigos aceptados del usuario logueado que participan en el evento.
+ * @param {string} event_id
+ * @param {string} user_id  - usuario logueado
+ */
+const getFriendsAttending = async (event_id, user_id) => {
+  const { rows } = await pool.query(
+    `SELECT u.id, u.full_name AS name, u.avatar_url AS avatar
+     FROM friendships f
+     -- expandir la relación bidireccional: friend puede estar en user_id o friend_id
+     JOIN users u ON u.id = CASE
+       WHEN f.user_id   = $2 THEN f.friend_id
+       WHEN f.friend_id = $2 THEN f.user_id
+     END
+     JOIN event_participants ep ON ep.user_id = u.id AND ep.event_id = $1
+     WHERE f.status = 'accepted'
+       AND (f.user_id = $2 OR f.friend_id = $2)`,
+    [event_id, user_id]
+  );
+  return rows;
+};
+
 export {
   createEvent,
   getAllEvents,
@@ -348,4 +371,5 @@ export {
   getParticipants,
   createFeedback,
   getFriendEvents,
+  getFriendsAttending,
 };

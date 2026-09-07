@@ -2,7 +2,7 @@
 import {newEvent, getEvents, getEvent, editEvent, removeEvent, participateInEvent, cancelParticipation, getEventParticipants, submitFeedback,
 } from '../services/event.service.js';
 import { insertNotification } from '../repositories/notification.repository.js';
-import { getFriendEvents } from '../repositories/event.repository.js';
+import { getFriendEvents, getFriendsAttending } from '../repositories/event.repository.js';
 
 // GET /api/events
 const getAllEvents = async (req, res) => {
@@ -186,4 +186,16 @@ const friendEvents = async (req, res) => {
   }
 };
 
-export {getAllEvents,getEventById,createEvent,updateEvent,deleteEvent,joinEvent,leaveEvent,getParticipants,createFeedback,friendEvents,};
+// GET /api/events/:id/friends-attending
+const friendsAttending = async (req, res) => {
+  try {
+    const event_id = req.params.id;
+    const user_id  = req.user.id;
+    const friends  = await getFriendsAttending(event_id, user_id);
+    res.status(200).json({ event_id, friends, count: friends.length });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export {getAllEvents,getEventById,createEvent,updateEvent,deleteEvent,joinEvent,leaveEvent,getParticipants,createFeedback,friendEvents,friendsAttending,};

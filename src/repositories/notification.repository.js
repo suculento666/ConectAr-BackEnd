@@ -52,10 +52,11 @@ const getNotificationsByUser = async (user_id) => {
 
   return rows.map(r => ({
     id:         r.id,
-    type:       r.type,
+    type:       r.type === 'new_message' ? 'message' : r.type,
     read:       r.read,
     created_at: r.created_at,
     actor: r.actor_id ? {
+      id:         r.actor_id,
       full_name:  r.actor_full_name,
       username:   r.actor_username,
       avatar_url: r.actor_avatar_url,

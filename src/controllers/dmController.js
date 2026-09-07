@@ -1,5 +1,6 @@
 // Controller de mensajes directos (DMs)
 import { sendDM, getConversation, getInbox, markConversationRead, deleteDM } from '../repositories/dm.repository.js';
+import pool from '../configs/db.js';
 
 /**
  * GET /api/messages
@@ -63,6 +64,21 @@ const send = async (req, res) => {
 
     if (content.length > 2000) {
       return res.status(400).json({ error: 'El mensaje no puede superar los 2000 caracteres' });
+    }
+
+    // Verificar que los dos usuarios son amigos (amistad aceptada, bidireccional)
+    const { rows } = await pool.query(
+      `SELECT 1 FROM friendships
+       WHERE status = 'accepted'
+         AND (
+           (user_id = $1 AND friend_id = $2) OR
+           (user_id = $2 AND friend_id = $1)
+         )
+       LIMIT 1`,
+      [sender_id, receiver_id]
+    );
+    if (!rows.length) {
+      return res.status(403).json({ error: 'Solo podés enviar mensajes a tus amigos' });
     }
 
     const message = await sendDM({ sender_id, receiver_id, content: content.trim() });
