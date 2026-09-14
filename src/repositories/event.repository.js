@@ -269,17 +269,15 @@ const joinEvent = async ({ user_id, event_id }) => {
 };
 
 const leaveEvent = async ({ user_id, event_id }) => {
-  const { error } = await supabase
-    .from('event_participants')
-    .delete()
-    .eq('user_id', user_id)
-    .eq('event_id', event_id);
+  // Usamos pool (pg directo) para bypasear RLS — igual que joinEvent
+  const { rowCount } = await pool.query(
+    `DELETE FROM event_participants WHERE user_id = $1 AND event_id = $2`,
+    [user_id, event_id]
+  );
 
-  if (error) throw new Error(error.message);
+  if (!rowCount) throw new Error('No estabas anotado en este evento');
 
-  return {
-    message: 'Participación cancelada',
-  };
+  return { message: 'Participación cancelada' };
 };
 
 const getParticipants = async (event_id) => {
