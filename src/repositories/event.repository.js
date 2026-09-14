@@ -193,6 +193,32 @@ const deleteEvent = async (id, creator_id) => {
 
 const joinEvent = async ({ user_id, event_id }) => {
 
+  // Obtener el evento completo: accessibility, creator_id y max_participants
+  const { data: event, error: eventError } = await supabase
+    .from('events')
+    .select('accessibility, creator_id, max_participants')
+    .eq('id', event_id)
+    .single();
+
+  if (eventError || !event) {
+    throw new Error('Evento no encontrado');
+  }
+
+  // Si el evento es privado, verificar que el usuario es el creador o tiene invitación
+  if (event.accessibility === 'privado' && event.creator_id !== user_id) {
+    const { rows: invRows } = await pool.query(
+      `SELECT 1 FROM event_invitations
+       WHERE event_id = $1
+         AND invited_user_id = $2
+         AND status IN ('pending', 'accepted')
+       LIMIT 1`,
+      [event_id, user_id]
+    );
+    if (!invRows.length) {
+      throw new Error('No tenés permiso para unirte a este evento privado');
+    }
+  }
+
   // Verificar si ya participa
   const { data: existing } = await supabase
     .from('event_participants')
@@ -203,17 +229,6 @@ const joinEvent = async ({ user_id, event_id }) => {
 
   if (existing) {
     throw new Error('Ya estás anotado en este evento');
-  }
-
-  // Obtener capacidad del evento
-  const { data: event, error: eventError } = await supabase
-    .from('events')
-    .select('max_participants')
-    .eq('id', event_id)
-    .single();
-
-  if (eventError) {
-    throw new Error(eventError.message);
   }
 
   // Contar participantes actuales
@@ -267,39 +282,6 @@ const leaveEvent = async ({ user_id, event_id }) => {
   };
 };
 
-const FAKE_PARTICIPANTS = [
-  {
-    user_id: 'fake-1',
-    event_id: null,
-    joined_at: new Date().toISOString(),
-    users: { id: 'fake-1', username: 'martina_g',    full_name: 'Martina González', avatar_url: 'https://i.pravatar.cc/150?img=1', birth_date: '1998-03-12' },
-  },
-  {
-    user_id: 'fake-2',
-    event_id: null,
-    joined_at: new Date().toISOString(),
-    users: { id: 'fake-2', username: 'lucas_rr',     full_name: 'Lucas Ramírez',    avatar_url: 'https://i.pravatar.cc/150?img=2', birth_date: '2001-07-25' },
-  },
-  {
-    user_id: 'fake-3',
-    event_id: null,
-    joined_at: new Date().toISOString(),
-    users: { id: 'fake-3', username: 'sofi.lopez',   full_name: 'Sofía López',      avatar_url: 'https://i.pravatar.cc/150?img=3', birth_date: '1995-11-03' },
-  },
-  {
-    user_id: 'fake-4',
-    event_id: null,
-    joined_at: new Date().toISOString(),
-    users: { id: 'fake-4', username: 'tomifernandez',full_name: 'Tomás Fernández',  avatar_url: 'https://i.pravatar.cc/150?img=4', birth_date: '2000-01-18' },
-  },
-  {
-    user_id: 'fake-5',
-    event_id: null,
-    joined_at: new Date().toISOString(),
-    users: { id: 'fake-5', username: 'caro.diaz',    full_name: 'Carolina Díaz',    avatar_url: 'https://i.pravatar.cc/150?img=5', birth_date: '1993-06-30' },
-  },
-];
-
 const getParticipants = async (event_id) => {
   const { data, error } = await supabase
     .from('event_participants')
@@ -308,14 +290,7 @@ const getParticipants = async (event_id) => {
 
   if (error) throw new Error(error.message);
 
-  if (!data || data.length === 0) {
-    return FAKE_PARTICIPANTS.map((p) => ({
-      ...p,
-      event_id,
-    }));
-  }
-
-  return data;
+  return data || [];
 };
 
 // --- Feedback ---

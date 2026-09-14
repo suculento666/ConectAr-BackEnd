@@ -54,9 +54,12 @@ const getUserById = async (req, res) => {
   }
 };
 
-// PUT /api/users/:id - edita perfil
+// PUT /api/users/:id - edita perfil (solo el propio usuario)
 const updateUser = async (req, res) => {
   try {
+    if (req.user.id !== req.params.id) {
+      return res.status(403).json({ error: 'No podés modificar el perfil de otro usuario' });
+    }
     const user = await editUser(req.params.id, req.body);
     res.status(200).json(user);
   } catch (err) {

@@ -21,6 +21,6 @@ router.get('/:id/events/attended',  authenticate, getAttendedEvents);
 router.get('/:id/events',           getUserEvents);
 router.get('/:id/suggestions', getSuggestedUsers);
 router.get('/:id',       getUserById);
-router.put('/:id',       updateUser);
+router.put('/:id',       authenticate, updateUser);
 
 export default router;

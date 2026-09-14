@@ -10,6 +10,14 @@ const sendRequest = async ({ user_id, friend_id }) => {
      RETURNING *`,
     [user_id, friend_id]
   );
+
+  // Notificar al receptor de forma no bloqueante
+  pool.query(
+    `INSERT INTO notifications (user_id, type, actor_id)
+     VALUES ($1, 'friend_request', $2)`,
+    [friend_id, user_id]
+  ).catch(err => console.error('⚠️ No se pudo crear notificación de solicitud de amistad:', err.message));
+
   return rows[0];
 };
 
