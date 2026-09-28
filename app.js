@@ -9,6 +9,7 @@ import eventRoutes from './src/routes/eventRoutes.js';
 import friendshipRoutes from './src/routes/friendshipRoutes.js';
 import notificationRoutes from './src/routes/notificationRoutes.js';
 import dmRoutes from './src/routes/dmRoutes.js';
+import invitationRoutes from './src/routes/invitationRoutes.js';
 
 const app = express();
 
@@ -49,6 +50,7 @@ app.use('/api/events', eventRoutes);
 app.use('/api/friendships', friendshipRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/messages', dmRoutes);
+app.use('/api/invitations', invitationRoutes);
 
 // Verificar conexión con Supabase
 supabase.from('_test_').select('*').limit(1).then(({ error }) => {

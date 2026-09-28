@@ -1,5 +1,5 @@
 // Controller de invitaciones a eventos privados
-import { createInvitation, getInvitationsByEvent } from '../repositories/invitation.repository.js';
+import { createInvitation, getInvitationsByEvent, respondToInvitation, getMyInvitations } from '../repositories/invitation.repository.js';
 import { insertNotification } from '../repositories/notification.repository.js';
 
 /**
@@ -55,4 +55,58 @@ const listInvitations = async (req, res) => {
   }
 };
 
-export { inviteUser, listInvitations };
+/**
+ * GET /api/users/me/invitations
+ * Devuelve todas las invitaciones recibidas por el usuario logueado,
+ * con datos del evento embebidos.
+ */
+const myInvitations = async (req, res) => {
+  try {
+    const invitations = await getMyInvitations(req.user.id);
+    res.status(200).json(invitations);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+/**
+ * PATCH /api/invitations/:id/accept
+ * El usuario logueado acepta la invitación. No requiere body.
+ */
+const acceptInvitation = async (req, res) => {
+  try {
+    const invitation = await respondToInvitation({
+      invitation_id: req.params.id,
+      user_id:       req.user.id,
+      newStatus:     'accepted',
+    });
+    res.status(200).json(invitation);
+  } catch (err) {
+    const status = err.message.includes('no encontrada') ? 404
+                 : err.message.includes('permiso') ? 403
+                 : 400;
+    res.status(status).json({ error: err.message });
+  }
+};
+
+/**
+ * PATCH /api/invitations/:id/reject
+ * El usuario logueado rechaza la invitación. No requiere body.
+ */
+const rejectInvitation = async (req, res) => {
+  try {
+    const invitation = await respondToInvitation({
+      invitation_id: req.params.id,
+      user_id:       req.user.id,
+      newStatus:     'rejected',
+    });
+    res.status(200).json(invitation);
+  } catch (err) {
+    const status = err.message.includes('no encontrada') ? 404
+                 : err.message.includes('permiso') ? 403
+                 : 400;
+    res.status(status).json({ error: err.message });
+  }
+};
+
+export { inviteUser, listInvitations, myInvitations, acceptInvitation, rejectInvitation };

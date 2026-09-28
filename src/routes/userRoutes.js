@@ -3,6 +3,7 @@ import { registerUser, loginUser, logoutUser, getAllUsers, getUserById, updateUs
 import { validarRegistro, validarLogin } from '../middlewares/validaciones.js';
 import { authenticate } from '../middlewares/auth.js';
 import { myLikes, mySaves } from '../controllers/interactionController.js';
+import { myInvitations } from '../controllers/invitationController.js';
 import { eventsPerMonth } from '../controllers/statsController.js';
 
 const router = express.Router();
@@ -13,8 +14,9 @@ router.post('/logout',          authenticate,    logoutUser);
 router.post('/forgot-password',                  forgotPassword);
 router.post('/reset-password',                   resetPassword);
 router.get('/search',    searchUsersByUsername);
-router.get('/me/likes',  authenticate,   myLikes);
-router.get('/me/saves',  authenticate,   mySaves);
+router.get('/me/likes',        authenticate, myLikes);
+router.get('/me/saves',        authenticate, mySaves);
+router.get('/me/invitations',  authenticate, myInvitations);
 router.get('/',          getAllUsers);
 router.get('/:id/stats/events-per-month', eventsPerMonth);
 router.get('/:id/events/attended',  authenticate, getAttendedEvents);

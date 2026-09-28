@@ -7,7 +7,6 @@ import pool from '../configs/db.js';
  * o si quien invita no es el creador.
  */
 const createInvitation = async ({ event_id, invited_user_id, invited_by }) => {
-  // Verificar que el evento existe, es privado y que quien invita es el creador
   const { rows: evRows } = await pool.query(
     `SELECT creator_id, accessibility FROM events WHERE id = $1`,
     [event_id]
@@ -31,7 +30,6 @@ const createInvitation = async ({ event_id, invited_user_id, invited_by }) => {
  * Solo accesible por el creador del evento.
  */
 const getInvitationsByEvent = async ({ event_id, requester_id }) => {
-  // Verificar que quien consulta es el creador
   const { rows: evRows } = await pool.query(
     `SELECT creator_id FROM events WHERE id = $1`,
     [event_id]
@@ -71,6 +69,40 @@ const getInvitationsByEvent = async ({ event_id, requester_id }) => {
 };
 
 /**
+ * Actualiza el status de una invitación ('accepted' o 'rejected').
+ * Solo el usuario invitado puede responder su propia invitación.
+ * Lanza error si la invitación no existe, no le pertenece, o ya fue respondida.
+ */
+const respondToInvitation = async ({ invitation_id, user_id, newStatus }) => {
+  const { rows } = await pool.query(
+    `SELECT id, invited_user_id, status FROM event_invitations WHERE id = $1`,
+    [invitation_id]
+  );
+
+  if (!rows.length) throw new Error('Invitación no encontrada');
+
+  const inv = rows[0];
+
+  if (inv.invited_user_id !== user_id) {
+    throw new Error('No tenés permiso para responder esta invitación');
+  }
+
+  if (inv.status !== 'pending') {
+    throw new Error(`La invitación ya fue ${inv.status}`);
+  }
+
+  const { rows: updated } = await pool.query(
+    `UPDATE event_invitations
+     SET status = $1
+     WHERE id = $2
+     RETURNING id, event_id, invited_user_id, invited_by, status, created_at`,
+    [newStatus, invitation_id]
+  );
+
+  return updated[0];
+};
+
+/**
  * Devuelve los event_ids de eventos privados a los que el usuario fue invitado
  * (status pending o accepted). Usado por getAllEvents para ampliar visibilidad.
  */
@@ -84,4 +116,55 @@ const getInvitedEventIds = async (user_id) => {
   return rows.map(r => r.event_id);
 };
 
-export { createInvitation, getInvitationsByEvent, getInvitedEventIds };
+/**
+ * Devuelve todas las invitaciones recibidas por un usuario, con datos del evento embebidos.
+ */
+const getMyInvitations = async (user_id) => {
+  const { rows } = await pool.query(
+    `SELECT
+       ei.id,
+       ei.event_id,
+       ei.invited_user_id,
+       ei.invited_by,
+       ei.status,
+       ei.created_at,
+       e.id            AS ev_id,
+       e.title         AS ev_title,
+       e.event_date    AS ev_event_date,
+       e.location      AS ev_location,
+       e.image_url     AS ev_image_url,
+       e.event_type    AS ev_event_type,
+       e.accessibility AS ev_accessibility
+     FROM event_invitations ei
+     JOIN events e ON e.id = ei.event_id
+     WHERE ei.invited_user_id = $1
+     ORDER BY ei.created_at DESC`,
+    [user_id]
+  );
+
+  return rows.map(r => ({
+    id:              r.id,
+    event_id:        r.event_id,
+    invited_user_id: r.invited_user_id,
+    invited_by:      r.invited_by,
+    status:          r.status,
+    created_at:      r.created_at,
+    event: {
+      id:            r.ev_id,
+      title:         r.ev_title,
+      event_date:    r.ev_event_date,
+      location:      r.ev_location,
+      image_url:     r.ev_image_url,
+      event_type:    r.ev_event_type,
+      accessibility: r.ev_accessibility,
+    },
+  }));
+};
+
+export {
+  createInvitation,
+  getInvitationsByEvent,
+  respondToInvitation,
+  getInvitedEventIds,
+  getMyInvitations,
+};
