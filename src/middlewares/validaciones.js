@@ -59,15 +59,15 @@ const validarActualizacionUsuario = (req, res, next) => {
 const validarEvento = (req, res, next) => {
   const { title, event_date, event_type, accessibility } = req.body;
 
-  if (title == null || event_date == null || event_type == null || accessibility == null) 
- {
-    return res.status(400).json({ 
-      error: 'Todos los campos son obligatorios: title, event_date, event_type, accessibility' 
+  if (title == null || event_date == null || event_type == null || accessibility == null) {
+    return res.status(400).json({
+      error: 'Todos los campos son obligatorios: title, event_date, event_type, accessibility',
     });
   }
 
-  const tiposValidos = ['deporte', 'deportes', 'concierto', 'cultura', 'fiesta', 'otro'];
-  if (!tiposValidos.includes(event_type)) {
+  // Lista unificada con event.service.js — acepta plural para que el service lo normalice
+  const tiposValidos = ['deporte', 'deportes', 'concierto', 'conciertos', 'cultura', 'fiesta', 'fiestas', 'otro', 'otros'];
+  if (!tiposValidos.includes(event_type.toLowerCase().trim())) {
     return res.status(400).json({ error: 'event_type debe ser: deporte, concierto, cultura, fiesta u otro' });
   }
 

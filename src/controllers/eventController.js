@@ -2,7 +2,7 @@
 import {newEvent, getEvents, getEvent, editEvent, removeEvent, participateInEvent, cancelParticipation, getEventParticipants, submitFeedback,
 } from '../services/event.service.js';
 import { insertNotification } from '../repositories/notification.repository.js';
-import { getFriendEvents, getFriendsAttending } from '../repositories/event.repository.js';
+import { getFriendEvents, getFriendsAttending, shareEvent as shareEventRepo, getShareInfo as getShareInfoRepo } from '../repositories/event.repository.js';
 
 // GET /api/events
 const getAllEvents = async (req, res) => {
@@ -198,4 +198,28 @@ const friendsAttending = async (req, res) => {
   }
 };
 
-export {getAllEvents,getEventById,createEvent,updateEvent,deleteEvent,joinEvent,leaveEvent,getParticipants,createFeedback,friendEvents,friendsAttending,};
+// POST /api/events/:id/share — registra el share y devuelve link + conteo
+const shareEvent = async (req, res) => {
+  try {
+    const event_id = req.params.id;
+    const user_id  = req.user?.id || null;  // opcional: puede llamarse sin login
+    const result   = await shareEventRepo({ event_id, user_id });
+    res.status(200).json(result);
+  } catch (err) {
+    const status = err.message.includes('no encontrado') ? 404 : 500;
+    res.status(status).json({ error: err.message });
+  }
+};
+
+// GET /api/events/:id/share — devuelve link + conteo sin registrar
+const getShareInfo = async (req, res) => {
+  try {
+    const result = await getShareInfoRepo(req.params.id);
+    res.status(200).json(result);
+  } catch (err) {
+    const status = err.message.includes('no encontrado') ? 404 : 500;
+    res.status(status).json({ error: err.message });
+  }
+};
+
+export {getAllEvents,getEventById,createEvent,updateEvent,deleteEvent,joinEvent,leaveEvent,getParticipants,createFeedback,friendEvents,friendsAttending,shareEvent,getShareInfo,};

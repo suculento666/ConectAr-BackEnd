@@ -1,5 +1,7 @@
 // userController.js - maneja todo lo relacionado al usuario
 import { registerUser as registerUserService, loginUser as loginUserService, logoutUser as logoutUserService, getUsers, getUser, editUser, searchUsers, getUserParticipations, getAttendedEventsService, forgotPassword as forgotPasswordService, resetPassword as resetPasswordService } from '../services/user.service.js';
+import { getAchievements as fetchAchievements } from '../repositories/user.repository.js';
+import { getSuggestions } from '../repositories/people.repository.js';
 
 // POST /api/users/register - crea un usuario nuevo via Supabase Auth
 const registerUser = async (req, res) => {
@@ -81,7 +83,6 @@ const searchUsersByUsername = async (req, res) => {
 // GET /api/users/:id/suggestions - sugerencias de personas basadas en eventos compartidos
 const getSuggestedUsers = async (req, res) => {
   try {
-    const { getSuggestions } = await import('../repositories/people.repository.js');
     const suggestions = await getSuggestions(req.params.id);
     res.status(200).json(suggestions);
   } catch (err) {
@@ -131,4 +132,14 @@ const resetPassword = async (req, res) => {
   }
 };
 
-export { registerUser, loginUser, logoutUser, getAllUsers, getUserById, updateUser, searchUsersByUsername, getUserEvents, getAttendedEvents, getSuggestedUsers, forgotPassword, resetPassword };
+// GET /api/users/:id/achievements - logros del usuario calculados en tiempo real
+const getAchievements = async (req, res) => {
+  try {
+    const result = await fetchAchievements(req.params.id);
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export { registerUser, loginUser, logoutUser, getAllUsers, getUserById, updateUser, searchUsersByUsername, getUserEvents, getAttendedEvents, getSuggestedUsers, forgotPassword, resetPassword, getAchievements };

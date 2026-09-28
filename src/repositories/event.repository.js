@@ -351,6 +351,63 @@ const getFriendsAttending = async (event_id, user_id) => {
   return rows;
 };
 
+// --- Shares ---
+
+/**
+ * Registra un share del evento y devuelve la URL pública + conteo total.
+ * user_id es opcional (null si el usuario no está logueado).
+ */
+const shareEvent = async ({ event_id, user_id }) => {
+  // Verificar que el evento existe
+  const { rows: evRows } = await pool.query(
+    `SELECT id FROM events WHERE id = $1`,
+    [event_id]
+  );
+  if (!evRows.length) throw new Error('Evento no encontrado');
+
+  // Registrar el share
+  await pool.query(
+    `INSERT INTO event_shares (event_id, user_id) VALUES ($1, $2)`,
+    [event_id, user_id || null]
+  );
+
+  // Contar total de shares
+  const { rows: countRows } = await pool.query(
+    `SELECT COUNT(*)::int AS share_count FROM event_shares WHERE event_id = $1`,
+    [event_id]
+  );
+
+  const share_url = `${process.env.FRONTEND_URL}/events/${event_id}`;
+
+  return {
+    share_url,
+    share_count: countRows[0].share_count,
+  };
+};
+
+/**
+ * Devuelve la URL pública del evento y el conteo de shares sin registrar uno nuevo.
+ */
+const getShareInfo = async (event_id) => {
+  const { rows: evRows } = await pool.query(
+    `SELECT id FROM events WHERE id = $1`,
+    [event_id]
+  );
+  if (!evRows.length) throw new Error('Evento no encontrado');
+
+  const { rows: countRows } = await pool.query(
+    `SELECT COUNT(*)::int AS share_count FROM event_shares WHERE event_id = $1`,
+    [event_id]
+  );
+
+  const share_url = `${process.env.FRONTEND_URL}/events/${event_id}`;
+
+  return {
+    share_url,
+    share_count: countRows[0].share_count,
+  };
+};
+
 export {
   createEvent,
   getAllEvents,
@@ -363,4 +420,6 @@ export {
   createFeedback,
   getFriendEvents,
   getFriendsAttending,
+  shareEvent,
+  getShareInfo,
 };

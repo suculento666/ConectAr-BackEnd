@@ -1,6 +1,6 @@
 import express from 'express';
-import { registerUser, loginUser, logoutUser, getAllUsers, getUserById, updateUser, searchUsersByUsername, getUserEvents, getAttendedEvents, getSuggestedUsers, forgotPassword, resetPassword } from '../controllers/userController.js';
-import { validarRegistro, validarLogin } from '../middlewares/validaciones.js';
+import { registerUser, loginUser, logoutUser, getAllUsers, getUserById, updateUser, searchUsersByUsername, getUserEvents, getAttendedEvents, getSuggestedUsers, forgotPassword, resetPassword, getAchievements } from '../controllers/userController.js';
+import { validarRegistro, validarLogin, validarActualizacionUsuario } from '../middlewares/validaciones.js';
 import { authenticate } from '../middlewares/auth.js';
 import { myLikes, mySaves } from '../controllers/interactionController.js';
 import { myInvitations } from '../controllers/invitationController.js';
@@ -19,10 +19,11 @@ router.get('/me/saves',        authenticate, mySaves);
 router.get('/me/invitations',  authenticate, myInvitations);
 router.get('/',          getAllUsers);
 router.get('/:id/stats/events-per-month', eventsPerMonth);
+router.get('/:id/achievements',             getAchievements);
 router.get('/:id/events/attended',  authenticate, getAttendedEvents);
 router.get('/:id/events',           getUserEvents);
 router.get('/:id/suggestions', getSuggestedUsers);
 router.get('/:id',       getUserById);
-router.put('/:id',       authenticate, updateUser);
+router.put('/:id',       authenticate, validarActualizacionUsuario, updateUser);
 
 export default router;

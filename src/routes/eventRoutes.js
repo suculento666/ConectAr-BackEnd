@@ -3,6 +3,7 @@ import {
   getAllEvents, getEventById, createEvent, updateEvent, deleteEvent,
   joinEvent, leaveEvent, getParticipants,
   createFeedback, friendEvents, friendsAttending,
+  shareEvent, getShareInfo,
 } from '../controllers/eventController.js';
 import { like, unlike, eventLikes, save, unsave, bulkStatus, listComments, postComment, removeComment } from '../controllers/interactionController.js';
 import { listMessages, sendMessage, removeMessage } from '../controllers/chatController.js';
@@ -10,6 +11,7 @@ import { participantAgeRanges } from '../controllers/statsController.js';
 import { rateEvent, updateRatingHandler, getAverage, getMyRating } from '../controllers/ratingController.js';
 import { inviteUser, listInvitations } from '../controllers/invitationController.js';
 import { authenticate, optionalAuth } from '../middlewares/auth.js';
+import { validarEvento } from '../middlewares/validaciones.js';
 
 const router = express.Router();
 
@@ -17,7 +19,7 @@ router.get('/', optionalAuth, getAllEvents);
 router.get('/friends', authenticate, friendEvents);  // eventos donde participan amigos
 router.get('/:id/friends-attending', authenticate, friendsAttending); // amigos que van a un evento
 router.get('/:id', getEventById);
-router.post('/', authenticate, createEvent);
+router.post('/', authenticate, validarEvento, createEvent);
 router.put('/:id', authenticate, updateEvent);
 router.delete('/:id', authenticate, deleteEvent);
 
@@ -30,6 +32,10 @@ router.post('/:id/invite',       authenticate, inviteUser);
 router.get('/:id/invitations',   authenticate, listInvitations);
 
 router.post('/:id/feedback', authenticate, createFeedback);
+
+// Shares
+router.post('/:id/share', optionalAuth, shareEvent);  // registra share y devuelve link + conteo
+router.get('/:id/share',              getShareInfo);  // solo consulta, público
 
 // Likes
 router.get('/:id/like',    eventLikes);               // público
@@ -49,7 +55,7 @@ router.post('/:id/comments',                 authenticate, postComment);
 router.delete('/:id/comments/:comment_id',   authenticate, removeComment);
 
 // Chat grupal del evento
-router.get('/:id/chat',                      listMessages);
+router.get('/:id/chat',                      optionalAuth, listMessages);
 router.post('/:id/chat',                     authenticate, sendMessage);
 router.delete('/:id/chat/:message_id',       authenticate, removeMessage);
 

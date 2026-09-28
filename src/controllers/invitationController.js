@@ -22,7 +22,7 @@ const inviteUser = async (req, res) => {
     // Notificar al invitado de forma no bloqueante
     insertNotification({
       user_id:  invited_user_id,
-      type:     'event_reminder',   // tipo más cercano disponible en el enum
+      type:     'event_invitation',
       actor_id: invited_by,
       event_id,
     }).catch(err => console.error('⚠️ No se pudo crear notificación de invitación:', err.message));

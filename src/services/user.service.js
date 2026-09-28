@@ -52,9 +52,20 @@ const getUser = async (id) => {
   return await getUserById(id);
 };
 
+// Campos editables por el usuario — allowlist explícita para prevenir mass assignment
+const EDITABLE_USER_FIELDS = ['username', 'full_name', 'bio', 'avatar_url', 'birth_date'];
+
 const editUser = async (id, fields) => {
-  // No permitir cambiar xp ni level directamente
-  const { xp, level, ...safeFields } = fields;
+  // Solo permitir campos de la allowlist — descartar todo lo demás (id, xp, level, role, etc.)
+  const safeFields = {};
+  for (const key of EDITABLE_USER_FIELDS) {
+    if (fields[key] !== undefined) safeFields[key] = fields[key];
+  }
+
+  if (Object.keys(safeFields).length === 0) {
+    throw new Error(`No hay campos válidos para actualizar. Campos permitidos: ${EDITABLE_USER_FIELDS.join(', ')}`);
+  }
+
   return await updateUser(id, safeFields);
 };
 
