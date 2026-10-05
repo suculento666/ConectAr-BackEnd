@@ -135,6 +135,16 @@ const deleteMessage = async ({ message_id, user_id }) => {
   return { message: 'Mensaje eliminado' };
 };
 
-export { isParticipantOrCreator, createMessage, getMessages, deleteMessage };
+/**
+ * Devuelve la accesibilidad de un evento (público/privado).
+ * Se usa para decidir si se puede leer el chat sin autenticación.
+ */
+const getEventAccessibility = async (event_id) => {
+  const { rows } = await pool.query(
+    `SELECT accessibility FROM events WHERE id = $1`,
+    [event_id]
+  );
+  return rows[0]?.accessibility || null;
+};
 
 export { isParticipantOrCreator, createMessage, getMessages, deleteMessage, getEventAccessibility };

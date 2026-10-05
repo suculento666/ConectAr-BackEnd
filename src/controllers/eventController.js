@@ -1,12 +1,9 @@
 // eventController.js
 import {newEvent, getEvents, getEvent, editEvent, removeEvent, participateInEvent, cancelParticipation, getEventParticipants, submitFeedback,
 } from '../services/event.service.js';
-<<<<<<< HEAD
 import { evaluateAchievements } from '../services/achievement.service.js';
-=======
 import { insertNotification } from '../repositories/notification.repository.js';
 import { getFriendEvents, getFriendsAttending, shareEvent as shareEventRepo, getShareInfo as getShareInfoRepo } from '../repositories/event.repository.js';
->>>>>>> 792ff7548c78685d229b95f01c94963829c9b223
 
 // GET /api/events
 const getAllEvents = async (req, res) => {
@@ -31,15 +28,10 @@ const getAllEvents = async (req, res) => {
 // GET /api/events/:id
 const getEventById = async (req, res) => {
   try {
-
     const event = await getEvent(req.params.id);
-
     res.status(200).json(event);
-
   } catch (err) {
-    res.status(404).json({
-      error: err.message
-    });
+    res.status(404).json({ error: err.message });
   }
 };
 
@@ -63,51 +55,26 @@ const createEvent = async (req, res) => {
 // PUT /api/events/:id
 const updateEvent = async (req, res) => {
   try {
-
     const event = await editEvent(req.params.id, req.body, req.user.id);
-
     res.status(200).json(event);
-
   } catch (err) {
-    res.status(400).json({
-      error: err.message
-    });
+    res.status(400).json({ error: err.message });
   }
 };
 
 // DELETE /api/events/:id
 const deleteEvent = async (req, res) => {
   try {
-
-    const result = await removeEvent(
-      req.params.id,
-      req.user.id
-    );
-
+    const result = await removeEvent(req.params.id, req.user.id);
     res.status(200).json(result);
-
   } catch (err) {
-    res.status(400).json({
-      error: err.message
-    });
+    res.status(400).json({ error: err.message });
   }
 };
 
 // POST /api/events/:id/join
 const joinEvent = async (req, res) => {
   try {
-<<<<<<< HEAD
-    const participation = await participateInEvent({
-      user_id: req.user.id,
-      event_id: req.params.id
-    });
-    res.status(201).json(participation);
-
-    // Evaluar logros de participación (no bloquea la respuesta)
-    evaluateAchievements(req.user.id, 'join_count').catch((e) =>
-      console.error('⚠️ achievements join_count:', e.message)
-    );
-=======
     const user_id  = req.user.id;
     const event_id = req.params.id;
 
@@ -129,7 +96,11 @@ const joinEvent = async (req, res) => {
     }
 
     res.status(201).json(participation);
->>>>>>> 792ff7548c78685d229b95f01c94963829c9b223
+
+    // Evaluar logros de participación (no bloquea la respuesta)
+    evaluateAchievements(user_id, 'join_count').catch((e) =>
+      console.error('⚠️ achievements join_count:', e.message)
+    );
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -138,84 +109,46 @@ const joinEvent = async (req, res) => {
 // DELETE /api/events/:id/join
 const leaveEvent = async (req, res) => {
   try {
-
     const result = await cancelParticipation({
       user_id: req.user.id,
       event_id: req.params.id
     });
-
     res.status(200).json(result);
-
   } catch (err) {
-    res.status(400).json({
-      error: err.message
-    });
+    res.status(400).json({ error: err.message });
   }
 };
 
 // GET /api/events/:id/participants
 const getParticipants = async (req, res) => {
   try {
-
     const participants = await getEventParticipants(req.params.id);
-
     res.status(200).json(participants);
-
   } catch (err) {
-    res.status(500).json({
-      error: err.message
-    });
+    res.status(500).json({ error: err.message });
   }
 };
 
 // POST /api/events/:id/feedback
 const createFeedback = async (req, res) => {
   try {
-
     const { puntuacion, comentario } = req.body;
-
     const feedback = await submitFeedback({
       usuario_id: req.user.id,
       evento_id: req.params.id,
       puntuacion,
       comentario
     });
-
     res.status(201).json(feedback);
-
   } catch (err) {
-    res.status(400).json({
-      error: err.message
-    });
+    res.status(400).json({ error: err.message });
   }
 };
 
-<<<<<<< HEAD
-// GET /api/events/:id/share — devuelve el link compartible del evento
-const shareEvent = async (req, res) => {
-  try {
-    const event = await getEvent(req.params.id);
-    const baseUrl = process.env.FRONTEND_URL
-      ? process.env.FRONTEND_URL.split(',')[0].trim()
-      : 'http://localhost:5174';
-    const shareUrl = `${baseUrl}/events/${event.id}`;
-    res.status(200).json({
-      url: shareUrl,
-      title: event.title,
-      description: event.description || '',
-    });
-  } catch (err) {
-    res.status(404).json({ error: err.message });
-  }
-};
-
-export {getAllEvents,getEventById,createEvent,updateEvent,deleteEvent,joinEvent,leaveEvent,getParticipants,createFeedback,shareEvent};
-=======
 // GET /api/events/friends — eventos donde participan amigos del usuario logueado
 const friendEvents = async (req, res) => {
   try {
-    const user_id = req.user.id;
-    const events  = await getFriendEvents(user_id);
+    const events = await getFriendEvents(req.user.id);
     res.status(200).json(events);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -225,10 +158,8 @@ const friendEvents = async (req, res) => {
 // GET /api/events/:id/friends-attending
 const friendsAttending = async (req, res) => {
   try {
-    const event_id = req.params.id;
-    const user_id  = req.user.id;
-    const friends  = await getFriendsAttending(event_id, user_id);
-    res.status(200).json({ event_id, friends, count: friends.length });
+    const friends = await getFriendsAttending(req.params.id, req.user.id);
+    res.status(200).json({ event_id: req.params.id, friends, count: friends.length });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -238,7 +169,7 @@ const friendsAttending = async (req, res) => {
 const shareEvent = async (req, res) => {
   try {
     const event_id = req.params.id;
-    const user_id  = req.user?.id || null;  // opcional: puede llamarse sin login
+    const user_id  = req.user?.id || null;
     const result   = await shareEventRepo({ event_id, user_id });
     res.status(200).json(result);
   } catch (err) {
@@ -258,5 +189,4 @@ const getShareInfo = async (req, res) => {
   }
 };
 
-export {getAllEvents,getEventById,createEvent,updateEvent,deleteEvent,joinEvent,leaveEvent,getParticipants,createFeedback,friendEvents,friendsAttending,shareEvent,getShareInfo,};
->>>>>>> 792ff7548c78685d229b95f01c94963829c9b223
+export {getAllEvents, getEventById, createEvent, updateEvent, deleteEvent, joinEvent, leaveEvent, getParticipants, createFeedback, friendEvents, friendsAttending, shareEvent, getShareInfo};

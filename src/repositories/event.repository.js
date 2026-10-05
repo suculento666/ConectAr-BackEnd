@@ -219,53 +219,36 @@ const joinEvent = async ({ user_id, event_id }) => {
     }
   }
 
-  // Verificar si ya participa
-  const { data: existing } = await supabase
-    .from('event_participants')
-    .select('user_id')
-    .eq('user_id', user_id)
-    .eq('event_id', event_id)
-    .single();
-
-  if (existing) {
+  // Verificar si ya participa (via pool para bypasear RLS)
+  const { rows: existingRows } = await pool.query(
+    `SELECT 1 FROM event_participants WHERE user_id = $1 AND event_id = $2 LIMIT 1`,
+    [user_id, event_id]
+  );
+  if (existingRows.length) {
     throw new Error('Ya estás anotado en este evento');
   }
 
-  // Contar participantes actuales
-  const { count, error: countError } = await supabase
-    .from('event_participants')
-    .select('*', {
-      count: 'exact',
-      head: true,
-    })
-    .eq('event_id', event_id);
-
-  if (countError) {
-    throw new Error(countError.message);
-  }
+  // Contar participantes actuales (via pool)
+  const { rows: countRows } = await pool.query(
+    `SELECT COUNT(*) AS total FROM event_participants WHERE event_id = $1`,
+    [event_id]
+  );
+  const count = parseInt(countRows[0].total, 10);
 
   // Verificar límite
-  if (
-    event.max_participants &&
-    count >= event.max_participants
-  ) {
+  if (event.max_participants && count >= event.max_participants) {
     throw new Error('Sin cupos disponibles');
   }
 
-  const { data, error } = await supabase
-    .from('event_participants')
-    .insert([
-      {
-        user_id,
-        event_id,
-      },
-    ])
-    .select()
-    .single();
+  // INSERT via pool para bypasear RLS
+  const { rows } = await pool.query(
+    `INSERT INTO event_participants (user_id, event_id)
+     VALUES ($1, $2)
+     RETURNING *`,
+    [user_id, event_id]
+  );
 
-  if (error) throw new Error(error.message);
-
-  return data;
+  return rows[0];
 };
 
 const leaveEvent = async ({ user_id, event_id }) => {

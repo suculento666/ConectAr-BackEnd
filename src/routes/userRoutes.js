@@ -1,7 +1,7 @@
 import express from 'express';
 import { registerUser, loginUser, logoutUser, getAllUsers, getUserById, updateUser, searchUsersByUsername, getUserEvents, getAttendedEvents, getSuggestedUsers, forgotPassword, resetPassword } from '../controllers/userController.js';
 import { upload, uploadAvatar } from '../controllers/uploadController.js';
-import { getUserAchievements } from '../controllers/achievementController.js';
+import { getUserAchievements, syncAchievements } from '../controllers/achievementController.js';
 import { validarRegistro, validarLogin, validarActualizacionUsuario } from '../middlewares/validaciones.js';
 import { authenticate } from '../middlewares/auth.js';
 import { myLikes, mySaves } from '../controllers/interactionController.js';
@@ -22,7 +22,8 @@ router.get('/me/saves',         authenticate, mySaves);
 router.get('/me/invitations',   authenticate, myInvitations);
 router.get('/',                 getAllUsers);
 router.get('/:id/stats/events-per-month', eventsPerMonth);
-router.get('/:id/achievements', getUserAchievements);  // GET - logros del usuario (público)
+router.get('/:id/achievements',  getUserAchievements);                    // GET  - logros del usuario (público)
+router.post('/:id/achievements/sync', authenticate, syncAchievements);   // POST - sincronizar logros retroactivos
 router.get('/:id/events/attended', authenticate, getAttendedEvents);
 router.get('/:id/events',       getUserEvents);
 router.get('/:id/suggestions',  getSuggestedUsers);

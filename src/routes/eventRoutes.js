@@ -2,12 +2,8 @@ import express from 'express';
 import {
   getAllEvents, getEventById, createEvent, updateEvent, deleteEvent,
   joinEvent, leaveEvent, getParticipants,
-<<<<<<< HEAD
-  createFeedback, shareEvent,
-=======
   createFeedback, friendEvents, friendsAttending,
   shareEvent, getShareInfo,
->>>>>>> 792ff7548c78685d229b95f01c94963829c9b223
 } from '../controllers/eventController.js';
 import { like, unlike, eventLikes, save, unsave, bulkStatus, listComments, postComment, removeComment } from '../controllers/interactionController.js';
 import { listMessages, sendMessage, removeMessage } from '../controllers/chatController.js';
@@ -19,26 +15,21 @@ import { validarEvento } from '../middlewares/validaciones.js';
 
 const router = express.Router();
 
-router.get('/', optionalAuth, getAllEvents);
-router.get('/friends', authenticate, friendEvents);  // eventos donde participan amigos
-router.get('/:id/friends-attending', authenticate, friendsAttending); // amigos que van a un evento
-router.get('/:id', getEventById);
-<<<<<<< HEAD
-router.get('/:id/share', shareEvent);       // GET  - link compartible (público)
-router.post('/', authenticate, createEvent);
-=======
-router.post('/', authenticate, validarEvento, createEvent);
->>>>>>> 792ff7548c78685d229b95f01c94963829c9b223
-router.put('/:id', authenticate, updateEvent);
-router.delete('/:id', authenticate, deleteEvent);
+router.get('/',        optionalAuth, getAllEvents);
+router.get('/friends', authenticate, friendEvents);                      // eventos donde participan amigos
+router.get('/:id/friends-attending', authenticate, friendsAttending);   // amigos que van a un evento
+router.get('/:id',     getEventById);
+router.post('/',       authenticate, validarEvento, createEvent);
+router.put('/:id',     authenticate, updateEvent);
+router.delete('/:id',  authenticate, deleteEvent);
 
-router.post('/:id/join', authenticate, joinEvent);
+router.post('/:id/join',   authenticate, joinEvent);
 router.delete('/:id/join', authenticate, leaveEvent);
 router.get('/:id/participants', getParticipants);
 
-// Invitaciones (solo eventos privados, solo el creador puede invitar)
-router.post('/:id/invite',       authenticate, inviteUser);
-router.get('/:id/invitations',   authenticate, listInvitations);
+// Invitaciones (solo el creador puede invitar)
+router.post('/:id/invite',     authenticate, inviteUser);
+router.get('/:id/invitations', authenticate, listInvitations);
 
 router.post('/:id/feedback', authenticate, createFeedback);
 
@@ -47,7 +38,7 @@ router.post('/:id/share', optionalAuth, shareEvent);  // registra share y devuel
 router.get('/:id/share',              getShareInfo);  // solo consulta, público
 
 // Likes
-router.get('/:id/like',    eventLikes);               // público
+router.get('/:id/like',    eventLikes);
 router.post('/:id/like',   authenticate, like);
 router.delete('/:id/like', authenticate, unlike);
 
@@ -59,23 +50,23 @@ router.delete('/:id/save', authenticate, unsave);
 router.post('/bulk-status', authenticate, bulkStatus);
 
 // Comments
-router.get('/:id/comments',                  listComments);
-router.post('/:id/comments',                 authenticate, postComment);
-router.delete('/:id/comments/:comment_id',   authenticate, removeComment);
+router.get('/:id/comments',                listComments);
+router.post('/:id/comments',               authenticate, postComment);
+router.delete('/:id/comments/:comment_id', authenticate, removeComment);
 
 // Chat grupal del evento
-router.get('/:id/chat',                      optionalAuth, listMessages);
-router.post('/:id/chat',                     authenticate, sendMessage);
-router.delete('/:id/chat/:message_id',       authenticate, removeMessage);
+router.get('/:id/chat',              optionalAuth, listMessages);
+router.post('/:id/chat',             authenticate, sendMessage);
+router.delete('/:id/chat/:message_id', authenticate, removeMessage);
 
 // Estadísticas del evento (solo creador)
-router.get('/:id/stats/age-ranges',          authenticate, participantAgeRanges);
+router.get('/:id/stats/age-ranges', authenticate, participantAgeRanges);
 
-// Ratings (calificaciones)
+// Ratings
 // IMPORTANTE: /rating/me debe ir antes de /rating para que Express no lo trate como param
-router.get('/:id/rating/me',                 authenticate, getMyRating);        // GET  - calificación del usuario logueado
-router.get('/:id/rating',                    getAverage);                       // GET  - promedio y total (público)
-router.post('/:id/rating',                   authenticate, rateEvent);          // POST - crear calificación
-router.put('/:id/rating',                    authenticate, updateRatingHandler); // PUT  - actualizar calificación existente
+router.get('/:id/rating/me',  authenticate, getMyRating);
+router.get('/:id/rating',                   getAverage);
+router.post('/:id/rating',    authenticate, rateEvent);
+router.put('/:id/rating',     authenticate, updateRatingHandler);
 
 export default router;

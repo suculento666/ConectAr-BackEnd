@@ -58,7 +58,18 @@ export const getAchievements = async (user_id) => {
   return await getUserAchievements(user_id);
 };
 
-// Trae todos los logros posibles con flag de si el usuario los tiene
+// Evalúa TODOS los tipos de logros para un usuario y persiste los que cumple.
+// Útil para sincronizar logros de usuarios existentes que actuaron antes de que
+// el sistema de logros estuviera funcionando correctamente.
+export const syncAllAchievements = async (user_id) => {
+  const types = ['join_count', 'create_count', 'like_count', 'rate_count', 'profile_complete'];
+  const allUnlocked = [];
+  for (const type of types) {
+    const unlocked = await evaluateAchievements(user_id, type);
+    allUnlocked.push(...unlocked);
+  }
+  return allUnlocked;
+};
 export const getAllAchievementsWithStatus = async (user_id) => {
   const unlocked = await getUserAchievements(user_id);
   const unlockedIds = new Set(unlocked.map((a) => a.id));
