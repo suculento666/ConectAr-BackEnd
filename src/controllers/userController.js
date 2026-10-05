@@ -1,5 +1,6 @@
 // userController.js - maneja todo lo relacionado al usuario
 import { registerUser as registerUserService, loginUser as loginUserService, logoutUser as logoutUserService, getUsers, getUser, editUser, searchUsers, getUserParticipations, getAttendedEventsService } from '../services/user.service.js';
+import { evaluateAchievements } from '../services/achievement.service.js';
 
 // POST /api/users/register - crea un usuario nuevo via Supabase Auth
 const registerUser = async (req, res) => {
@@ -54,11 +55,19 @@ const getUserById = async (req, res) => {
   }
 };
 
-// PUT /api/users/:id - edita perfil
+// PUT /api/users/:id - edita perfil (solo el propio usuario)
 const updateUser = async (req, res) => {
   try {
+    if (req.user.id !== req.params.id) {
+      return res.status(403).json({ error: 'No podés editar el perfil de otro usuario' });
+    }
     const user = await editUser(req.params.id, req.body);
     res.status(200).json(user);
+
+    // Evaluar logro de perfil completo (no bloquea la respuesta)
+    evaluateAchievements(req.params.id, 'profile_complete').catch((e) =>
+      console.error('⚠️ achievements profile_complete:', e.message)
+    );
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -68,6 +77,7 @@ const updateUser = async (req, res) => {
 const searchUsersByUsername = async (req, res) => {
   try {
     const query = req.query.q || req.query.username;
+    if (!query) return res.status(400).json({ error: 'Parámetro q requerido' });
     const users = await searchUsers(query);
     res.status(200).json(users);
   } catch (err) {

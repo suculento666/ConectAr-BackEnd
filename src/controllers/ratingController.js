@@ -1,5 +1,6 @@
 // ratingController.js - calificaciones de eventos
 import { createRating, updateRating, getEventRating, getUserRating } from '../repositories/rating.repository.js';
+import { evaluateAchievements } from '../services/achievement.service.js';
 
 /**
  * POST /api/events/:id/rating
@@ -12,12 +13,18 @@ const rateEvent = async (req, res) => {
     const event_id = req.params.id;
     const { score } = req.body;
 
-    if (score == null || !Number.isInteger(Number(score)) || score < 1 || score > 5) {
+    const n = Number(score);
+    if (!Number.isInteger(n) || n < 1 || n > 5) {
       return res.status(400).json({ error: 'score debe ser un número entero entre 1 y 5' });
     }
 
-    const rating = await createRating({ event_id, user_id, score: Number(score) });
+    const rating = await createRating({ event_id, user_id, score: n });
     res.status(201).json(rating);
+
+    // Evaluar logros de rating (no bloquea la respuesta)
+    evaluateAchievements(user_id, 'rate_count').catch((e) =>
+      console.error('⚠️ achievements rate_count:', e.message)
+    );
   } catch (err) {
     if (err.message === 'Ya calificaste este evento') {
       return res.status(400).json({ error: err.message });
@@ -40,11 +47,12 @@ const updateRatingHandler = async (req, res) => {
     const event_id = req.params.id;
     const { score } = req.body;
 
-    if (score == null || !Number.isInteger(Number(score)) || score < 1 || score > 5) {
+    const n = Number(score);
+    if (!Number.isInteger(n) || n < 1 || n > 5) {
       return res.status(400).json({ error: 'score debe ser un número entero entre 1 y 5' });
     }
 
-    const rating = await updateRating({ event_id, user_id, score: Number(score) });
+    const rating = await updateRating({ event_id, user_id, score: n });
     res.status(200).json(rating);
   } catch (err) {
     if (err.message === 'No encontramos una calificación previa') {

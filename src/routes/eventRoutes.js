@@ -2,7 +2,7 @@ import express from 'express';
 import {
   getAllEvents, getEventById, createEvent, updateEvent, deleteEvent,
   joinEvent, leaveEvent, getParticipants,
-  createFeedback,
+  createFeedback, shareEvent,
 } from '../controllers/eventController.js';
 import { like, unlike, eventLikes, save, unsave, bulkStatus, listComments, postComment, removeComment } from '../controllers/interactionController.js';
 import { listMessages, sendMessage, removeMessage } from '../controllers/chatController.js';
@@ -14,6 +14,7 @@ const router = express.Router();
 
 router.get('/', getAllEvents);
 router.get('/:id', getEventById);
+router.get('/:id/share', shareEvent);       // GET  - link compartible (público)
 router.post('/', authenticate, createEvent);
 router.put('/:id', authenticate, updateEvent);
 router.delete('/:id', authenticate, deleteEvent);

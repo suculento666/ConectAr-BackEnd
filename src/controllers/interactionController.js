@@ -6,6 +6,7 @@ import {
 } from '../repositories/interaction.repository.js';
 import { getEventById } from '../repositories/event.repository.js';
 import { insertNotification } from '../repositories/notification.repository.js';
+import { evaluateAchievements } from '../services/achievement.service.js';
 
 // POST /api/events/:id/like
 const like = async (req, res) => {
@@ -41,6 +42,13 @@ const like = async (req, res) => {
     }
 
     res.status(201).json({ message: 'like agregado' });
+
+    // Evaluar logros de likes (no bloquea la respuesta)
+    if (!result.already) {
+      evaluateAchievements(user_id, 'like_count').catch((e) =>
+        console.error('⚠️ achievements like_count:', e.message)
+      );
+    }
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -84,6 +92,10 @@ const bulkStatus = async (req, res) => {
     const user_id   = req.user.id;
     const { event_ids } = req.body;
     if (!Array.isArray(event_ids)) return res.status(400).json({ error: 'event_ids debe ser un array' });
+    const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!event_ids.every((id) => UUID_RE.test(id))) {
+      return res.status(400).json({ error: 'Todos los event_ids deben ser UUIDs válidos' });
+    }
     const [likes, saves] = await Promise.all([
       getBulkLikeStatus({ user_id, event_ids }),
       getBulkSaveStatus({ user_id, event_ids }),

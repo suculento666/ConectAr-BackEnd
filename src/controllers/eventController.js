@@ -1,6 +1,7 @@
 // eventController.js
 import {newEvent, getEvents, getEvent, editEvent, removeEvent, participateInEvent, cancelParticipation, getEventParticipants, submitFeedback,
 } from '../services/event.service.js';
+import { evaluateAchievements } from '../services/achievement.service.js';
 
 // GET /api/events
 const getAllEvents = async (req, res) => {
@@ -48,19 +49,17 @@ const getEventById = async (req, res) => {
 // POST /api/events
 const createEvent = async (req, res) => {
   try {
-
     const creator_id = req.user.id;
-
     const {title, description, location, event_date, event_type, accessibility, max_participants, image_url } = req.body;
-
     const event = await newEvent({creator_id, title,description,location,event_date,event_type,accessibility,max_participants,image_url});
-
     res.status(201).json(event);
 
+    // Evaluar logros de creación (no bloquea la respuesta)
+    evaluateAchievements(creator_id, 'create_count').catch((e) =>
+      console.error('⚠️ achievements create_count:', e.message)
+    );
   } catch (err) {
-    res.status(400).json({
-      error: err.message
-    });
+    res.status(400).json({ error: err.message });
   }
 };
 
@@ -100,18 +99,18 @@ const deleteEvent = async (req, res) => {
 // POST /api/events/:id/join
 const joinEvent = async (req, res) => {
   try {
-
     const participation = await participateInEvent({
       user_id: req.user.id,
       event_id: req.params.id
     });
-
     res.status(201).json(participation);
 
+    // Evaluar logros de participación (no bloquea la respuesta)
+    evaluateAchievements(req.user.id, 'join_count').catch((e) =>
+      console.error('⚠️ achievements join_count:', e.message)
+    );
   } catch (err) {
-    res.status(400).json({
-      error: err.message
-    });
+    res.status(400).json({ error: err.message });
   }
 };
 
@@ -170,4 +169,22 @@ const createFeedback = async (req, res) => {
   }
 };
 
-export {getAllEvents,getEventById,createEvent,updateEvent,deleteEvent,joinEvent,leaveEvent,getParticipants,createFeedback,};
+// GET /api/events/:id/share — devuelve el link compartible del evento
+const shareEvent = async (req, res) => {
+  try {
+    const event = await getEvent(req.params.id);
+    const baseUrl = process.env.FRONTEND_URL
+      ? process.env.FRONTEND_URL.split(',')[0].trim()
+      : 'http://localhost:5174';
+    const shareUrl = `${baseUrl}/events/${event.id}`;
+    res.status(200).json({
+      url: shareUrl,
+      title: event.title,
+      description: event.description || '',
+    });
+  } catch (err) {
+    res.status(404).json({ error: err.message });
+  }
+};
+
+export {getAllEvents,getEventById,createEvent,updateEvent,deleteEvent,joinEvent,leaveEvent,getParticipants,createFeedback,shareEvent};
