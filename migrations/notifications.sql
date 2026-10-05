@@ -1,15 +1,17 @@
 -- Tabla: notifications
 -- Persiste notificaciones con estado read para poder marcarlas como leídas.
--- Tipos soportados: 'like', 'friend_request', 'message'
+-- Tipos soportados por el enum notification_type:
+--   'like', 'friend_request', 'new_message', 'comment',
+--   'new_participant', 'friend_accepted', 'event_reminder'
 
 CREATE TABLE IF NOT EXISTS notifications (
-  id         UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id    UUID        NOT NULL REFERENCES users(id)   ON DELETE CASCADE,
-  type       TEXT        NOT NULL CHECK (type IN ('like', 'friend_request', 'message')),
-  actor_id   UUID        REFERENCES users(id)            ON DELETE SET NULL,
-  event_id   UUID        REFERENCES events(id)           ON DELETE SET NULL,
-  read       BOOLEAN     NOT NULL DEFAULT false,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  id         UUID              PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id    UUID              NOT NULL REFERENCES users(id)   ON DELETE CASCADE,
+  type       notification_type NOT NULL,
+  actor_id   UUID              REFERENCES users(id)            ON DELETE SET NULL,
+  event_id   UUID              REFERENCES events(id)           ON DELETE SET NULL,
+  read       BOOLEAN           NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ       NOT NULL DEFAULT NOW()
 );
 
 -- Índice para traer notificaciones de un usuario ordenadas (query más frecuente)

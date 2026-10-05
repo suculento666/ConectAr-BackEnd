@@ -1,6 +1,12 @@
 // userController.js - maneja todo lo relacionado al usuario
+<<<<<<< HEAD
 import { registerUser as registerUserService, loginUser as loginUserService, logoutUser as logoutUserService, getUsers, getUser, editUser, searchUsers, getUserParticipations, getAttendedEventsService } from '../services/user.service.js';
 import { evaluateAchievements } from '../services/achievement.service.js';
+=======
+import { registerUser as registerUserService, loginUser as loginUserService, logoutUser as logoutUserService, getUsers, getUser, editUser, searchUsers, getUserParticipations, getAttendedEventsService, forgotPassword as forgotPasswordService, resetPassword as resetPasswordService } from '../services/user.service.js';
+import { getAchievements as fetchAchievements } from '../repositories/user.repository.js';
+import { getSuggestions } from '../repositories/people.repository.js';
+>>>>>>> 792ff7548c78685d229b95f01c94963829c9b223
 
 // POST /api/users/register - crea un usuario nuevo via Supabase Auth
 const registerUser = async (req, res) => {
@@ -59,7 +65,11 @@ const getUserById = async (req, res) => {
 const updateUser = async (req, res) => {
   try {
     if (req.user.id !== req.params.id) {
+<<<<<<< HEAD
       return res.status(403).json({ error: 'No podés editar el perfil de otro usuario' });
+=======
+      return res.status(403).json({ error: 'No podés modificar el perfil de otro usuario' });
+>>>>>>> 792ff7548c78685d229b95f01c94963829c9b223
     }
     const user = await editUser(req.params.id, req.body);
     res.status(200).json(user);
@@ -88,7 +98,6 @@ const searchUsersByUsername = async (req, res) => {
 // GET /api/users/:id/suggestions - sugerencias de personas basadas en eventos compartidos
 const getSuggestedUsers = async (req, res) => {
   try {
-    const { getSuggestions } = await import('../repositories/people.repository.js');
     const suggestions = await getSuggestions(req.params.id);
     res.status(200).json(suggestions);
   } catch (err) {
@@ -116,4 +125,36 @@ const getAttendedEvents = async (req, res) => {
   }
 };
 
-export { registerUser, loginUser, logoutUser, getAllUsers, getUserById, updateUser, searchUsersByUsername, getUserEvents, getAttendedEvents, getSuggestedUsers };
+// POST /api/users/forgot-password - envía email para restablecer contraseña
+const forgotPassword = async (req, res) => {
+  try {
+    const { email, redirectTo } = req.body;
+    const result = await forgotPasswordService({ email, redirectTo });
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+// POST /api/users/reset-password - actualiza la contraseña con el token del email
+const resetPassword = async (req, res) => {
+  try {
+    const { access_token, newPassword } = req.body;
+    const result = await resetPasswordService({ accessToken: access_token, newPassword });
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+// GET /api/users/:id/achievements - logros del usuario calculados en tiempo real
+const getAchievements = async (req, res) => {
+  try {
+    const result = await fetchAchievements(req.params.id);
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export { registerUser, loginUser, logoutUser, getAllUsers, getUserById, updateUser, searchUsersByUsername, getUserEvents, getAttendedEvents, getSuggestedUsers, forgotPassword, resetPassword, getAchievements };

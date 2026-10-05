@@ -1,9 +1,11 @@
 // chatController.js - chat grupal por evento
-import { isParticipantOrCreator, createMessage, getMessages, deleteMessage } from '../repositories/chat.repository.js';
+import { isParticipantOrCreator, createMessage, getMessages, deleteMessage, getEventAccessibility } from '../repositories/chat.repository.js';
 
 /**
  * GET /api/events/:id/chat
  * Trae los mensajes del chat de un evento.
+ * Eventos privados: solo participantes o el creador pueden leer.
+ * Eventos públicos: cualquier usuario autenticado puede leer.
  * Query params opcionales:
  *   - limit    (default 50, máx 100)
  *   - before_id (UUID, paginación hacia atrás)
@@ -13,10 +15,23 @@ const listMessages = async (req, res) => {
     const event_id  = req.params.id;
     const { limit, before_id } = req.query;
 
+    // Para eventos privados verificar membresía
+    const accessibility = await getEventAccessibility(event_id);
+    if (accessibility === 'privado') {
+      if (!req.user) {
+        return res.status(401).json({ error: 'Autenticación requerida para ver el chat de un evento privado' });
+      }
+      const allowed = await isParticipantOrCreator({ user_id: req.user.id, event_id });
+      if (!allowed) {
+        return res.status(403).json({ error: 'Solo los participantes del evento pueden ver el chat' });
+      }
+    }
+
     const messages = await getMessages({ event_id, limit, before_id });
     res.status(200).json(messages);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    const status = err.message.includes('no encontrado') ? 404 : 500;
+    res.status(status).json({ error: err.message });
   }
 };
 
@@ -32,7 +47,7 @@ const sendMessage = async (req, res) => {
     const event_id = req.params.id;
     const { content } = req.body;
 
-    if (!content || !content.trim()) {
+    if (!content || !content.trim()) { 
       return res.status(400).json({ error: 'El mensaje no puede estar vacío' });
     }
 

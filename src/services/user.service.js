@@ -1,5 +1,5 @@
 // Servicio User - lógica de negocio para usuarios
-import { signUp, signIn, signOut, getAllUsers, getUserById, updateUser, searchUsersByUsername, getUserEvents, getAttendedEvents } from '../repositories/user.repository.js';
+import { signUp, signIn, signOut, getAllUsers, getUserById, updateUser, searchUsersByUsername, getUserEvents, getAttendedEvents, sendPasswordReset, updatePassword } from '../repositories/user.repository.js';
 
 const registerUser = async ({ email, password, username, full_name, bio, avatar_url, birth_date }) => {
   if (!email || !password || !username || !full_name) {
@@ -52,9 +52,20 @@ const getUser = async (id) => {
   return await getUserById(id);
 };
 
+// Campos editables por el usuario — allowlist explícita para prevenir mass assignment
+const EDITABLE_USER_FIELDS = ['username', 'full_name', 'bio', 'avatar_url', 'birth_date'];
+
 const editUser = async (id, fields) => {
-  // No permitir cambiar xp ni level directamente
-  const { xp, level, ...safeFields } = fields;
+  // Solo permitir campos de la allowlist — descartar todo lo demás (id, xp, level, role, etc.)
+  const safeFields = {};
+  for (const key of EDITABLE_USER_FIELDS) {
+    if (fields[key] !== undefined) safeFields[key] = fields[key];
+  }
+
+  if (Object.keys(safeFields).length === 0) {
+    throw new Error(`No hay campos válidos para actualizar. Campos permitidos: ${EDITABLE_USER_FIELDS.join(', ')}`);
+  }
+
   return await updateUser(id, safeFields);
 };
 
@@ -73,4 +84,23 @@ const getAttendedEventsService = async (user_id) => {
   return await getAttendedEvents(user_id);
 };
 
-export { registerUser, loginUser, logoutUser, getUsers, getUser, editUser, searchUsers, getUserParticipations, getAttendedEventsService };
+// Envía el email de recuperación de contraseña
+const forgotPassword = async ({ email, redirectTo }) => {
+  if (!email) throw new Error('El email es obligatorio');
+  await sendPasswordReset({ email, redirectTo });
+  return { message: 'Si el email existe, recibirás un enlace para restablecer tu contraseña' };
+};
+
+// Actualiza la contraseña usando el access_token del link de recuperación
+const resetPassword = async ({ accessToken, newPassword }) => {
+  if (!accessToken || !newPassword) {
+    throw new Error('access_token y newPassword son obligatorios');
+  }
+  if (newPassword.length < 6) {
+    throw new Error('La contraseña debe tener al menos 6 caracteres');
+  }
+  await updatePassword({ accessToken, newPassword });
+  return { message: 'Contraseña actualizada correctamente' };
+};
+
+export { registerUser, loginUser, logoutUser, getUsers, getUser, editUser, searchUsers, getUserParticipations, getAttendedEventsService, forgotPassword, resetPassword };

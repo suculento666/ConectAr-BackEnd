@@ -136,3 +136,5 @@ const deleteMessage = async ({ message_id, user_id }) => {
 };
 
 export { isParticipantOrCreator, createMessage, getMessages, deleteMessage };
+
+export { isParticipantOrCreator, createMessage, getMessages, deleteMessage, getEventAccessibility };
