@@ -131,6 +131,8 @@ const forgotPassword = async (req, res) => {
 // POST /api/users/reset-password - actualiza la contraseña con el token del email
 const resetPassword = async (req, res) => {
   try {
+    console.log('reset-password body:', req.body);
+    console.log('access_token recibido:', req.body?.access_token);
     const { access_token, newPassword } = req.body;
     const result = await resetPasswordService({ accessToken: access_token, newPassword });
     res.status(200).json(result);

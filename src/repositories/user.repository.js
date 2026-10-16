@@ -107,17 +107,19 @@ const sendPasswordReset = async ({ email, redirectTo }) => {
   if (error) throw new Error(error.message);
 };
 
-// Auth: actualiza la contraseña del usuario usando su access_token de sesión
+// Auth: actualiza la contraseña del usuario usando su access_token de recuperación
 const updatePassword = async ({ accessToken, newPassword }) => {
-  const { createClient } = await import('@supabase/supabase-js');
-  const userClient = createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_ANON_KEY,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } }
-  );
-  const { data, error } = await userClient.auth.updateUser({ password: newPassword });
+  // 1. Verificar el token y obtener el usuario (no requiere sesión activa)
+  const { data: { user }, error: userError } = await supabase.auth.getUser(accessToken);
+  if (userError) throw new Error(userError.message);
+
+  // 2. Actualizar la contraseña con el admin client (service_role, no necesita sesión)
+  const { error } = await supabase.auth.admin.updateUserById(user.id, {
+    password: newPassword,
+  });
   if (error) throw new Error(error.message);
-  return data;
+
+  return { message: 'Contraseña actualizada correctamente' };
 };
 
 // --- Logros ---
