@@ -15,7 +15,13 @@ const app = express();
 
 // Middlewares
 app.use(helmet({
-  contentSecurityPolicy: false  // el panel HTML usa JS inline; la CSP lo bloquearía
+  contentSecurityPolicy: false,  // el panel HTML usa JS inline; la CSP lo bloquearía
+  // El backend es una API consumida entre orígenes (cross-origin) desde Vercel/localhost.
+  // Estos encabezados por defecto en "same-origin" bloquearían la lectura de
+  // las respuestas desde el frontend aunque el CORS esté bien configurado.
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  crossOriginOpenerPolicy: false,
+  crossOriginEmbedderPolicy: false,
 }));
 app.use(morgan('dev'));
 app.use(cors({
@@ -25,21 +31,35 @@ app.use(cors({
       'http://localhost:5174',
       'http://10.152.2.108:5174',
       'http://localhost:3000',
+      // Producción en Vercel (estable)
+      'https://conect-ar-front-end-xp8c-21w369i2g-conect-ar.vercel.app',
     ];
     const envOrigins = process.env.FRONTEND_URL
-      ? process.env.FRONTEND_URL.split(',').map(u => u.trim())
+      ? process.env.FRONTEND_URL.split(',').map(u => u.trim()).filter(Boolean)
       : [];
     const allowed = [...new Set([...baseOrigins, ...envOrigins])];
-    // Permitir también requests sin origin (ej: Postman, curl)
-    if (!origin || allowed.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('CORS: origen no permitido → ' + origin));
+
+    // Permitir peticiones sin origen (ej: Postman, curl, servidor a servidor)
+    if (!origin) {
+      return callback(null, true);
     }
+    if (allowed.includes(origin)) {
+      return callback(null, true);
+    }
+    // Permitir cualquier subdominio *.vercel.app del proyecto (vistas previas / despliegues)
+    if (/^https:\/\/[a-z0-9-]+\.vercel\.app$/.test(origin)) {
+      return callback(null, true);
+    }
+    // Origen no permitido: NO lanzamos error (evita un 500 sin encabezados CORS).
+    // Simplemente no agregamos los encabezados CORS y el navegador lo bloqueará.
+    callback(null, false);
   },
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
+  // Asegura respuestas correctas a las verificaciones previas (preflight) OPTIONS
+  optionsSuccessStatus: 204,
+  preflightContinue: false,
 }));
 app.use(express.json());
 app.use(express.static('public'));
